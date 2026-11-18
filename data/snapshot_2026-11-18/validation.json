@@ -1,0 +1,19 @@
+{
+  "stocks": 30,
+  "daily_price_rows": 13919,
+  "financial_observations": 816,
+  "last_daily_price_date": "2026-11-17",
+  "issuer_supplements": [
+    "0981.HK",
+    "1347.HK",
+    "0992.HK",
+    "1698.HK",
+    "9618.HK"
+  ],
+  "metric_calculation": "deferred_to_chat_tools",
+  "limitations": [
+    "Vendor publication dates unavailable; not a fully point-in-time-verified dataset.",
+    "Issuer freshness review is selective, not exhaustive for all 30 companies.",
+    "Financial periods vary; use period and source columns before comparing."
+  ]
+}
