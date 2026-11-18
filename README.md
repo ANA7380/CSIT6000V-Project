@@ -1,20 +1,26 @@
 # Instruction for running locally on Windows using Deepseek API
 
 cd agent
-powershell -NoProfile -ExecutionPolicy Bypass -File .\start-local.ps1
+
+`powershell -NoProfile -ExecutionPolicy Bypass -File .\start-local.ps1`
 
 # Instruction for running on TACC
 
-cd qwen27b-student-release/qwen-public-serve
-tcloud submit
+`cd qwen27b-student-release/qwen-public-serve`
+
+`tcloud submit`
+
 ==AFTER QWEN STARTED==
-cd ../../agent
 
-printf '%s\n' 'http://SERVICE_HOST:8000/v1' > server-url.txt (e.g. ACTUAL_SERVICE_HOST=10.0.0.1)
-printf '%s\n' 'Show all four metrics for 0700.HK' > question.txt
-tcloud submit
+`cd ../../agent`
 
-tcloud cat "slurm_log/agent-${JOBID}.log"
+`printf '%s\n' 'http://SERVICE_HOST:8000/v1' > server-url.txt` (e.g. ACTUAL_SERVICE_HOST=10.0.0.1)
+
+`printf '%s\n' 'Show all four metrics for 0700.HK' > question.txt`
+
+`tcloud submit`
+
+`tcloud cat "slurm_log/agent-${JOBID}.log"`
 
 
 
