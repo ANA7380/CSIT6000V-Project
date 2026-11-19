@@ -26,42 +26,7 @@ HTTP 401 means check the key; 402 means check API balance; 429 means wait before
 
 Reference: https://api-docs.deepseek.com/quick_start
 
-## Standalone ticker calculations
 
-A deterministic Python agent for the 30 Hong Kong tickers in the supplied CSVs. It accepts a ticker and invokes financial and price calculations at runtime. No LLM, GPU, API key, network request, or third-party Python package is required. Requires Python 3.9 or later.
-
-The [agent data folder](agent/data/) contains byte-for-byte copies of the project's three CSVs and their original documentation. Original project data is untouched.
-
-Run the following from the `agent/` folder, locally or in a TACC terminal.
-
-```bash
-python agent.py
-python agent.py 0700.HK
-python agent.py 700 --window 60
-python agent.py --list
-python agent.py 700 --json
-```
-
-On this Windows workstation Python is available through uv; use `uv run --no-project python agent.py` if `python` is unavailable. Interactive mode accepts a ticker, `list`, and `quit`. Unknown tickers produce a clear error. Numeric HKEX codes, leading zeros, and case-insensitive `.HK` suffixes are accepted.
-
-## Submit to the course TACC environment
-
-Use Bash with your course `tcloud` account configured. On Windows, use your SDK-enabled WSL shell. Follow the [course setup guide](qwen27b-student-release/README.md) for `tcloud config` and `tcloud init`. If the shared proxy entry point is missing, run `bash setup-sdk-account.sh` from `agent/`.
-
-From the repository root, submit the Qwen service. Replace JOB_ID with the returned service job ID.
-
-```bash
-cd qwen27b-student-release/qwen-public-serve
-tcloud submit
-tcloud cat slurm_log/qwen-public-serve-JOB_ID.log
-```
-
-Wait for `Application startup complete`. Replace the example URL below with the log's `SERVICE_BASE_URL`.
-
-```bash
-cd ../../agent
-printf '%s\n' 'http://ACTUAL_SERVICE_HOST:8000/v1' > server-url.txt
-```
 
 ### Browser chat on TACC
 
@@ -103,6 +68,45 @@ tcloud cat "slurm_log/agent-YOUR_JOB_ID.log"
 The LLM answer appears in the client job log. Full results and tool calls are saved under `$TACC_USERDIR/ticker-metrics-results/job-JOB_ID.jsonl`. Batch jobs do not accept interactive stdin; change `question.txt` and resubmit for each new message. Each batch submission is a fresh conversation. Keep the model service running while clients execute, update the URL after restarting it, and stop it afterwards with `tcloud cancel -j SERVICE_JOB_ID`.
 
 In an interactive course compute allocation, source `/mnt/home/public/course-envs/CSIT6000V/project/activate.sh` and run `qwen-python chat_agent.py --provider qwen --base-url http://ACTUAL_SERVICE_HOST:8000/v1` for a multi-turn chat prompt. The service is internal to TACC; this command is not intended to connect directly from your Windows laptop. For proxy issues, use the same `no_proxy` settings as `job.sh`. Cluster execution has not been verified from this workstation.
+
+
+## Standalone ticker calculations (for playing around)
+
+A deterministic Python agent for the 30 Hong Kong tickers in the supplied CSVs. It accepts a ticker and invokes financial and price calculations at runtime. No LLM, GPU, API key, network request, or third-party Python package is required. Requires Python 3.9 or later.
+
+The [agent data folder](agent/data/) contains byte-for-byte copies of the project's three CSVs and their original documentation. Original project data is untouched.
+
+Run the following from the `agent/` folder, locally or in a TACC terminal.
+
+```bash
+python agent.py
+python agent.py 0700.HK
+python agent.py 700 --window 60
+python agent.py --list
+python agent.py 700 --json
+```
+
+On this Windows workstation Python is available through uv; use `uv run --no-project python agent.py` if `python` is unavailable. Interactive mode accepts a ticker, `list`, and `quit`. Unknown tickers produce a clear error. Numeric HKEX codes, leading zeros, and case-insensitive `.HK` suffixes are accepted.
+
+## Submit to the course TACC environment
+
+Use Bash with your course `tcloud` account configured. On Windows, use your SDK-enabled WSL shell. Follow the [course setup guide](qwen27b-student-release/README.md) for `tcloud config` and `tcloud init`. If the shared proxy entry point is missing, run `bash setup-sdk-account.sh` from `agent/`.
+
+From the repository root, submit the Qwen service. Replace JOB_ID with the returned service job ID.
+
+```bash
+cd qwen27b-student-release/qwen-public-serve
+tcloud submit
+tcloud cat slurm_log/qwen-public-serve-JOB_ID.log
+```
+
+Wait for `Application startup complete`. Replace the example URL below with the log's `SERVICE_BASE_URL`.
+
+```bash
+cd ../../agent
+printf '%s\n' 'http://ACTUAL_SERVICE_HOST:8000/v1' > server-url.txt
+```
+
 
 ## How the LLM uses tools
 
