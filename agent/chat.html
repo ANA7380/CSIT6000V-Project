@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HK Tech · Research chat</title>
+<style>
+* {box-sizing:border-box}
+body {margin:0;background:#f3f6f5;color:#182e2b;font:1rem/1.55 Inter,"Segoe UI",sans-serif}
+main {max-width:52rem;margin:auto;padding:clamp(1rem,4vw,3rem);display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+header {border-top:5px solid #176d58;border-bottom:1px solid #bccfc8;padding:1.5rem 0}
+h1 {font:500 clamp(2.1rem,5vw,3.5rem)/1.1 Georgia,serif;margin:0 0 .5rem;letter-spacing:-.035em}
+header p,label {margin:0;color:#435e55}
+#messages {flex:1;padding:1.5rem 0}
+article {margin:0 0 1rem;padding:1rem 1.25rem;border:1px solid #d4dfdb;background:white;border-radius:.75rem;white-space:pre-wrap;overflow-wrap:anywhere}
+article.user {margin-left:12%;background:#e1eee8}
+article strong {display:block;font-size:.88rem;color:#23604d;margin-bottom:.3rem}
+form {position:sticky;bottom:0;background:#f3f6f5;padding:.6rem 0 1rem}
+textarea {width:100%;resize:vertical;min-height:4rem;font:inherit;padding:.7rem;border:1px solid #88a49a;border-radius:.5rem}
+footer {display:flex;justify-content:space-between;align-items:center;gap:1rem}
+button {font:inherit;font-weight:600;background:#165e49;color:white;border:0;border-radius:.45rem;padding:.6rem 1.4rem;cursor:pointer}
+button:disabled {opacity:.6;cursor:wait}
+#status {font-size:.9rem}
+</style>
+<main>
+ <header><h1>HK Tech research chat</h1><p>Qwen · Hong Kong technology stocks · 18 Nov 2026 data snapshot</p></header>
+ <section id="messages" role="log" aria-label="Conversation"></section>
+ <form>
+  <label for="question">Your question</label>
+  <textarea id="question" required maxlength="8000" placeholder="Show all four metrics for 0700.HK"></textarea>
+  <footer><span id="status" role="status"></span><button type="submit">Send</button></footer>
+ </form>
+</main>
+<script>
+const session = crypto.randomUUID().replaceAll('-', '');
+const form = document.querySelector('form');
+const question = document.querySelector('#question');
+const button = document.querySelector('button');
+const statusText = document.querySelector('#status');
+let pending = null;
+function message(author, text) {
+  const card = document.createElement('article');
+  const label = document.createElement('strong');
+  label.textContent = author;
+  if (author === 'You') card.className = 'user';
+  card.append(label, document.createTextNode(text));
+  document.querySelector('#messages').append(card);
+  form.scrollIntoView({block:'end'});
+}
+form.onsubmit = async event => {
+  event.preventDefault();
+  const text = question.value.trim();
+  if (button.disabled || (!pending && !text)) return;
+  button.disabled = true;
+  question.disabled = true;
+  try {
+    if (!pending) {
+      statusText.textContent = 'Sending to TACC…';
+      const response = await fetch('/ask', {method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({session, question:text})});
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error);
+      pending = data.turn;
+      message('You', text);
+      question.value = '';
+    }
+    statusText.textContent = 'Waiting for Qwen…';
+    const deadline = Date.now() + 120000;
+    while (pending) {
+      await new Promise(resolve => setTimeout(resolve, 4000));
+      const response = await fetch('/reply/' + pending);
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error);
+      if (response.status === 202) {
+        if (Date.now() >= deadline) throw Error('Still waiting. Check both jobs with tcloud ps, then check again.');
+        continue;
+      }
+      pending = null;
+      if (data.error) {question.value = text; throw Error(data.error);}
+      message('Qwen', data.answer);
+      statusText.textContent = '';
+    }
+  } catch (error) {
+    statusText.textContent = error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = pending ? 'Check reply' : 'Send';
+    question.disabled = Boolean(pending);
+    if (!pending) question.focus();
+  }
+};
+question.onkeydown = event => {
+  if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+    event.preventDefault();
+    form.requestSubmit();
+  }
+};
+</script>
+</html>

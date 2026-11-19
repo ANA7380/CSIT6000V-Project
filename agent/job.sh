@@ -16,4 +16,9 @@ else
 fi
 export no_proxy="${no_proxy:+$no_proxy,}${service_host},127.0.0.1,localhost"
 export NO_PROXY="$no_proxy"
+if [[ ${1:-} == web ]]; then
+    umask 077
+    qwen-python -u web_worker.py
+    exit
+fi
 qwen-python -u chat_agent.py --provider qwen --prompt-file question.txt --log "$TACC_USERDIR/ticker-metrics-results/job-${SLURM_JOB_ID:-manual}.jsonl"
