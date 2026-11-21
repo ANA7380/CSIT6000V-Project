@@ -10,6 +10,8 @@ from qwen_client import chat, normalize_base_url
 from analysis_tools import AnalysisTools
 from tool_registry import TOOLS, validate
 
+MAX_STEPS = 12  # model calls allowed per question, including format retries
+
 SYSTEM = '''You are a financial CSV assistant.
 Use the language of the user's latest message unless they explicitly request another
 language. Apply this to the entire answer, including the final tool-results section
@@ -83,7 +85,8 @@ def parse_action(content):
     text = content.strip()
     if text.startswith('```') and text.endswith('```'):
         text = '\n'.join(text.splitlines()[1:-1])
-    action, end = json.JSONDecoder().raw_decode(text)
+    # strict=False accepts literal line breaks inside strings, which models often emit in long answers.
+    action, end = json.JSONDecoder(strict=False).raw_decode(text)
     if not isinstance(action, dict):
         raise ValueError('Expected a JSON object')
     if 'tool' in action:
@@ -157,7 +160,7 @@ class ChatAgent:
                          'model_seconds': round(counts['model_seconds'], 3),
                          'tool_seconds': round(counts['tool_seconds'], 3), **extra})
         try:
-            for _ in range(8):
+            for _ in range(MAX_STEPS):
                 called = time.perf_counter()
                 try:
                     response = self.call(self.messages, self.base_url, max_tokens=1800, temperature=0)
@@ -202,7 +205,7 @@ class ChatAgent:
                 counts['tool_seconds'] += seconds
                 self.record({'event': 'tool_result', **tool_result, 'seconds': round(seconds, 3)})
                 self.messages.append({'role': 'user', 'content': 'TOOL_RESULT\n' + json.dumps(tool_result, ensure_ascii=False)})
-            raise RuntimeError('Model exceeded 8 tool/format steps; simplify the question and retry.')
+            raise RuntimeError(f'Model exceeded {MAX_STEPS} tool/format steps; ask about fewer stocks at once and retry.')
         except Exception as exc:
             # A failed turn must not poison the next interactive turn.
             del self.messages[start:]

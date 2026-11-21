@@ -42,6 +42,7 @@ class ChatTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 parse_action(text)
         self.assertEqual(parse_action('```json\n{"answer":"OK"}\n```'), {'answer': 'OK'})
+        self.assertEqual(parse_action('{"answer":"line one\nline two"}'), {'answer': 'line one\nline two'})
 
     def test_tool_roundtrip(self):
         actions = iter([

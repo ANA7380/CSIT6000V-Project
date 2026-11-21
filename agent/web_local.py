@@ -31,7 +31,7 @@ class Local(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def valid_host(self):
-        return self.headers.get('Host') == self.server.address
+        return self.headers.get('Host') in self.server.hosts
 
     def do_GET(self):
         if not self.valid_host():
@@ -48,7 +48,7 @@ class Local(BaseHTTPRequestHandler):
         self.respond(200, result)
 
     def do_POST(self):
-        if (not self.valid_host() or self.headers.get('Origin') != 'http://' + self.server.address
+        if (not self.valid_host() or self.headers.get('Origin') != 'http://' + str(self.headers.get('Host'))
                 or self.headers.get_content_type() != 'application/json'):
             return self.respond(403, {'error': 'Open the printed localhost URL.'})
         if self.path != '/ask':
@@ -83,6 +83,7 @@ def build(provider, base_url, log_dir, port, call=None):
     page = page.replace('Qwen', label).replace('Sending to TACC…', 'Sending…')
     server = ThreadingHTTPServer(('127.0.0.1', port), Local)
     server.address = f'127.0.0.1:{server.server_port}'
+    server.hosts = {server.address, f'localhost:{server.server_port}'}  # loopback names only
     server.page = page.encode('utf-8')
     server.turns, sessions, locks = {}, {}, {}
 

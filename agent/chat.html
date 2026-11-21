@@ -14,6 +14,16 @@ header p,label {margin:0;color:#435e55}
 article {margin:0 0 1rem;padding:1rem 1.25rem;border:1px solid #d4dfdb;background:white;border-radius:.75rem;white-space:pre-wrap;overflow-wrap:anywhere}
 article.user {margin-left:12%;background:#e1eee8}
 article img {display:block;max-width:100%;height:auto;margin-top:.8rem;border:1px solid #d4dfdb;border-radius:.5rem}
+article .md {white-space:normal}
+article .md p {margin:0 0 .7rem}
+article .md h3 {font-size:1.02rem;margin:1rem 0 .4rem;color:#23604d}
+article .md ul,article .md ol {margin:0 0 .7rem;padding-left:1.4rem}
+article .md code {background:#eef3f1;padding:.05rem .3rem;border-radius:.25rem;font-size:.92em}
+article .md .scroll {overflow-x:auto;margin:0 0 .8rem}
+article .md table {border-collapse:collapse;font-size:.93rem;font-variant-numeric:tabular-nums}
+article .md th,article .md td {padding:.4rem .7rem;border-bottom:1px solid #d4dfdb;text-align:left;white-space:nowrap}
+article .md th {background:#e1eee8;color:#1c4a3c;font-weight:600}
+article .md tr:nth-child(even) td {background:#f7faf9}
 article strong {display:block;font-size:.88rem;color:#23604d;margin-bottom:.3rem}
 form {position:sticky;bottom:0;background:#f3f6f5;padding:.6rem 0 1rem}
 textarea {width:100%;resize:vertical;min-height:4rem;font:inherit;padding:.7rem;border:1px solid #88a49a;border-radius:.5rem}
@@ -38,12 +48,57 @@ const question = document.querySelector('#question');
 const button = document.querySelector('button');
 const statusText = document.querySelector('#status');
 let pending = null;
+// Small Markdown subset for model answers: tables, lists, headings, bold, code.
+// Text is escaped first, so nothing in an answer can become page markup.
+function markdown(text) {
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const inline = s => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+  const isRow = line => /^\s*\|.*\|\s*$/.test(line);
+  const isRule = line => /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(line);
+  const lines = text.split('\n');
+  let html = '', paragraph = [], i = 0;
+  const flush = () => { if (paragraph.length) html += '<p>' + paragraph.map(inline).join('<br>') + '</p>'; paragraph = []; };
+  while (i < lines.length) {
+    const line = lines[i];
+    if (isRow(line) && i + 1 < lines.length && isRule(lines[i + 1])) {
+      flush();
+      html += '<div class="scroll"><table><tr>' + cells(line).map(c => '<th>' + inline(c) + '</th>').join('') + '</tr>';
+      for (i += 2; i < lines.length && isRow(lines[i]); i++)
+        html += '<tr>' + cells(lines[i]).map(c => '<td>' + inline(c) + '</td>').join('') + '</tr>';
+      html += '</table></div>';
+      continue;
+    }
+    const bullet = /^\s*[-*•]\s+(.*)$/, number = /^\s*\d+[.)]\s+(.*)$/;
+    const kind = bullet.test(line) ? [bullet, 'ul'] : number.test(line) ? [number, 'ol'] : null;
+    if (kind) {
+      flush();
+      html += '<' + kind[1] + '>';
+      for (; i < lines.length && kind[0].test(lines[i]); i++) html += '<li>' + inline(lines[i].match(kind[0])[1]) + '</li>';
+      html += '</' + kind[1] + '>';
+      continue;
+    }
+    const heading = line.match(/^\s*#{1,6}\s+(.*)$/);
+    if (heading) { flush(); html += '<h3>' + inline(heading[1]) + '</h3>'; }
+    else if (!line.trim()) flush();
+    else paragraph.push(line);
+    i++;
+  }
+  flush();
+  return html;
+}
 function message(author, text, charts) {
   const card = document.createElement('article');
   const label = document.createElement('strong');
   label.textContent = author;
   if (author === 'You') card.className = 'user';
-  card.append(label, document.createTextNode(text));
+  if (author === 'You') card.append(label, document.createTextNode(text));
+  else {
+    const body = document.createElement('div');
+    body.className = 'md';
+    body.innerHTML = markdown(text);
+    card.append(label, body);
+  }
   for (const svg of charts || []) {
     // Shown as an image so markup inside a chart can never run as page script.
     const image = document.createElement('img');
