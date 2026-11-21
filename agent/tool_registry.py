@@ -21,8 +21,8 @@ TOOLS = {
         'parameters': {'ticker': 'string', 'other_ticker': 'string', 'window': 'integer:2:5000'}, 'required': ['ticker', 'other_ticker'],
         'example': {'ticker': '0700.HK', 'other_ticker': '9988.HK', 'window': 60}},
     'rank_stocks': {
-        'description': 'Screen all supported stocks, then return Top-K weighted percentile ranks. top_k defaults 5. weights defaults equal across revenue_growth, net_profit_margin, debt_to_equity, historical_volatility. Supply nonnegative weights for any subset. Higher growth/margin and lower debt/volatility score better. filters maps those same keys to min/max numeric bounds. Growth, margin and volatility are percent values (10 means 10%); debt is a multiple (0.5 means 0.5x). window defaults 252 for volatility. Missing required data excluded. No sector filters available.',
-        'parameters': {'top_k': 'integer:1:30', 'weights': 'object', 'filters': 'object', 'window': 'integer:2:5000'}, 'required': [],
+        'description': 'Set reuse_previous=true to keep last ranking parameters, overriding only supplied fields. Explicit filters={} clears filters. Screen all supported stocks, then return Top-K weighted percentile ranks. top_k defaults 5. weights defaults equal across revenue_growth, net_profit_margin, debt_to_equity, historical_volatility. Supply nonnegative weights for any subset. Higher growth/margin and lower debt/volatility score better. filters maps those same keys to min/max numeric bounds. Growth, margin and volatility are percent values (10 means 10%); debt is a multiple (0.5 means 0.5x). window defaults 252 for volatility. Missing required data excluded. No sector filters available.',
+        'parameters': {'reuse_previous': 'boolean', 'top_k': 'integer:1:30', 'weights': 'object', 'filters': 'object', 'window': 'integer:2:5000'}, 'required': [],
         'example': {'top_k': 5, 'weights': {'revenue_growth': 2, 'historical_volatility': 1}, 'filters': {'net_profit_margin': {'min': 0}, 'debt_to_equity': {'max': 1}}}},
 }
 
@@ -41,6 +41,8 @@ def validate(name, args):
         kind = spec['parameters'][key]
         if kind == 'string' and (not isinstance(value, str) or not value.strip()):
             raise ValueError(key + ' must be a nonempty string')
+        if kind == 'boolean' and type(value) is not bool:
+            raise ValueError(key + ' must be a boolean')
         if kind == 'object' and not isinstance(value, dict):
             raise ValueError(key + ' must be an object')
         if kind.startswith('integer:'):

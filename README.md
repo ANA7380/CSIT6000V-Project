@@ -1,5 +1,39 @@
 # An Explainable AI Agent for Stock Screening and Analysis
 
+## Implementation update on the proposal-completion branch
+
+This branch adds deterministic evidence tables, historical price/SMA and rolling-volatility charts, validated numerical presentation, reusable ranking preferences, multiple browser conversations, private restart snapshots, worker progress events, a local browser server, independent offline references and a genuine **no-tool** baseline runner. It keeps the original fixed CSVs and the single-agent architecture.
+
+Start an explicitly scripted preview without any model or key:
+
+```bash
+python3 agent/demo_web.py
+```
+
+Connect a real model from the repository root:
+
+```bash
+# Fill agent/server-url.txt with the actual /v1 URL, or pass it explicitly:
+python3 agent/local_web.py --provider qwen --base-url http://ACTUAL_SERVICE_HOST:8000/v1
+# Local DeepSeek browser alternative, after exporting DEEPSEEK_API_KEY:
+python3 agent/local_web.py --provider deepseek
+```
+
+Only use the local Qwen option where its internal service address is reachable. The existing TACC `submit-web.sh` / `web_bridge.py` deployment remains supported. Configure credentials in environment variables; `.env.example` is an example and is not loaded automatically.
+
+Run offline verification from the repository root:
+
+```bash
+python3 -m unittest discover -s agent -v
+python3 scripts/export_snapshot.py --check
+python3 evaluation/run.py --mode offline --output evaluation/runs/offline-001
+```
+
+See the [Chinese implementation and connection guide](docs/实施说明与接入指南.md), [evaluation protocol](evaluation/README.md) and [validation record](docs/VALIDATION.md). Real Qwen/DeepSeek evaluation and TACC deployment have **not** been run for this branch; model endpoints will be supplied later. Do not interpret the offline scripted preview or calculation checks as live LLM performance.
+
+The current scope is financial-condition screening within a fixed thirty-company technology universe. Verified sub-sector metadata is unavailable. The UI and prompt explicitly disclose this limitation; a sub-sector filter still requires sourced metadata. Historical analysis does not require a future-price forecasting model.
+
+
 ## Local chat with DeepSeek (start here)
 
 The Python agent and CSV tools run locally. The LLM runs at DeepSeek's API; your messages and selected tool results are sent there. No TACC job is needed. API usage is billed to your DeepSeek account.
@@ -41,7 +75,7 @@ tcloud cat slurm_log/stock-chat-JOB_ID.log
 python3 web_bridge.py JOB_ID
 ```
 
-Open the printed loopback URL (default `http://127.0.0.1:8765/`). Ask “Show all four metrics for 0700.HK”, then “Now use 60 trading days for volatility”. Keep the same page open for follow-ups. Refreshing or opening a new tab starts a fresh conversation. Use `--port 8766` if the default local port is occupied.
+Open the printed loopback URL (default `http://127.0.0.1:8765/`). Ask “Show all four metrics for 0700.HK”, then “Now use 60 trading days for volatility”. Keep the same page open for follow-ups. The browser saves conversation IDs and display history; New conversation creates a separate session. The worker restores private snapshots from the same job directory after a restart. Use `--port 8766` if the default local port is occupied.
 
 The job supplies the page and runs the agent and its tools. The laptop serves the page on loopback and uses the authenticated SDK to upload a question and poll for its reply. Transfers add a few seconds to each turn. Job-specific messages and audit logs are under `$TACC_USERDIR/stock-chat/JOB_ID/`. This setup uses the documented file-transfer interface. [TACC SDK](https://github.com/turingaicloud/tcloud-sdk) · [TACC SSH FAQ](https://github.com/turingaicloud/quickstart/blob/master/FAQ.md)
 
@@ -112,7 +146,7 @@ printf '%s\n' 'http://ACTUAL_SERVICE_HOST:8000/v1' > server-url.txt
 
 `question.txt → chat_agent.py → TACC Qwen → JSON tool request → Python CSV calculation → Qwen → final answer`
 
-The chat client selects `deepseek_client.py` for local DeepSeek use or the course's unmodified `qwen_client.py` for TACC. The model requests tools via a prompted JSON protocol. `tool_registry.py` supplies the descriptions, argument types, required fields and examples included in the system prompt, and validates each request before dispatch. The dispatcher executes only the allowlisted Python tools and sends their results back to the model. This is application-managed tool calling, not native API `tools` mode. Malformed requests are returned to the LLM for correction, with at most eight steps per turn. The audit log records model messages, token usage, requests, and tool results. Numerical calculations are deterministic; the LLM's summary still requires review against the logged results.
+The chat client selects `deepseek_client.py` for local DeepSeek use or the course's unmodified `qwen_client.py` for TACC. The model requests tools via a prompted JSON protocol. `tool_registry.py` supplies the descriptions, argument types, required fields and examples included in the system prompt, and validates each request before dispatch. The dispatcher executes only the allowlisted Python tools and sends their results back to the model. This is application-managed tool calling, not native API `tools` mode. Malformed requests are returned to the LLM for correction, with at most twelve steps per turn. Final prose contains qualitative explanation and evidence IDs; numbers, dates, sources and score breakdowns are rendered by the application, with bounded repair or a clearly marked tool-only fallback. The audit log records model input messages, outputs, token usage, requests, tool results, errors and duration, with session/turn identifiers. Numerical calculations are deterministic; the LLM's summary still requires review against the logged results.
 
 ### Available tool groups
 
@@ -161,7 +195,7 @@ Tests cover all tickers, normalization, unknown symbols, independent numeric exa
 
 # Project Tasks
 
-Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysis**. Tasks are listed in suggested implementation order; completion status is not yet assessed.
+Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysis**. Tasks are listed in suggested implementation order; statuses below distinguish implemented code from pending real-model acceptance. Historical task ownership is retained; this branch does not assign new team responsibilities.
 
 | # | Task | Description | Done? | Responsible |
 |---|------|-----------|-------|-------------|
@@ -169,18 +203,18 @@ Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysi
 | 2 | Build the fixed dataset | Collect and clean financial statements and historical prices; save sources, snapshot date, and missing-data flags. | ✅ | DUAN Zihang Raymond |
 | 3 | Implement financial tools | Calculate and verify revenue growth, net profit margin, debt-to-equity, and historical volatility. | ✅ | DUAN Zihang Raymond |
 | 4 | Implement screening and ranking | Apply mandatory filters, normalize metrics, calculate weighted scores, and return configurable Top-K with score breakdowns. | ✅ | DUAN Zihang Raymond |
-| 5 | Implement historical trend tools | Calculate indicators and generate price charts; explain historical bullish/bearish signals without predicting prices. | X | |
-| 6 | Connect the TACC model | Confirm backend access, configure model calls, and validate structured tool requests and parameters. | ✅ | DUAN Zihang Raymond |
-| 7 | Build the three agent workflows | Route requests to individual stock analysis, recommendations, or trend analysis; execute the appropriate tools. | X | |
-| 8 | Add grounded explanations | Explain performance, risks, rankings, and trends using tool results; display the data date and check numerical consistency. | X | |
-| 9 | Add conversation memory | Preserve results and preferences; support comparisons, indicator questions, and revised screening criteria. | Partial Complete | DUAN Zihang Raymond |
-| 10 | Build backend reliability and logging | Handle invalid inputs, missing data, and service/tool errors; log model calls, tool executions, errors, and timings. | ? | |
-| 11 | Build the web interface | Support natural-language requests, execution progress, metrics, rankings, charts, and follow-up questions. | Partial Complete | DUAN Zihang Raymond |
-| 12 | Create the evaluation set | Cover all three workflows, follow-ups, and invalid/incomplete inputs; verify reference calculations, filters, rankings, and tool outputs. | X | |
-| 13 | Implement the baseline | Use another provider's general-purpose LLM without custom tools; keep prompts and applicable company context identical; record model/API settings. | X | |
-| 14 | Run and compare evaluations | Report numerical accuracy, recommendation quality, trend grounding, explanation grounding, follow-up success, and response time. | X | |
-| 15 | Analyze failures and limitations | Document at least one observed failure, its cause, and mitigation; acknowledge that different models prevent isolating tool-use effects. | X | |
-| 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | X | |
+| 5 | Implement historical trend tools | Calculate indicators and generate price charts; explain historical bullish/bearish signals without predicting prices. | Implemented indicators and charts; live explanation review pending | |
+| 6 | Connect the TACC model | Confirm backend access, configure model calls, and validate structured tool requests and parameters. | Client/deployment implemented; live acceptance pending | DUAN Zihang Raymond |
+| 7 | Build the three agent workflows | Route requests to individual stock analysis, recommendations, or trend analysis; execute the appropriate tools. | Implemented shared tool loop; live routing acceptance pending | |
+| 8 | Add grounded explanations | Explain performance, risks, rankings, and trends using tool results; display the data date and check numerical consistency. | Deterministic numbers and citation guard implemented; qualitative review pending | |
+| 9 | Add conversation memory | Preserve results and preferences; support comparisons, indicator questions, and revised screening criteria. | Implemented state, conversations and restart snapshots; live follow-up acceptance pending | DUAN Zihang Raymond |
+| 10 | Build backend reliability and logging | Handle invalid inputs, missing data, and service/tool errors; log model calls, tool executions, errors, and timings. | Implemented validation, failure rollback, progress and timing logs | |
+| 11 | Build the web interface | Support natural-language requests, execution progress, metrics, rankings, charts, and follow-up questions. | Implemented charts, tables and conversation UI; local browser tested | DUAN Zihang Raymond |
+| 12 | Create the evaluation set | Cover all three workflows, follow-ups, and invalid/incomplete inputs; verify reference calculations, filters, rankings, and tool outputs. | Implemented 30 scenarios / 42 turns and independent numeric references | |
+| 13 | Implement the baseline | Use another provider's general-purpose LLM without custom tools; keep prompts and applicable company context identical; record model/API settings. | Implemented separate no-tool baseline runner; live execution pending | |
+| 14 | Run and compare evaluations | Report numerical accuracy, recommendation quality, trend grounding, explanation grounding, follow-up success, and response time. | Offline numeric evaluation complete; live comparison pending | |
+| 15 | Analyze failures and limitations | Document at least one observed failure, its cause, and mitigation; acknowledge that different models prevent isolating tool-use effects. | Simulated failure documented; real-model failure analysis pending | |
+| 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | Runnable app, tests and instructions provided; live demo/final results pending | |
 
 ## Task 1
 
@@ -254,7 +288,7 @@ Financial trends require matching annual periods and currencies and may use olde
 
 Annual trends exclude issuer quarterly supplements. Correlation matches both endpoints of each return interval. Invalid prices are rejected, and a constant return series yields undefined correlation.
 
-**Trend prediction status:** Indicator calculations are implemented, but there is no combined up/down/neutral forecast formula or model yet. Trend prediction is separate from ranking and still needs a defined forecast horizon, prediction rule/model, and backtesting. Historical indicators alone are not a validated prediction system.
+**Trend prediction status:** Indicator calculations are implemented, but there is no combined up/down/neutral forecast formula or model yet. Future-price prediction is outside the proposal scope; no forecast model or backtest is required for historical signal analysis. Historical indicators alone are not a validated prediction system.
 
 ## Task 2
 
@@ -294,11 +328,8 @@ User can send and receive message to/from TACC with correct tool calls.
 
 ## Task 9
 
-Current web chat interface can keep earlier messages and tool results so follow-up questions can refer to previous stocks, metrics, and screening criteria.
-But now only have one conversation, and "new conversation" feature is not added yet. So need to work on it later.
-
+The agent retains bounded recent messages plus explicit ranking history, filters, weights, windows and focused symbols. `reuse_previous=true` preserves unmodified ranking parameters. Browser conversations have independent IDs, local display histories and private server JSON snapshots. Failed turns roll back state. Long-term semantic memory and cross-job migration are outside this implementation.
 
 ## Task 11
 
-Current web chat is single conversation webpage, support natural language requests, it can display the execution progress (by outputing the tools used), metrics, rankings, and followup request.
-Need to further test markdown display, and implement multi-conversation feature, and chart display in the webchat.
+The browser renders financial tables, rankings, source/period details, historical adjusted-price/SMA and rolling-volatility charts, live worker phase updates and follow-ups. It supports new conversations, switching, reload recovery and JSON export. Model/user prose is rendered as text; numerical tables are built from evidence. Local browser smoke tests cover desktop and mobile behavior. Real TACC browser acceptance remains pending.

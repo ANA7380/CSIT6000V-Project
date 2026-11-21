@@ -6,9 +6,10 @@ import time
 from pathlib import Path
 
 from chat_agent import ChatAgent
+from session_store import atomic_json, save_agent, restore_agent
 
 
-def process(path, sessions, base_url):
+def process(path, sessions, base_url, factory=None):
     reply = path.with_suffix('.reply')
     if reply.exists():
         path.unlink()
@@ -22,13 +23,24 @@ def process(path, sessions, base_url):
         if not isinstance(question, str) or not 0 < len(question.strip()) <= 8000:
             raise ValueError('Enter a question of up to 8000 characters.')
         if session not in sessions:
-            sessions[session] = ChatAgent(base_url, path.parent / (session + '.jsonl'))
-        result = {'answer': sessions[session].ask(question)}
+            sessions[session] = (factory or ChatAgent)(base_url, path.parent / (session + '.jsonl'))
+            sessions[session].session_id = session
+            restore_agent(path.parent / (session + '.state'), sessions[session])
+        agent = sessions[session]
+        def progress(event):
+            atomic_json(path.with_suffix('.status'), dict(event, request_id=path.stem))
+        agent.progress = progress
+        # Old factories are supported for the original mocked transport tests.
+        text = agent.ask(question)
+        result = dict(agent.last_response or {}, answer=text)
+        if agent.last_response:
+            result['explanation'] = agent.last_response['answer']
+        save_agent(path.parent / (session + '.state'), agent)
+        result['request_id'] = path.stem
     except Exception as exc:
-        result = {'error': str(exc)}
-    temp = reply.with_suffix('.tmp')
-    temp.write_text(json.dumps(result), encoding='utf-8')
-    temp.replace(reply)
+        result = {'error': str(exc), 'request_id': path.stem}
+        atomic_json(path.with_suffix('.status'), {'event': 'turn_error', 'error': str(exc), 'request_id': path.stem})
+    atomic_json(reply, result)
     path.unlink()
 
 
@@ -43,7 +55,7 @@ def main():
     print(f'Chat ready. On your SDK machine run: python3 web_bridge.py {job}', flush=True)
     sessions = {}
     while True:
-        for path in folder.glob('*.ask'):
+        for path in sorted(folder.glob('*.ask'), key=lambda p: p.stat().st_mtime):
             if re.fullmatch('[a-f0-9]{32}', path.stem):
                 process(path, sessions, os.environ['QWEN_BASE_URL'])
         time.sleep(1)

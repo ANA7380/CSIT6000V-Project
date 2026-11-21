@@ -47,6 +47,8 @@ class AnalysisTools:
                     data_notice='Fixed snapshot, not live data. Historical indicators do not predict future prices.')
 
     def price_analysis(self, ticker, window=252, rolling_window=20):
+        if type(window) is not int or not 2 <= window <= 5000 or type(rolling_window) is not int or not 2 <= rolling_window <= 5000:
+            raise ValueError('Price windows must be integers between 2 and 5000.')
         symbol, rows = self.prices(ticker)
         prices = positive_prices(rows)
         out = self.context(symbol)
@@ -130,6 +132,15 @@ class AnalysisTools:
         metrics['volume_ratio_20'] = metric(volume / baseline if volume is not None and volume >= 0 and baseline and baseline > 0 else None,
                                             unit='x', formula='latest volume / mean volume of previous 20 sessions',
                                             inputs={'latest_volume': volume, 'prior_average_volume': baseline})
+        count = min(len(rows), window + 1)
+        series = {'adjusted_close': prices}
+        for n in (20, 50, 200):
+            series[f'sma_{n}'] = [statistics.mean(prices[i-n+1:i+1]) if i >= n-1 else None for i in range(len(prices))]
+        out['chart'] = dict(symbol=symbol, currency=out['price_currency'], price_basis='adjusted_close',
+                            source_url=out['source_url'], snapshot_cutoff=out['snapshot_cutoff'],
+                            dates=[r['date'] for r in rows[-count:]],
+                            series={k: v[-count:] for k, v in series.items()},
+                            rolling_volatility=rolling[-window:])
         out['metrics'] = metrics
         out['trend_comparison'] = {
             'price_above_sma_50': prices[-1] > averages[50] if averages[50] is not None else None,
@@ -143,6 +154,8 @@ class AnalysisTools:
         return out
 
     def stock_correlation(self, ticker, other_ticker, window=252):
+        if type(window) is not int or not 2 <= window <= 5000:
+            raise ValueError('Correlation window must be an integer between 2 and 5000.')
         symbol, left = self.prices(ticker)
         other, right = self.prices(other_ticker)
         def returns(rows):
@@ -226,6 +239,8 @@ class AnalysisTools:
                     basis='Latest available comparable annual vendor observations per metric; may be older than the curated snapshot income period. No quarterly annualization or issuer/vendor mixing.')
 
     def rank_stocks(self, top_k=5, weights=None, filters=None, window=252):
+        if type(top_k) is not int or not 1 <= top_k <= 30 or type(window) is not int or not 2 <= window <= 5000:
+            raise ValueError('top_k must be 1..30; window must be 2..5000.')
         names = {'revenue_growth': 'Revenue growth', 'net_profit_margin': 'Net profit margin',
                  'debt_to_equity': 'Debt-to-equity', 'historical_volatility': 'Historical volatility'}
         weights = weights if weights is not None else {k: 1 for k in names}
@@ -266,7 +281,8 @@ class AnalysisTools:
                 score = rank / (len(vals)-1) * 100 if len(vals) > 1 else 50
                 percentiles[key] = 100-score if key in {'debt_to_equity', 'historical_volatility'} else score
             row['percentile_scores'] = percentiles
-            row['score'] = sum(weights[k] * percentiles[k] for k in weights)
+            row['contributions'] = {k: weights[k] * percentiles[k] for k in weights}
+            row['score'] = sum(row['contributions'].values())
         eligible.sort(key=lambda r: (-r['score'], r['symbol']))
         for i, row in enumerate(eligible, 1):
             row['rank'] = i

@@ -34,7 +34,7 @@ class WebChatTest(unittest.TestCase):
                     action = {'tool': 'list_tickers', 'arguments': {}}
                 elif question.startswith('TOOL_RESULT'):
                     self.assertIn('0700.HK', json.loads(question.split('\n', 1)[1])['result'])
-                    action = {'answer': 'Includes Tencent.'}
+                    action = {'answer': 'Includes Tencent. [E1]'}
                 else:
                     self.assertIn('List the tickers', [m['content'] for m in messages])
                     action = {'answer': '0700.HK'}
@@ -50,11 +50,11 @@ class WebChatTest(unittest.TestCase):
                 conn = HTTPConnection(server.address)
                 try:
                     conn.request('GET', '/')
-                    self.assertIn(b'HK Tech research chat', conn.getresponse().read())
+                    self.assertIn(b'Research with evidence', conn.getresponse().read())
                     with patch.object(web_bridge, 'transfer', transfer), patch.object(
                         web_worker, 'ChatAgent', lambda url, log: ChatAgent(url, log, model)
                     ):
-                        for question, answer in [('List the tickers', 'Includes Tencent.'),
+                        for question, answer in [('List the tickers', 'Includes Tencent. [E1]'),
                                                  ('Which ticker was that?', '0700.HK')]:
                             conn.request('POST', '/ask', json.dumps({'session': 'a' * 32, 'question': question}),
                                          {'Content-Type': 'application/json', 'Origin': 'http://' + server.address})
@@ -65,7 +65,10 @@ class WebChatTest(unittest.TestCase):
                             response.read()
                             web_worker.process(directory / (turn + '.ask'), sessions, 'http://localhost:8000/v1')
                             conn.request('GET', '/reply/' + turn)
-                            self.assertEqual(json.load(conn.getresponse()), {'answer': answer})
+                            reply = json.load(conn.getresponse())
+                            self.assertEqual(reply['explanation'], answer)
+                            self.assertIn('evidence', reply)
+                            self.assertTrue(reply['answer'].startswith(answer))
                 finally:
                     conn.close()
                     server.shutdown()

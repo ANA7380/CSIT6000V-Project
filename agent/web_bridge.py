@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import tempfile
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from uuid import uuid4
@@ -48,8 +49,13 @@ class Bridge(BaseHTTPRequestHandler):
                 reply = Path(temp) / (match[1] + '.reply')
                 ok = transfer('download', self.server.remote + reply.name, reply, allow_missing=True)
                 if not ok:
-                    return self.respond(202, {})
+                    status = reply.with_suffix('.status')
+                    found = transfer('download', self.server.remote + status.name, status, allow_missing=True)
+                    return self.respond(202, json.loads(status.read_text(encoding='utf-8')) if found else {'event': 'queued'})
                 result = json.loads(reply.read_text(encoding='utf-8'))
+            elapsed = self.server.started.get(match[1]) if hasattr(self.server, 'started') else None
+            if elapsed is not None:
+                result['end_to_end_ms'] = (time.perf_counter() - elapsed) * 1000
             self.respond(200, result)
         except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as exc:
             self.respond(502, {'error': str(exc)})
@@ -66,12 +72,14 @@ class Bridge(BaseHTTPRequestHandler):
                 raise ValueError('Invalid message size.')
             request = json.loads(self.rfile.read(length))
             question, session = request['question'], request['session']
-            if not re.fullmatch('[a-f0-9]{32}', session) or not 0 < len(question.strip()) <= 8000:
+            if not isinstance(session, str) or not re.fullmatch('[a-f0-9]{32}', session) or not isinstance(question, str) or not 0 < len(question.strip()) <= 8000:
                 raise ValueError('Invalid conversation or question.')
         except (KeyError, AttributeError, TypeError, ValueError) as exc:
             return self.respond(400, {'error': str(exc)})
         try:
             turn = uuid4().hex
+            if hasattr(self.server, 'started'):
+                self.server.started[turn] = time.perf_counter()
             with tempfile.TemporaryDirectory() as temp:
                 path = Path(temp) / (turn + '.ask')
                 path.write_text(json.dumps({'question': question, 'session': session}), encoding='utf-8')
@@ -93,6 +101,7 @@ def main():
         html = page.read_bytes()
     with ThreadingHTTPServer(('127.0.0.1', args.port), Bridge) as server:
         server.address = f'127.0.0.1:{server.server_port}'
+        server.started = {}
         server.remote = remote
         server.page = html
         print(f'Open http://{server.address}/ in your browser. Press Ctrl+C to stop.', flush=True)

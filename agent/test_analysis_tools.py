@@ -126,7 +126,7 @@ class ToolRoutingTests(unittest.TestCase):
     def test_each_catalog_tool_roundtrip(self):
         for name, spec in TOOLS.items():
             with self.subTest(tool=name), tempfile.TemporaryDirectory() as folder:
-                calls = iter([{'tool': name, 'arguments': spec['example']}, {'answer': 'Computed from tool result.'}])
+                calls = iter([{'tool': name, 'arguments': spec['example']}, {'answer': 'Computed from tool result. [E1]'}])
                 def fake(messages, base_url, **kwargs):
                     if messages[-1]['content'].startswith('TOOL_RESULT'):
                         data = json.loads(messages[-1]['content'].split('\n', 1)[1])
@@ -135,16 +135,16 @@ class ToolRoutingTests(unittest.TestCase):
                     return {'choices': [{'message': {'content': json.dumps(next(calls))}}]}
                 agent = ChatAgent('https://api.deepseek.com/v1', Path(folder)/'test.jsonl', call=fake)
                 self.assertIn(name, SYSTEM)
-                self.assertEqual(agent.ask('Test request'), 'Computed from tool result.')
+                self.assertTrue(agent.ask('Test request').startswith('Computed from tool result. [E1]'))
 
     def test_invalid_request_is_corrected(self):
         actions = iter([{'tool': 'price_analysis', 'arguments': {'ticker': '700', 'window': -1}},
-                        {'tool': 'price_analysis', 'arguments': {'ticker': '700'}}, {'answer': 'Done.'}])
+                        {'tool': 'price_analysis', 'arguments': {'ticker': '700'}}, {'answer': 'Done. [E1]'}])
         def fake(*args, **kwargs):
             return {'choices': [{'message': {'content': json.dumps(next(actions))}}]}
         with tempfile.TemporaryDirectory() as folder:
             agent = ChatAgent('https://api.deepseek.com/v1', Path(folder)/'test.jsonl', call=fake)
-            self.assertEqual(agent.ask('Show RSI'), 'Done.')
+            self.assertTrue(agent.ask('Show RSI').startswith('Done. [E1]'))
             self.assertIn('error', agent.log.read_text(encoding='utf-8'))
 
 
