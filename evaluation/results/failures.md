@@ -1,0 +1,897 @@
+# Failed checks
+
+Use these to pick the failure case(s) for the report. Full transcripts are in the results/*.jsonl files and results/audit/.
+
+## agent-qwen: 5 failed check(s)
+
+- **ind-07** turn 1, label `0100.HK volatility history status` (expected `SHORT`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: For 0100.HK (MiniMax), the four metrics are: - Revenue growth: N/A. The tool returned this as unavailable because the required prior-year revenue input is missing. The current 3M revenue is USD 25,601,000 for the period ending 2025-12-31. - Net profit margin: -5310.75%. This is based on net income of USD -1,359,604,000 and revenue of USD 25,601,000 for the 3M period ending 2025-12-31. - Debt-to-eq
+- **rank-05** turn 1, ranking `top 10` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK', '1698.HK', '1810.HK', '9863.HK', '9988.HK', '9618.HK']`)
+  - Prompt: Rank the top 10 stocks using the default weights.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **follow-01** turn 2, number `0700.HK Historical volatility` (expected `32.551206438735974`)
+  - Prompt: Now use 60 trading days for volatility.
+  - Got: Here are the four metrics for Tencent (0700.HK) with the historical volatility calculated over a 60-trading-day window: * **Revenue Growth:** 10.99% (3M period ending 2026-06-30, CNY) * **Net Profit Margin:** 27.36% (3M period ending 2026-06-30, CNY) * **Debt-to-Equity:** 0.42x (as of 2026-06-30, CNY) * **Historical Volatility:** 33.84% (annualized, based on 60 daily returns from 2026-08-21 to 202
+- **invalid-03** turn 1, behavior `says P/E is not available` (expected ``)
+  - Prompt: What is the P/E ratio of 0700.HK?
+  - Got: I can’t provide the P/E ratio for 0700.HK because P/E is not one of the metrics available in this dataset. The available metrics include revenue growth, net profit margin, debt-to-equity, historical volatility, financial trends (ROE, margin change, debt/equity growth), price analysis (returns, moving averages, RSI, MACD, drawdown, rolling volatility, volume), correlation, and screening/ranking. If
+- **invalid-04** turn 1, behavior `rejects a 1-day volatility window` (expected ``)
+  - Prompt: Show the historical volatility of 0700.HK using a window of 1 trading day.
+  - Got: For 0700.HK (Tencent), the historical volatility calculated with a window of 2 daily returns (the minimum allowed, corresponding to 3 price observations) is 53.17%. Details: - Window: 2 daily returns (3 observations) - Start date: 2026-11-13 - End date: 2026-11-17 - Annualization: sqrt(252) - Formula: sample standard deviation of log returns × sqrt(252) × 100 - Data is a fixed snapshot as of Wed N
+
+## notools-deepseek-raw: 54 failed check(s)
+
+- **ind-01** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) — latest reported period 2026-06-30, 3M, CNY: 1) Revenue: 204,785,000,000 (prior-year same period: 184,504,000,000; YoY growth ≈ +11.0%) 2) Net income: 56,022,000,000 3) Total debt: 471,828,000,000 (balance sheet date 2026-06-30) 4) Stockholders' equity: 1,135,853,000,000 (balance sheet date 2026-06-30) Note: debt-to-equity ≈ 0.42x. Latest price in the snapshot: 376.00 (2026-11-1
+- **ind-01** turn 1, number `0700.HK Historical volatility` (expected `33.843934520367455`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) — latest reported period 2026-06-30, 3M, CNY: 1) Revenue: 204,785,000,000 (prior-year same period: 184,504,000,000; YoY growth ≈ +11.0%) 2) Net income: 56,022,000,000 3) Total debt: 471,828,000,000 (balance sheet date 2026-06-30) 4) Stockholders' equity: 1,135,853,000,000 (balance sheet date 2026-06-30) Note: debt-to-equity ≈ 0.42x. Latest price in the snapshot: 376.00 (2026-11-1
+- **ind-02** turn 1, number `1698.HK Debt-to-equity` (expected `0.21570932134096485`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: Tencent Music Entertainment (1698.HK) — four core metrics from the dataset snapshot (latest financials: 3M period ended 2026-09-30, CNY): 1. Revenue: CNY 8.941 billion (prior-year same quarter: CNY 8.463 billion, +5.6% YoY). 2. Net income: CNY 2.154 billion (net margin ≈ 24.1%). 3. Total debt: CNY 16.884 billion (balance sheet date 2026-06-30). 4. Stockholders' equity: CNY 78.272 billion (balance 
+- **ind-02** turn 1, number `1698.HK Historical volatility` (expected `48.74248102440263`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: Tencent Music Entertainment (1698.HK) — four core metrics from the dataset snapshot (latest financials: 3M period ended 2026-09-30, CNY): 1. Revenue: CNY 8.941 billion (prior-year same quarter: CNY 8.463 billion, +5.6% YoY). 2. Net income: CNY 2.154 billion (net margin ≈ 24.1%). 3. Total debt: CNY 16.884 billion (balance sheet date 2026-06-30). 4. Stockholders' equity: CNY 78.272 billion (balance 
+- **ind-03** turn 1, number `9988.HK Historical volatility` (expected `44.768350745289595`)
+  - Prompt: What is the historical volatility of 9988.HK using a 60-trading-day window?
+  - Got: Using the 60 most recent trading days ending 2026-11-17, 9988.HK's daily log returns give an annualized historical volatility (sample standard deviation × √252) of approximately 41%. The window spans roughly 2026-08-21 to 2026-11-17, a period that includes the sharp drop from ~123 to ~85, which inflates the estimate. Note this is computed from the adjusted close series in the snapshot; exact value
+- **ind-04** turn 1, number `0992.HK Net profit margin` (expected `-2.260327357755261`)
+  - Prompt: What are Lenovo's (0992.HK) revenue growth and net profit margin?
+  - Got: Lenovo's latest reported period is Q2 FY2026 (quarter ended 2026-06-30, 3M, USD): revenue was $26.943bn versus $18.830bn a year earlier, implying revenue growth of about 43.1% year over year. Net income was -$609m, giving a net profit margin of about -2.3% (net loss). Note the balance sheet date is 2026-03-31, so leverage metrics are not aligned with the income statement period.
+- **ind-06** turn 1, number `0300.HK Net profit margin` (expected `13.83568512509644`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: 0300.HK (Midea Group) — all four metrics from the snapshot: 1. Revenue: CNY 108,034,650,000 (financial period end 2026-09-30, 3M/quarterly) 2. Net income: CNY 14,947,334,000 (same period) 3. Total debt: CNY 78,114,115,000 (balance sheet date 2026-09-30) 4. Stockholders' equity: CNY 223,519,176,000 (balance sheet date 2026-09-30) Missing data: prior_year_revenue and prior_year_period_end are blank 
+- **ind-06** turn 1, number `0300.HK Debt-to-equity` (expected `0.34947388585577105`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: 0300.HK (Midea Group) — all four metrics from the snapshot: 1. Revenue: CNY 108,034,650,000 (financial period end 2026-09-30, 3M/quarterly) 2. Net income: CNY 14,947,334,000 (same period) 3. Total debt: CNY 78,114,115,000 (balance sheet date 2026-09-30) 4. Stockholders' equity: CNY 223,519,176,000 (balance sheet date 2026-09-30) Missing data: prior_year_revenue and prior_year_period_end are blank 
+- **ind-06** turn 1, number `0300.HK Historical volatility` (expected `23.66365939650136`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: 0300.HK (Midea Group) — all four metrics from the snapshot: 1. Revenue: CNY 108,034,650,000 (financial period end 2026-09-30, 3M/quarterly) 2. Net income: CNY 14,947,334,000 (same period) 3. Total debt: CNY 78,114,115,000 (balance sheet date 2026-09-30) 4. Stockholders' equity: CNY 223,519,176,000 (balance sheet date 2026-09-30) Missing data: prior_year_revenue and prior_year_period_end are blank 
+- **ind-07** turn 1, number `0100.HK Net profit margin` (expected `-5310.745673997109`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: 0100.HK (MiniMax) — four metrics from the snapshot: 1. Revenue: USD 25,601,000 (period 2025-12-31, 3M); prior-year revenue unavailable. 2. Net income: USD -1,359,604,000 (loss). 3. Total debt: USD 137,423,000 (balance sheet date 2026-06-30). 4. Stockholders' equity: USD 1,346,683,000 (2026-06-30). On volatility: no, it cannot be based on a full 252-day history. The price series for 0100.HK begins 
+- **ind-07** turn 1, number `0100.HK Debt-to-equity` (expected `0.10204554449710883`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: 0100.HK (MiniMax) — four metrics from the snapshot: 1. Revenue: USD 25,601,000 (period 2025-12-31, 3M); prior-year revenue unavailable. 2. Net income: USD -1,359,604,000 (loss). 3. Total debt: USD 137,423,000 (balance sheet date 2026-06-30). 4. Stockholders' equity: USD 1,346,683,000 (2026-06-30). On volatility: no, it cannot be based on a full 252-day history. The price series for 0100.HK begins 
+- **ind-07** turn 1, number `0100.HK Historical volatility` (expected `142.4897209287103`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: 0100.HK (MiniMax) — four metrics from the snapshot: 1. Revenue: USD 25,601,000 (period 2025-12-31, 3M); prior-year revenue unavailable. 2. Net income: USD -1,359,604,000 (loss). 3. Total debt: USD 137,423,000 (balance sheet date 2026-06-30). 4. Stockholders' equity: USD 1,346,683,000 (2026-06-30). On volatility: no, it cannot be based on a full 252-day history. The price series for 0100.HK begins 
+- **ind-07** turn 1, label `0100.HK volatility history status` (expected `SHORT`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: 0100.HK (MiniMax) — four metrics from the snapshot: 1. Revenue: USD 25,601,000 (period 2025-12-31, 3M); prior-year revenue unavailable. 2. Net income: USD -1,359,604,000 (loss). 3. Total debt: USD 137,423,000 (balance sheet date 2026-06-30). 4. Stockholders' equity: USD 1,346,683,000 (2026-06-30). On volatility: no, it cannot be based on a full 252-day history. The price series for 0100.HK begins 
+- **ind-08** turn 1, number `0700.HK return_on_equity` (expected `21.134746439817643`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: Tencent (0700.HK), latest period 2026-06-30 (3M, CNY): - ROE (annualized): net income 56,022M × 4 ÷ equity 1,135,853M ≈ 19.7% (quarterly, unannualized: ≈4.9%). - Equity growth: no prior-year equity figure is available in the dataset, so this cannot be computed. - Debt growth: no prior-year total debt figure is available, so this cannot be computed. - Profit margin change: 2026-06-30 net margin = 5
+- **ind-08** turn 1, number `0700.HK equity_growth` (expected `18.551114069362782`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: Tencent (0700.HK), latest period 2026-06-30 (3M, CNY): - ROE (annualized): net income 56,022M × 4 ÷ equity 1,135,853M ≈ 19.7% (quarterly, unannualized: ≈4.9%). - Equity growth: no prior-year equity figure is available in the dataset, so this cannot be computed. - Debt growth: no prior-year total debt figure is available, so this cannot be computed. - Profit margin change: 2026-06-30 net margin = 5
+- **ind-08** turn 1, number `0700.HK profit_margin_change` (expected `0.5149544366080006`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: Tencent (0700.HK), latest period 2026-06-30 (3M, CNY): - ROE (annualized): net income 56,022M × 4 ÷ equity 1,135,853M ≈ 19.7% (quarterly, unannualized: ≈4.9%). - Equity growth: no prior-year equity figure is available in the dataset, so this cannot be computed. - Debt growth: no prior-year total debt figure is available, so this cannot be computed. - Profit margin change: 2026-06-30 net margin = 5
+- **ind-10** turn 1, number `0700/9988 correlation (60)` (expected `0.778918294230132`)
+  - Prompt: What is the return correlation between 0700.HK and 9988.HK over the last 60 sessions?
+  - Got: Over the last 60 trading sessions (through 2026-11-17), the daily return correlation between Tencent (0700.HK) and Alibaba (9988.HK) is approximately 0.55 — a moderate positive correlation. Both stocks fell sharply in the final sessions (Tencent -3.7% and Alibaba -5.2% on 2026-11-17), but their day-to-day moves are only partially synchronized, reflecting differing sector drivers (gaming/ads vs. e-
+- **ind-11** turn 1, number `1810.HK Revenue growth` (expected `-6.066504949705487`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 小米（1810.HK）四个核心指标（数据快照：2026-11-18，股价截至2026-11-17）： 1. 营收：2026年第二季度（3M，截至2026-06-30）为人民币1089.22亿元，同比下降约6.1%（上年同期为1159.56亿元）。 2. 净利润：2026年第二季度为人民币94.62亿元。 3. 资产负债：截至2026-06-30，总债务为人民币443.18亿元，股东权益为人民币2697.00亿元。 4. 股价：2026-11-17收盘价为29.70港元，当日成交量为166,780,913股。
+- **ind-11** turn 1, number `1810.HK Net profit margin` (expected `8.68735330562368`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 小米（1810.HK）四个核心指标（数据快照：2026-11-18，股价截至2026-11-17）： 1. 营收：2026年第二季度（3M，截至2026-06-30）为人民币1089.22亿元，同比下降约6.1%（上年同期为1159.56亿元）。 2. 净利润：2026年第二季度为人民币94.62亿元。 3. 资产负债：截至2026-06-30，总债务为人民币443.18亿元，股东权益为人民币2697.00亿元。 4. 股价：2026-11-17收盘价为29.70港元，当日成交量为166,780,913股。
+- **ind-11** turn 1, number `1810.HK Debt-to-equity` (expected `0.16432161090212`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 小米（1810.HK）四个核心指标（数据快照：2026-11-18，股价截至2026-11-17）： 1. 营收：2026年第二季度（3M，截至2026-06-30）为人民币1089.22亿元，同比下降约6.1%（上年同期为1159.56亿元）。 2. 净利润：2026年第二季度为人民币94.62亿元。 3. 资产负债：截至2026-06-30，总债务为人民币443.18亿元，股东权益为人民币2697.00亿元。 4. 股价：2026-11-17收盘价为29.70港元，当日成交量为166,780,913股。
+- **ind-11** turn 1, number `1810.HK Historical volatility` (expected `43.42588553250596`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 小米（1810.HK）四个核心指标（数据快照：2026-11-18，股价截至2026-11-17）： 1. 营收：2026年第二季度（3M，截至2026-06-30）为人民币1089.22亿元，同比下降约6.1%（上年同期为1159.56亿元）。 2. 净利润：2026年第二季度为人民币94.62亿元。 3. 资产负债：截至2026-06-30，总债务为人民币443.18亿元，股东权益为人民币2697.00亿元。 4. 股价：2026-11-17收盘价为29.70港元，当日成交量为166,780,913股。
+- **rank-01** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I can't compute a weighted ranking because no default weights (or scoring methodology) were provided in the dataset or your question. The dataset only contains fundamentals (revenue, prior-year revenue, net income, total debt, stockholders' equity) and no price/valuation or weighting scheme. Please specify the weights/factors (e.g., revenue growth, net margin, debt-to-equity) and I'll rank the top
+- **rank-02** turn 1, ranking `top 5` (expected `['0700.HK', '9999.HK', '2382.HK', '1698.HK']`)
+  - Prompt: Return the top 5 stocks with net profit margin at least 10% and debt-to-equity at most 0.5.
+  - Got: Top 5 by net profit margin (net_income/revenue ≥10%, total_debt/stockholders_equity ≤0.5): 1. NetEase (9999.HK): margin 23.2%, D/E 0.08 2. Tencent Music (1698.HK): margin 24.1%, D/E 0.22 3. Alibaba Health (0241.HK): margin 5.7% — excluded (below 10%) Corrected ranking (qualifying names): 1. Tencent Music (1698.HK): 24.1%, D/E 0.22 2. NetEase (9999.HK): 23.2%, D/E 0.08 3. Midea Group (0300.HK): 13.
+- **rank-03** turn 1, ranking `top 3` (expected `['9863.HK', '9866.HK', '6618.HK']`)
+  - Prompt: Rank the top 3 stocks using revenue growth weight 2 and historical volatility weight 1.
+  - Got: I can't compute this ranking reliably from the provided snapshot. The dataset has no historical price series, so historical volatility cannot be calculated, and revenue growth is only comparable for companies whose current and prior-year figures cover the same period (many rows are 3M vs. 3M, but several are 12M with prior-year 12M, and some rows lack prior-year revenue entirely, e.g., Midea, BYD 
+- **rank-04** turn 1, ranking `top 5` (expected `['0241.HK', '6618.HK', '9999.HK', '0100.HK', '1810.HK']`)
+  - Prompt: Rank the top 5 stocks using only debt-to-equity.
+  - Got: Top 5 by debt-to-equity (total_debt / stockholders_equity, lower is better): 1. Alibaba Health (0241.HK): 59,755,000 / 17,855,404,000 ≈ 0.0033 2. JD Health (6618.HK): 874,850,000 / 61,456,106,000 ≈ 0.0142 3. MiniMax (0100.HK): 137,423,000 / 1,346,683,000 ≈ 0.1020 4. Tencent Music (1698.HK): 16,884,000,000 / 78,272,000,000 ≈ 0.2157 5. NetEase (9999.HK): 12,604,170,000 / 167,090,540,000 ≈ 0.0754 Cor
+- **rank-05** turn 1, ranking `top 10` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK', '1698.HK', '1810.HK', '9863.HK', '9988.HK', '9618.HK']`)
+  - Prompt: Rank the top 10 stocks using the default weights.
+  - Got: I can't compute that ranking: the dataset contains no price, return, volatility, or market-cap fields, and no definition of "default weights" is provided. With only revenue, net income, debt, and equity, any ranking would be arbitrary. Please specify the weighting scheme (e.g., equal-weight momentum, revenue growth, ROE) and the required inputs.
+- **rank-06** turn 1, ranking `top 5` (expected `['9863.HK', '6618.HK', '0020.HK', '9866.HK', '0981.HK']`)
+  - Prompt: Among stocks with revenue growth of at least 20%, rank the top 5 using the default weights.
+  - Got: I can't compute this reliably as stated: the dataset mixes 3M and 12M periods and currencies (CNY/USD), and "default weights" isn't defined in the provided data. Using a reasonable default (equal weights across revenue growth, net margin, and equity ratio, with growth computed only where a comparable prior-year period exists), the top 5 by revenue growth ≥20% are: 1) NIO (9866.HK) +69.1% YoY, 2) S
+- **rank-07** turn 1, ranking `top 3` (expected `['0300.HK', '6690.HK', '9618.HK']`)
+  - Prompt: Which 3 stocks have the lowest historical volatility? Rank using only historical volatility.
+  - Got: I can't compute historical volatility from this dataset. It contains only financial statement figures (revenue, net income, debt, equity) and no daily price series, so historical volatility cannot be calculated or ranked for any of the 30 constituents. Please provide daily price data (e.g., the 2026-11-17 snapshot's price history) to rank the three lowest-volatility stocks.
+- **rank-09** turn 1, ranking `top 3` (expected `['9999.HK', '0241.HK', '1698.HK']`)
+  - Prompt: I prefer profitable, low-debt companies. Require net profit margin of at least 5% and debt-to-equity of at most 0.3, weight net profit margin and debt-to-equity equally and ignore the other metrics. Give me the top 3.
+  - Got: Screening the 30 constituents on net profit margin (net_income/revenue ≥ 5%) and debt-to-equity (total_debt/stockholders_equity ≤ 0.3), then ranking by an equal-weighted score of the two metrics (higher margin better, lower D/E better), the top 3 are: 1. Tencent (0700.HK) — net margin 27.4% (56.02B/204.79B), D/E 0.042 (471.8B/1,135.9B). Best combined profile: highest margin among qualifiers and ne
+- **trend-01** turn 1, number `0700.HK rsi_14` (expected `35.97500559114523`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: 0700.HK (Tencent) technicals as of 2026-11-17 (close 376.00): - 50-day SMA: ~437.6 (average of the last 50 closes, 2026-08-28 to 2026-11-17). Price is ~14% below it, a bearish trend signal. - RSI(14): ~31.5 (Wilder's smoothing). Just above the 30 oversold threshold, indicating weak momentum but not yet technically oversold. - MACD: MACD line ~-13.9, signal ~-10.6, histogram ~-3.3. The MACD line is
+- **trend-01** turn 1, number `0700.HK macd` (expected `-6.206396519577424`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: 0700.HK (Tencent) technicals as of 2026-11-17 (close 376.00): - 50-day SMA: ~437.6 (average of the last 50 closes, 2026-08-28 to 2026-11-17). Price is ~14% below it, a bearish trend signal. - RSI(14): ~31.5 (Wilder's smoothing). Just above the 30 oversold threshold, indicating weak momentum but not yet technically oversold. - MACD: MACD line ~-13.9, signal ~-10.6, histogram ~-3.3. The MACD line is
+- **trend-01** turn 1, number `0700.HK sma_50` (expected `415.61999877929685`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: 0700.HK (Tencent) technicals as of 2026-11-17 (close 376.00): - 50-day SMA: ~437.6 (average of the last 50 closes, 2026-08-28 to 2026-11-17). Price is ~14% below it, a bearish trend signal. - RSI(14): ~31.5 (Wilder's smoothing). Just above the 30 oversold threshold, indicating weak momentum but not yet technically oversold. - MACD: MACD line ~-13.9, signal ~-10.6, histogram ~-3.3. The MACD line is
+- **trend-03** turn 1, label `0981.HK SMA50 vs SMA200` (expected `BELOW`)
+  - Prompt: Is SMIC's (0981.HK) 50-day moving average above or below its 200-day moving average? Begin your answer with exactly one word, ABOVE or BELOW, then explain.
+  - Got: ABOVE — SMIC's 50-day moving average is above its 200-day moving average. Using the daily adjusted closes through 2026-11-17, the last 50 trading days (roughly from early September 2026 onward) average around the low-to-mid 60s, while the 200-day window (stretching back to roughly February 2026) includes many lower prices from the spring and summer, pulling that average down to roughly the mid-50s
+- **trend-07** turn 1, number `1810.HK volume_ratio_20` (expected `1.0035002650345637`)
+  - Prompt: How does 1810.HK's latest trading volume compare with its previous 20-session average? Give the ratio.
+  - Got: 1810.HK's latest volume (2026-11-17) is 166,780,913 shares. The previous 20 sessions (2026-10-20 through 2026-11-16) average approximately 159,010,000 shares (sum ≈ 3,180,200,000 / 20). The ratio is about 1.05x, i.e., latest volume is roughly 5% above the prior 20-session average.
+- **trend-08** turn 1, number `3690.HK rolling_volatility` (expected `50.58972477864734`)
+  - Prompt: What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?
+  - Got: Meituan (3690.HK), using daily adjusted closes through 2026-11-17: 20-day rolling annualized volatility is approximately 44.6% (std dev of the last 20 daily log returns × √252). RSI(14) is approximately 41.5, indicating mildly weak/neutral momentum — the stock has pulled back from the early-November spike near 80.4 to 70.5, with recent losses outweighing gains but not yet in oversold territory.
+- **trend-08** turn 1, number `3690.HK rsi_14` (expected `43.236175319372585`)
+  - Prompt: What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?
+  - Got: Meituan (3690.HK), using daily adjusted closes through 2026-11-17: 20-day rolling annualized volatility is approximately 44.6% (std dev of the last 20 daily log returns × √252). RSI(14) is approximately 41.5, indicating mildly weak/neutral momentum — the stock has pulled back from the early-November spike near 80.4 to 70.5, with recent losses outweighing gains but not yet in oversold territory.
+- **trend-09** turn 1, behavior `declines to predict future prices` (expected ``)
+  - Prompt: Will 0700.HK go up next month? Give me a price target.
+  - Got: I can't forecast next-month price direction or provide a price target — I have no price data, no market-implied multiples, and no forward estimates in this snapshot, only one quarter of fundamentals. What the data does show for Tencent (0700.HK, quarter ended 2026-06-30): revenue of CNY 204.785bn vs CNY 184.504bn a year earlier (+11.0% YoY), net income of CNY 56.022bn (a ~27.4% net margin), total 
+- **follow-01** turn 1, number `0700.HK Revenue growth` (expected `10.992173611412227`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent), latest reported period 2026-06-30 (3M, CNY): revenue 204,785,000,000; prior-year revenue 184,504,000,000 (2025-06-30); net income 56,022,000,000; balance sheet date 2026-06-30 with total debt 471,828,000,000 and stockholders' equity 1,135,853,000,000. Latest price (2026-11-17 adjusted close): 376.00.
+- **follow-01** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent), latest reported period 2026-06-30 (3M, CNY): revenue 204,785,000,000; prior-year revenue 184,504,000,000 (2025-06-30); net income 56,022,000,000; balance sheet date 2026-06-30 with total debt 471,828,000,000 and stockholders' equity 1,135,853,000,000. Latest price (2026-11-17 adjusted close): 376.00.
+- **follow-01** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent), latest reported period 2026-06-30 (3M, CNY): revenue 204,785,000,000; prior-year revenue 184,504,000,000 (2025-06-30); net income 56,022,000,000; balance sheet date 2026-06-30 with total debt 471,828,000,000 and stockholders' equity 1,135,853,000,000. Latest price (2026-11-17 adjusted close): 376.00.
+- **follow-01** turn 1, number `0700.HK Historical volatility` (expected `33.843934520367455`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent), latest reported period 2026-06-30 (3M, CNY): revenue 204,785,000,000; prior-year revenue 184,504,000,000 (2025-06-30); net income 56,022,000,000; balance sheet date 2026-06-30 with total debt 471,828,000,000 and stockholders' equity 1,135,853,000,000. Latest price (2026-11-17 adjusted close): 376.00.
+- **follow-01** turn 2, number `0700.HK Historical volatility` (expected `32.551206438735974`)
+  - Prompt: Now use 60 trading days for volatility.
+  - Got: 0700.HK 60-trading-day volatility (daily adjusted closes, 2026-08-21 through 2026-11-17): I computed log returns over the 59 intervals. The standard deviation of daily log returns is approximately 1.72%, which annualizes (×√252) to roughly 27.3%. The window includes the 2026-09-22 jump (+5.0%) and the October decline (2026-10-21 to 2026-10-22: -3.9%, -2.9%), plus the 2026-11-05 rebound (+7.2%) and
+- **follow-02** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I can't compute a weighted ranking because no default weights (or scoring methodology) were provided in the dataset or your question. The dataset contains only raw fundamentals (revenue, prior-year revenue, net income, total debt, stockholders' equity) with no factor weights, so any ranking would require me to invent a methodology. Please specify the weights/factors (e.g., revenue growth, net marg
+- **follow-02** turn 2, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '2382.HK', '1810.HK']`)
+  - Prompt: Keep the same weights, but now require debt-to-equity of at most 0.3.
+  - Got: I still can't produce this ranking: no default weights were ever defined in the dataset or in our conversation, so there are no "same weights" to reuse. I can, however, apply the debt-to-equity ≤ 0.3 screen to the snapshot. Using total_debt / stockholders_equity, the qualifying constituents are: Alibaba Health (0.003), JD Health (0.014), MiniMax (0.102), Leapmotor (0.279), and Tencent Music (0.216
+- **follow-03** turn 1, ranking `top 3` (expected `['0700.HK', '9999.HK', '2382.HK']`)
+  - Prompt: Rank the top 3 stocks with net profit margin of at least 10%.
+  - Got: Using net income ÷ revenue for the latest reported period, the top 3 qualifying stocks (margin ≥10%) are: 1. NetEase (9999.HK) — 23.2% (CNY 6.98bn / 30.11bn, 3M to 2026-06-30) 2. Tencent (0700.HK) — 27.4% (CNY 56.02bn / 204.79bn, 3M to 2026-06-30) 3. Midea Group (0300.HK) — 13.8% (CNY 14.95bn / 108.03bn, 3M to 2026-09-30) Note: Tencent actually has the highest margin of the three; ranked strictly 
+- **follow-03** turn 2, ranking `top 6` (expected `['0700.HK', '9999.HK', '2382.HK', '1698.HK', '0981.HK', '1347.HK']`)
+  - Prompt: Using the same filter and weights, show the top 6 instead.
+  - Got: Using the same filter (net profit margin ≥10%, computed as net income ÷ revenue for the latest reported period) and ranking by margin, the top 6 are: 1. Tencent (0700.HK) — 27.4% (CNY 56.02bn / 204.79bn, 3M to 2026-06-30) 2. NetEase (9999.HK) — 23.2% (CNY 6.98bn / 30.11bn, 3M to 2026-06-30) 3. Midea Group (0300.HK) — 13.8% (CNY 14.95bn / 108.03bn, 3M to 2026-09-30) 4. Hua Hong Semiconductor (1347.
+- **follow-04** turn 1, number `0700.HK rsi_14` (expected `35.97500559114523`)
+  - Prompt: What is 0700.HK's RSI?
+  - Got: I can't compute a precise RSI without running the calculation, but based on the price series: Tencent (0700.HK) closed at 376.00 on 2026-11-17, down from 430.40 on 2026-11-05 — a sharp ~12.6% decline over eight sessions, with the last several days (409.6 → 398.8 → 386.6 → 390.4 → 376.0) mostly negative. Using the standard 14-day Wilder RSI, the recent string of losses after the early-November spik
+- **follow-04** turn 2, number `9988.HK rsi_14` (expected `29.090166679435086`)
+  - Prompt: And the same indicator for Alibaba?
+  - Got: For Alibaba (9988.HK), the 2026-11-17 close was 85.45, down from 109.10 on 2026-11-05 — a steep ~21.7% drop in eight sessions, with the final days (104.6 → 101.6 → 100.6 → 93.8 → 90.55 → 90.15 → 85.45) almost uniformly negative and heavy volume on the declines. A standard 14-day Wilder RSI on this path would be deeply oversold, roughly in the mid-to-high teens (approximately 15–20), lower than Ten
+- **follow-05** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I can't compute a weighted ranking because no scoring methodology or default weights are defined in the provided dataset or question. The dataset contains only raw financial fields (revenue, prior-year revenue, net income, total debt, stockholders' equity) with no valuation, momentum, or quality metrics, and no "default weights" are specified. Please provide the factor definitions and weights (e.g
+- **follow-05** turn 2, number `9999.HK return_on_equity` (expected `22.583186313477853`)
+  - Prompt: What is the return on equity of the top-ranked one?
+  - Got: There is no top-ranked stock, since no ranking methodology or default weights were defined, so I can't identify a top-ranked company or its ROE. If you specify the ranking criteria, I can compute ROE (net income / stockholders' equity) for the resulting top name. For reference, ROE varies widely across the constituents—e.g., Tencent ~4.9% (56.02B/1,135.85B), Alibaba ~1.0% (10.61B/1,049.04B), Meitu
+- **follow-06** turn 2, number `0700.HK Historical volatility` (expected `38.319796728677126`)
+  - Prompt: For those same two companies, give the historical volatility over 120 trading days.
+  - Got: Using daily adjusted closes through 2026-11-17, the 120-trading-day historical volatility (annualized, standard deviation of daily log returns × √252): - Tencent (0700.HK): approximately 30.5% - NetEase (9999.HK): approximately 31.5% Both stocks show similar volatility over the past 120 trading days, with NetEase slightly higher. Note: these are estimates computed from the price series in the snap
+- **follow-06** turn 2, number `9999.HK Historical volatility` (expected `36.592504107679154`)
+  - Prompt: For those same two companies, give the historical volatility over 120 trading days.
+  - Got: Using daily adjusted closes through 2026-11-17, the 120-trading-day historical volatility (annualized, standard deviation of daily log returns × √252): - Tencent (0700.HK): approximately 30.5% - NetEase (9999.HK): approximately 31.5% Both stocks show similar volatility over the past 120 trading days, with NetEase slightly higher. Note: these are estimates computed from the price series in the snap
+- **invalid-03** turn 1, behavior `says P/E is not available` (expected ``)
+  - Prompt: What is the P/E ratio of 0700.HK?
+  - Got: The dataset does not contain share price or share count data, so a P/E ratio for Tencent (0700.HK) cannot be computed from the provided inputs. Only fundamentals are available: Q2 2026 (3M, ended 2026-06-30) revenue of CNY 204.785B and net income of CNY 56.022B. A trailing P/E would require the current market price and diluted share count (or market cap), neither of which is in the snapshot.
+- **invalid-06** turn 1, behavior `says sector classification is unavailable` (expected ``)
+  - Prompt: Rank the top 5 semiconductor stocks.
+  - Got: Based on the snapshot (daily prices through 2026-11-17), the semiconductor names in the Hang Seng TECH constituents are SMIC (0981.HK), Hua Hong Semiconductor (1347.HK), Horizon Robotics (9660.HK), and Iluvatar CoreX (9903.HK). Ranking them by latest-period revenue scale (USD converted at ~7.1 for comparability): 1. SMIC (0981.HK) — 3M revenue US$3.19bn (up ~34% YoY), net income US$428m, profitabl
+
+## notools-deepseek: 81 failed check(s)
+
+- **ind-01** turn 1, number `0700.HK Revenue growth` (expected `10.992173611412227`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I don't have access to the dataset snapshot in this conversation, so I can't retrieve the four metrics for 0700.HK. Please provide the data or ask a question I can answer from the information given.
+- **ind-01** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I don't have access to the dataset snapshot in this conversation, so I can't retrieve the four metrics for 0700.HK. Please provide the data or ask a question I can answer from the information given.
+- **ind-01** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I don't have access to the dataset snapshot in this conversation, so I can't retrieve the four metrics for 0700.HK. Please provide the data or ask a question I can answer from the information given.
+- **ind-01** turn 1, number `0700.HK Historical volatility` (expected `33.843934520367455`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I don't have access to the dataset snapshot in this conversation, so I can't retrieve the four metrics for 0700.HK. Please provide the data or ask a question I can answer from the information given.
+- **ind-02** turn 1, number `1698.HK Revenue growth` (expected `5.648115325534686`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: I don't have the dataset in front of me and no tools to query it, so I can't retrieve Tencent Music Entertainment's four core metrics from the 2026-11-18 snapshot. Please provide the data or specify which four metrics you mean (e.g., price, market cap, P/E, revenue growth) and I can help interpret them.
+- **ind-02** turn 1, number `1698.HK Net profit margin` (expected `24.091264959176826`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: I don't have the dataset in front of me and no tools to query it, so I can't retrieve Tencent Music Entertainment's four core metrics from the 2026-11-18 snapshot. Please provide the data or specify which four metrics you mean (e.g., price, market cap, P/E, revenue growth) and I can help interpret them.
+- **ind-02** turn 1, number `1698.HK Debt-to-equity` (expected `0.21570932134096485`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: I don't have the dataset in front of me and no tools to query it, so I can't retrieve Tencent Music Entertainment's four core metrics from the 2026-11-18 snapshot. Please provide the data or specify which four metrics you mean (e.g., price, market cap, P/E, revenue growth) and I can help interpret them.
+- **ind-02** turn 1, number `1698.HK Historical volatility` (expected `48.74248102440263`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: I don't have the dataset in front of me and no tools to query it, so I can't retrieve Tencent Music Entertainment's four core metrics from the 2026-11-18 snapshot. Please provide the data or specify which four metrics you mean (e.g., price, market cap, P/E, revenue growth) and I can help interpret them.
+- **ind-03** turn 1, number `9988.HK Historical volatility` (expected `44.768350745289595`)
+  - Prompt: What is the historical volatility of 9988.HK using a 60-trading-day window?
+  - Got: I don't have access to the underlying price data in this session, so I can't compute the 60-trading-day historical volatility for 9988.HK. Historical volatility is typically calculated as the annualized standard deviation of daily log returns over the trailing 60 trading days (through 2026-11-17 in this snapshot), i.e., stdev(ln(P_t/P_{t-1})) × √252. If you can provide the daily closing prices for
+- **ind-04** turn 1, number `0992.HK Revenue growth` (expected `43.08550185873605`)
+  - Prompt: What are Lenovo's (0992.HK) revenue growth and net profit margin?
+  - Got: Based on the fixed dataset snapshot (2026-11-18, prices through 2026-11-17), Lenovo (0992.HK) shows revenue growth of approximately 18% year-over-year and a net profit margin of roughly 2.2%. Note: these figures reflect the most recent reported period in the snapshot; Lenovo's thin-margin hardware model typically keeps net margin in the low single digits.
+- **ind-04** turn 1, number `0992.HK Net profit margin` (expected `-2.260327357755261`)
+  - Prompt: What are Lenovo's (0992.HK) revenue growth and net profit margin?
+  - Got: Based on the fixed dataset snapshot (2026-11-18, prices through 2026-11-17), Lenovo (0992.HK) shows revenue growth of approximately 18% year-over-year and a net profit margin of roughly 2.2%. Note: these figures reflect the most recent reported period in the snapshot; Lenovo's thin-margin hardware model typically keeps net margin in the low single digits.
+- **ind-05** turn 1, number `9866.HK Debt-to-equity` (expected `7.134757531914056`)
+  - Prompt: Show NIO's (9866.HK) debt-to-equity ratio and net profit margin.
+  - Got: I don't have access to NIO's financial statement data in this snapshot—only daily price data through 2026-11-17—so I can't compute its debt-to-equity ratio or net profit margin.
+- **ind-05** turn 1, number `9866.HK Net profit margin` (expected `-2.245368643813719`)
+  - Prompt: Show NIO's (9866.HK) debt-to-equity ratio and net profit margin.
+  - Got: I don't have access to NIO's financial statement data in this snapshot—only daily price data through 2026-11-17—so I can't compute its debt-to-equity ratio or net profit margin.
+- **ind-06** turn 1, number `0300.HK Net profit margin` (expected `13.83568512509644`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: I don't have the four metrics defined or the dataset values for 0300.HK available in this conversation, so I can't display them. Please specify which four metrics you mean (e.g., price, market cap, P/E, dividend yield) and I can explain any that are missing from the 2026-11-18 snapshot.
+- **ind-06** turn 1, number `0300.HK Debt-to-equity` (expected `0.34947388585577105`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: I don't have the four metrics defined or the dataset values for 0300.HK available in this conversation, so I can't display them. Please specify which four metrics you mean (e.g., price, market cap, P/E, dividend yield) and I can explain any that are missing from the 2026-11-18 snapshot.
+- **ind-06** turn 1, number `0300.HK Historical volatility` (expected `23.66365939650136`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: I don't have the four metrics defined or the dataset values for 0300.HK available in this conversation, so I can't display them. Please specify which four metrics you mean (e.g., price, market cap, P/E, dividend yield) and I can explain any that are missing from the 2026-11-18 snapshot.
+- **ind-07** turn 1, unavailable `0100.HK Revenue growth` (expected ``)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I don't have the dataset in front of me in this session, so I can't report the four metric values for 0100.HK (MiniMax). Regarding your second question: in this snapshot the volatility metric is computed from the trailing daily return series, and it is only a full 252-day (one trading year) estimate if the stock has at least 252 valid daily observations in the window; otherwise it is based on the 
+- **ind-07** turn 1, number `0100.HK Net profit margin` (expected `-5310.745673997109`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I don't have the dataset in front of me in this session, so I can't report the four metric values for 0100.HK (MiniMax). Regarding your second question: in this snapshot the volatility metric is computed from the trailing daily return series, and it is only a full 252-day (one trading year) estimate if the stock has at least 252 valid daily observations in the window; otherwise it is based on the 
+- **ind-07** turn 1, number `0100.HK Debt-to-equity` (expected `0.10204554449710883`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I don't have the dataset in front of me in this session, so I can't report the four metric values for 0100.HK (MiniMax). Regarding your second question: in this snapshot the volatility metric is computed from the trailing daily return series, and it is only a full 252-day (one trading year) estimate if the stock has at least 252 valid daily observations in the window; otherwise it is based on the 
+- **ind-07** turn 1, number `0100.HK Historical volatility` (expected `142.4897209287103`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I don't have the dataset in front of me in this session, so I can't report the four metric values for 0100.HK (MiniMax). Regarding your second question: in this snapshot the volatility metric is computed from the trailing daily return series, and it is only a full 252-day (one trading year) estimate if the stock has at least 252 valid daily observations in the window; otherwise it is based on the 
+- **ind-07** turn 1, label `0100.HK volatility history status` (expected `SHORT`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I don't have the dataset in front of me in this session, so I can't report the four metric values for 0100.HK (MiniMax). Regarding your second question: in this snapshot the volatility metric is computed from the trailing daily return series, and it is only a full 252-day (one trading year) estimate if the stock has at least 252 valid daily observations in the window; otherwise it is based on the 
+- **ind-08** turn 1, number `0700.HK return_on_equity` (expected `21.134746439817643`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: I don't have access to Tencent's financial statements in this dataset snapshot, so I can't compute ROE, equity growth, debt growth, or profit-margin change. The snapshot covers daily prices through 2026-11-17 for the 30 Hang Seng TECH constituents; it does not include balance-sheet or income-statement line items needed for these ratios.
+- **ind-08** turn 1, number `0700.HK equity_growth` (expected `18.551114069362782`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: I don't have access to Tencent's financial statements in this dataset snapshot, so I can't compute ROE, equity growth, debt growth, or profit-margin change. The snapshot covers daily prices through 2026-11-17 for the 30 Hang Seng TECH constituents; it does not include balance-sheet or income-statement line items needed for these ratios.
+- **ind-08** turn 1, unavailable `0700.HK debt_growth` (expected ``)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: I don't have access to Tencent's financial statements in this dataset snapshot, so I can't compute ROE, equity growth, debt growth, or profit-margin change. The snapshot covers daily prices through 2026-11-17 for the 30 Hang Seng TECH constituents; it does not include balance-sheet or income-statement line items needed for these ratios.
+- **ind-08** turn 1, number `0700.HK profit_margin_change` (expected `0.5149544366080006`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: I don't have access to Tencent's financial statements in this dataset snapshot, so I can't compute ROE, equity growth, debt growth, or profit-margin change. The snapshot covers daily prices through 2026-11-17 for the 30 Hang Seng TECH constituents; it does not include balance-sheet or income-statement line items needed for these ratios.
+- **ind-09** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: Based on the 2026-11-18 snapshot (daily prices through 2026-11-17), here is the comparison of Tencent (0700.HK) and NetEase (9999.HK): - Net profit margin: Tencent (0700.HK) is roughly in the low-30% range, while NetEase (9999.HK) is roughly in the low-to-mid-20% range. Tencent therefore has the higher net profit margin. - Debt-to-equity: Both companies carry very low leverage. Tencent's D/E is ap
+- **ind-09** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: Based on the 2026-11-18 snapshot (daily prices through 2026-11-17), here is the comparison of Tencent (0700.HK) and NetEase (9999.HK): - Net profit margin: Tencent (0700.HK) is roughly in the low-30% range, while NetEase (9999.HK) is roughly in the low-to-mid-20% range. Tencent therefore has the higher net profit margin. - Debt-to-equity: Both companies carry very low leverage. Tencent's D/E is ap
+- **ind-09** turn 1, number `9999.HK Net profit margin` (expected `23.18650568550773`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: Based on the 2026-11-18 snapshot (daily prices through 2026-11-17), here is the comparison of Tencent (0700.HK) and NetEase (9999.HK): - Net profit margin: Tencent (0700.HK) is roughly in the low-30% range, while NetEase (9999.HK) is roughly in the low-to-mid-20% range. Tencent therefore has the higher net profit margin. - Debt-to-equity: Both companies carry very low leverage. Tencent's D/E is ap
+- **ind-09** turn 1, number `9999.HK Debt-to-equity` (expected `0.07543317533117075`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: Based on the 2026-11-18 snapshot (daily prices through 2026-11-17), here is the comparison of Tencent (0700.HK) and NetEase (9999.HK): - Net profit margin: Tencent (0700.HK) is roughly in the low-30% range, while NetEase (9999.HK) is roughly in the low-to-mid-20% range. Tencent therefore has the higher net profit margin. - Debt-to-equity: Both companies carry very low leverage. Tencent's D/E is ap
+- **ind-10** turn 1, number `0700/9988 correlation (60)` (expected `0.778918294230132`)
+  - Prompt: What is the return correlation between 0700.HK and 9988.HK over the last 60 sessions?
+  - Got: I don't have access to the underlying price data in this session, so I can't compute the 60-session return correlation between 0700.HK (Tencent) and 9988.HK (Alibaba) from the 2026-11-18 snapshot. To get it, calculate daily log or simple returns for both tickers over the last 60 trading sessions through 2026-11-17 and take the Pearson correlation of the two return series.
+- **ind-11** turn 1, number `1810.HK Revenue growth` (expected `-6.066504949705487`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 抱歉，我无法显示小米（1810.HK）的四个核心指标，因为我没有工具，无法访问该固定数据集快照中的具体数值。请提供数据或允许我使用工具后再查询。
+- **ind-11** turn 1, number `1810.HK Net profit margin` (expected `8.68735330562368`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 抱歉，我无法显示小米（1810.HK）的四个核心指标，因为我没有工具，无法访问该固定数据集快照中的具体数值。请提供数据或允许我使用工具后再查询。
+- **ind-11** turn 1, number `1810.HK Debt-to-equity` (expected `0.16432161090212`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 抱歉，我无法显示小米（1810.HK）的四个核心指标，因为我没有工具，无法访问该固定数据集快照中的具体数值。请提供数据或允许我使用工具后再查询。
+- **ind-11** turn 1, number `1810.HK Historical volatility` (expected `43.42588553250596`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 抱歉，我无法显示小米（1810.HK）的四个核心指标，因为我没有工具，无法访问该固定数据集快照中的具体数值。请提供数据或允许我使用工具后再查询。
+- **rank-01** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I don't have access to the scoring model, the default weights, or the underlying dataset in this conversation, and I have no tools to retrieve them. Please provide the default weight definitions and the constituent data (or the precomputed scores), and I can rank the top 5.
+- **rank-02** turn 1, ranking `top 5` (expected `['0700.HK', '9999.HK', '2382.HK', '1698.HK']`)
+  - Prompt: Return the top 5 stocks with net profit margin at least 10% and debt-to-equity at most 0.5.
+  - Got: I don't have access to the underlying financial dataset in this session (no tools available), so I can't compute or verify net profit margin and debt-to-equity figures for the 30 Hang Seng TECH constituents. Please provide the relevant financial data (net profit margin and debt-to-equity per stock), and I'll return the top 5 qualifying names as JSON.
+- **rank-03** turn 1, ranking `top 3` (expected `['9863.HK', '9866.HK', '6618.HK']`)
+  - Prompt: Rank the top 3 stocks using revenue growth weight 2 and historical volatility weight 1.
+  - Got: I don't have access to the underlying dataset in this session (no tools), so I can't compute the weighted revenue-growth/volatility scores or name the top 3 constituents. To rank them I'd need each stock's revenue growth and historical volatility from the 2026-11-18 snapshot; with those, the score would be 2×normalized revenue growth + 1×normalized volatility (or −1× if lower volatility is preferr
+- **rank-04** turn 1, ranking `top 5` (expected `['0241.HK', '6618.HK', '9999.HK', '0100.HK', '1810.HK']`)
+  - Prompt: Rank the top 5 stocks using only debt-to-equity.
+  - Got: I don't have the debt-to-equity figures in the provided snapshot, so I can't produce a reliable top-5 ranking. Please provide the debt-to-equity data for the 30 Hang Seng TECH constituents, and I'll rank them.
+- **rank-05** turn 1, ranking `top 10` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK', '1698.HK', '1810.HK', '9863.HK', '9988.HK', '9618.HK']`)
+  - Prompt: Rank the top 10 stocks using the default weights.
+  - Got: I don't have access to the dataset snapshot or the default weights in this conversation, and I have no tools to retrieve them, so I can't compute a top-10 ranking. Please provide the constituent scores (or the weighting scheme and underlying factor data) and I'll rank them.
+- **rank-06** turn 1, ranking `top 5` (expected `['9863.HK', '6618.HK', '0020.HK', '9866.HK', '0981.HK']`)
+  - Prompt: Among stocks with revenue growth of at least 20%, rank the top 5 using the default weights.
+  - Got: I don't have access to the underlying dataset in this session (no tools), so I can't compute the ranking. To answer, I'd need the 30 Hang Seng TECH constituents' revenue growth figures and the default-weighted composite scores from the 2026-11-18 snapshot; please provide those inputs or enable data access.
+- **rank-07** turn 1, ranking `top 3` (expected `['0300.HK', '6690.HK', '9618.HK']`)
+  - Prompt: Which 3 stocks have the lowest historical volatility? Rank using only historical volatility.
+  - Got: I don't have access to the underlying price data in this session (no tools available), so I can't compute or rank historical volatility for the 30 Hang Seng TECH constituents. Please provide the volatility figures or enable data access, and I'll rank the three lowest.
+- **rank-08** turn 1, behavior `reports that no stock passes the filter` (expected ``)
+  - Prompt: Rank the top 5 stocks with net profit margin at least 50%.
+  - Got: I don't have access to the underlying financial dataset in this session, so I can't reliably rank the Hang Seng TECH constituents by net profit margin. To produce an accurate top-5 list, please provide the net profit margin figures (or the net profit and revenue data) for the constituents as of the 2026-11-18 snapshot.
+- **rank-09** turn 1, ranking `top 3` (expected `['9999.HK', '0241.HK', '1698.HK']`)
+  - Prompt: I prefer profitable, low-debt companies. Require net profit margin of at least 5% and debt-to-equity of at most 0.3, weight net profit margin and debt-to-equity equally and ignore the other metrics. Give me the top 3.
+  - Got: I can't produce a reliable top 3 for this screen. The fixed snapshot I'm working from does not include the fundamental fields needed to apply your filters — specifically net profit margin and debt-to-equity for the 30 Hang Seng TECH constituents — and I have no tools to retrieve or compute them. Any ranking I gave would be fabricated. To run this screen, please provide the net profit margin and de
+- **trend-01** turn 1, number `0700.HK rsi_14` (expected `35.97500559114523`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: I don't have access to the dataset snapshot in this session (no tools available), so I can't compute or quote 0700.HK's RSI, MACD line, 50-day moving average, or 12-month return. Please provide the price data or re-run the query in a session with dataset access.
+- **trend-01** turn 1, number `0700.HK macd` (expected `-6.206396519577424`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: I don't have access to the dataset snapshot in this session (no tools available), so I can't compute or quote 0700.HK's RSI, MACD line, 50-day moving average, or 12-month return. Please provide the price data or re-run the query in a session with dataset access.
+- **trend-01** turn 1, number `0700.HK sma_50` (expected `415.61999877929685`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: I don't have access to the dataset snapshot in this session (no tools available), so I can't compute or quote 0700.HK's RSI, MACD line, 50-day moving average, or 12-month return. Please provide the price data or re-run the query in a session with dataset access.
+- **trend-01** turn 1, number `0700.HK return_12m` (expected `-40.238690804462216`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: I don't have access to the dataset snapshot in this session (no tools available), so I can't compute or quote 0700.HK's RSI, MACD line, 50-day moving average, or 12-month return. Please provide the price data or re-run the query in a session with dataset access.
+- **trend-02** turn 1, label `0700.HK price vs SMA50` (expected `BELOW`)
+  - Prompt: Is 0700.HK's latest adjusted close above or below its 50-day simple moving average? Begin your answer with exactly one word, ABOVE or BELOW, then explain.
+  - Got: ABOVE — Based on the fixed dataset snapshot (daily prices through 2026-11-17), 0700.HK's latest adjusted close is above its 50-day simple moving average, indicating the stock is trading in positive short-to-medium-term momentum relative to its recent trend.
+- **trend-03** turn 1, label `0981.HK SMA50 vs SMA200` (expected `BELOW`)
+  - Prompt: Is SMIC's (0981.HK) 50-day moving average above or below its 200-day moving average? Begin your answer with exactly one word, ABOVE or BELOW, then explain.
+  - Got: ABOVE — Based on the fixed dataset snapshot (daily prices through 2026-11-17), SMIC's 50-day moving average sits above its 200-day moving average, a configuration consistent with an uptrend over the medium term relative to the longer-term trend.
+- **trend-04** turn 1, number `9988.HK maximum_drawdown` (expected `-30.528457765656757`)
+  - Prompt: What was the maximum drawdown of 9988.HK over the last 60 trading sessions?
+  - Got: I don't have access to the price data in this session, so I can't compute 9988.HK's maximum drawdown over the last 60 trading sessions. To calculate it, take the daily closing prices for the 60 sessions ending 2026-11-17, compute the running peak, then find the minimum of (price / running peak − 1); the most negative value is the maximum drawdown.
+- **trend-05** turn 1, number `0981.HK return_1m` (expected `-6.106871507167922`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: I don't have access to the underlying price data in this session (no tools available), so I can't compute 0981.HK's 1-month, 3-month, or 6-month returns from the 2026-11-18 snapshot. Please provide the closing prices for 2026-11-17, 2026-10-17, 2026-08-17, and 2026-05-17 (or the relevant trading-day closes), and I can calculate the returns.
+- **trend-05** turn 1, number `0981.HK return_3m` (expected `-34.530938437843176`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: I don't have access to the underlying price data in this session (no tools available), so I can't compute 0981.HK's 1-month, 3-month, or 6-month returns from the 2026-11-18 snapshot. Please provide the closing prices for 2026-11-17, 2026-10-17, 2026-08-17, and 2026-05-17 (or the relevant trading-day closes), and I can calculate the returns.
+- **trend-05** turn 1, number `0981.HK return_6m` (expected `-30.850316643992947`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: I don't have access to the underlying price data in this session (no tools available), so I can't compute 0981.HK's 1-month, 3-month, or 6-month returns from the 2026-11-18 snapshot. Please provide the closing prices for 2026-11-17, 2026-10-17, 2026-08-17, and 2026-05-17 (or the relevant trading-day closes), and I can calculate the returns.
+- **trend-07** turn 1, number `1810.HK volume_ratio_20` (expected `1.0035002650345637`)
+  - Prompt: How does 1810.HK's latest trading volume compare with its previous 20-session average? Give the ratio.
+  - Got: I don't have access to the underlying price/volume dataset in this session, so I can't compute 1810.HK's latest volume versus its prior 20-session average or provide the ratio. Please provide the volume series (or the two figures) and I can calculate it.
+- **trend-08** turn 1, number `3690.HK rolling_volatility` (expected `50.58972477864734`)
+  - Prompt: What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?
+  - Got: I don't have access to the underlying price data in this session, so I can't compute Meituan's (3690.HK) 20-day rolling annualized volatility or its RSI as of the 2026-11-17 snapshot. Please provide the recent daily closing prices (at least ~20–30 sessions) or enable data access, and I'll calculate both indicators.
+- **trend-08** turn 1, number `3690.HK rsi_14` (expected `43.236175319372585`)
+  - Prompt: What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?
+  - Got: I don't have access to the underlying price data in this session, so I can't compute Meituan's (3690.HK) 20-day rolling annualized volatility or its RSI as of the 2026-11-17 snapshot. Please provide the recent daily closing prices (at least ~20–30 sessions) or enable data access, and I'll calculate both indicators.
+- **trend-09** turn 1, behavior `declines to predict future prices` (expected ``)
+  - Prompt: Will 0700.HK go up next month? Give me a price target.
+  - Got: I can't give a price target or directional call for 0700.HK (Tencent) next month. I have no tools and no access to the underlying price series, so I can't run any quantitative analysis, and even with full data, one-month equity direction is not reliably forecastable. Any specific number I produced would be fabricated rather than derived from the 2026-11-18 snapshot. If you want, I can instead outl
+- **trend-10** turn 1, number `0100.HK return_1m` (expected `-36.29873909281517`)
+  - Prompt: Show the 1-month and 12-month price returns of 0100.HK.
+  - Got: I don't have access to the price data for 0100.HK in this snapshot, so I can't compute its 1-month or 12-month returns. Note also that 0100.HK is not one of the 30 Hang Seng TECH constituents covered by this dataset.
+- **trend-10** turn 1, unavailable `0100.HK return_12m` (expected ``)
+  - Prompt: Show the 1-month and 12-month price returns of 0100.HK.
+  - Got: I don't have access to the price data for 0100.HK in this snapshot, so I can't compute its 1-month or 12-month returns. Note also that 0100.HK is not one of the 30 Hang Seng TECH constituents covered by this dataset.
+- **follow-01** turn 1, number `0700.HK Revenue growth` (expected `10.992173611412227`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I don't have the dataset in front of me in this session, so I can't reliably report the four metrics for 0700.HK (Tencent). Please share the metric names or the snapshot values, and I'll format them for you.
+- **follow-01** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I don't have the dataset in front of me in this session, so I can't reliably report the four metrics for 0700.HK (Tencent). Please share the metric names or the snapshot values, and I'll format them for you.
+- **follow-01** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I don't have the dataset in front of me in this session, so I can't reliably report the four metrics for 0700.HK (Tencent). Please share the metric names or the snapshot values, and I'll format them for you.
+- **follow-01** turn 1, number `0700.HK Historical volatility` (expected `33.843934520367455`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I don't have the dataset in front of me in this session, so I can't reliably report the four metrics for 0700.HK (Tencent). Please share the metric names or the snapshot values, and I'll format them for you.
+- **follow-01** turn 2, number `0700.HK Historical volatility` (expected `32.551206438735974`)
+  - Prompt: Now use 60 trading days for volatility.
+  - Got: Understood — you want 0700.HK's four metrics with volatility computed over a 60-trading-day window. However, I still don't have the dataset values available in this session, so I can't produce the numbers. If you provide the 60-day price series (or the precomputed metrics), I'll return all four metrics for 0700.HK using the 60-trading-day volatility.
+- **follow-02** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I don't have access to the scoring model, default weights, or the underlying dataset in this conversation, so I can't compute or rank the top 5 stocks. Please provide the default weight definitions and the relevant factor data (or the precomputed scores), and I'll rank them for you.
+- **follow-02** turn 2, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '2382.HK', '1810.HK']`)
+  - Prompt: Keep the same weights, but now require debt-to-equity of at most 0.3.
+  - Got: I still don't have the default weights, the scoring model, or the debt-to-equity data for the 30 Hang Seng TECH constituents in this conversation, so I can't apply the ≤0.3 D/E screen or produce a ranking. Please share the weight definitions and the factor data (including D/E per stock), and I'll filter and rank the top 5.
+- **follow-03** turn 1, ranking `top 3` (expected `['0700.HK', '9999.HK', '2382.HK']`)
+  - Prompt: Rank the top 3 stocks with net profit margin of at least 10%.
+  - Got: I don't have access to the underlying financial dataset in this session, so I can't reliably rank the Hang Seng TECH constituents by net profit margin. To produce an accurate top-3 list, please provide the net profit margin figures (or the relevant revenue and net profit data) for the constituents, and I'll rank those with margins of at least 10%.
+- **follow-03** turn 2, ranking `top 6` (expected `['0700.HK', '9999.HK', '2382.HK', '1698.HK', '0981.HK', '1347.HK']`)
+  - Prompt: Using the same filter and weights, show the top 6 instead.
+  - Got: I still don't have the underlying dataset available in this session, so I can't produce a top-6 ranking under the same filter (net profit margin ≥ 10%) and weights. Please share the net profit margin figures (or revenue and net profit data) for the Hang Seng TECH constituents, and I'll return the top 6 using the identical filter and weighting.
+- **follow-04** turn 1, number `0700.HK rsi_14` (expected `35.97500559114523`)
+  - Prompt: What is 0700.HK's RSI?
+  - Got: I don't have access to the dataset or any tools in this session, so I can't compute or retrieve 0700.HK's RSI value. Please provide the price data or enable data access.
+- **follow-04** turn 2, number `9988.HK rsi_14` (expected `29.090166679435086`)
+  - Prompt: And the same indicator for Alibaba?
+  - Got: I can't provide Alibaba's (9988.HK) RSI either — I have no tools or dataset access in this session, so I can't compute or retrieve indicator values for any of the Hang Seng TECH constituents. If you share the price history or enable data access, I can calculate it.
+- **follow-05** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I don't have access to the scoring model, the default weights, or the underlying dataset in this conversation, so I can't compute or rank the top 5 stocks. Please provide the default weights and the relevant factor data (or the precomputed scores), and I'll produce the ranking.
+- **follow-05** turn 2, number `9999.HK return_on_equity` (expected `22.583186313477853`)
+  - Prompt: What is the return on equity of the top-ranked one?
+  - Got: I can't answer that because no stock has been ranked yet — I don't have the default weights or the underlying dataset, so there is no top-ranked stock to look up. If you share the weights and factor data (or the precomputed scores), I can identify the top-ranked stock and then report its return on equity from the snapshot.
+- **follow-06** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Compare the net profit margin of 0700.HK and 9999.HK.
+  - Got: Based on the dataset snapshot (daily prices through 2026-11-17), net profit margin is calculated as net profit divided by revenue using the most recent reported financials. 0700.HK (Tencent) has a net profit margin of approximately 30%, while 9999.HK (NetEase) has a net profit margin of approximately 25%. Tencent's margin is therefore higher by roughly 5 percentage points, reflecting its larger sh
+- **follow-06** turn 1, number `9999.HK Net profit margin` (expected `23.18650568550773`)
+  - Prompt: Compare the net profit margin of 0700.HK and 9999.HK.
+  - Got: Based on the dataset snapshot (daily prices through 2026-11-17), net profit margin is calculated as net profit divided by revenue using the most recent reported financials. 0700.HK (Tencent) has a net profit margin of approximately 30%, while 9999.HK (NetEase) has a net profit margin of approximately 25%. Tencent's margin is therefore higher by roughly 5 percentage points, reflecting its larger sh
+- **follow-06** turn 2, number `0700.HK Historical volatility` (expected `38.319796728677126`)
+  - Prompt: For those same two companies, give the historical volatility over 120 trading days.
+  - Got: Using daily returns from the 120 trading days ending 2026-11-17, annualized historical volatility (standard deviation of daily log returns × √252) is approximately 28% for 0700.HK (Tencent) and approximately 33% for 9999.HK (NetEase). NetEase thus shows the higher realized volatility over this window, consistent with its greater sensitivity to game-approval and title-launch news, while Tencent's l
+- **follow-06** turn 2, number `9999.HK Historical volatility` (expected `36.592504107679154`)
+  - Prompt: For those same two companies, give the historical volatility over 120 trading days.
+  - Got: Using daily returns from the 120 trading days ending 2026-11-17, annualized historical volatility (standard deviation of daily log returns × √252) is approximately 28% for 0700.HK (Tencent) and approximately 33% for 9999.HK (NetEase). NetEase thus shows the higher realized volatility over this window, consistent with its greater sensitivity to game-approval and title-launch news, while Tencent's l
+- **invalid-01** turn 1, behavior `says AAPL is not in the supported universe` (expected ``)
+  - Prompt: Show all four metrics for AAPL.
+  - Got: I can't provide metrics for AAPL. My dataset covers only the 30 Hang Seng TECH constituents (Hong Kong-listed technology stocks) as of the 2026-11-18 snapshot, and Apple (AAPL) is not among them. Please ask about one of the Hang Seng TECH constituents instead.
+- **invalid-03** turn 1, behavior `says P/E is not available` (expected ``)
+  - Prompt: What is the P/E ratio of 0700.HK?
+  - Got: I don't have access to the dataset snapshot in this conversation, so I can't retrieve the P/E ratio for 0700.HK (Tencent Holdings). Please provide the snapshot data or the specific figure you'd like me to work with.
+- **invalid-04** turn 1, behavior `rejects a 1-day volatility window` (expected ``)
+  - Prompt: Show the historical volatility of 0700.HK using a window of 1 trading day.
+  - Got: I can't compute that from the fixed snapshot. A 1-trading-day volatility window requires at least two consecutive daily returns (i.e., three consecutive closing prices) to produce even a single estimate, and the snapshot only provides daily prices through 2026-11-17 without the ability to run calculations. With a 1-day window, volatility is effectively undefined/degenerate—there is no dispersion w
+- **invalid-05** turn 1, behavior `rejects a negative weight` (expected ``)
+  - Prompt: Rank the top 5 stocks with revenue growth weight -1 and net profit margin weight 2.
+  - Got: I don't have access to the underlying dataset in this session (no tools available), so I can't compute the weighted score (revenue growth × -1 + net profit margin × 2) or rank the top 5 Hang Seng TECH constituents. Please provide the revenue growth and net profit margin figures for the 30 constituents, and I'll rank them immediately.
+- **invalid-06** turn 1, behavior `says sector classification is unavailable` (expected ``)
+  - Prompt: Rank the top 5 semiconductor stocks.
+  - Got: I can't rank semiconductor stocks from this dataset. The Hang Seng TECH constituents include only a few semiconductor names (e.g., SMIC 0981.HK and Hua Hong Semiconductor 1347.HK), which is fewer than five, and the snapshot contains no semiconductor-specific ranking metric. If you'd like, I can rank those two semiconductor names on a metric such as 1-day, 1-month, or YTD return, or rank the top 5 
+
+## notools-qwen-raw: 73 failed check(s)
+
+- **ind-01** turn 1, number `0700.HK Revenue growth` (expected `10.992173611412227`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) metrics for the 3-month period ending 2026-06-30 (CNY): Revenue: 204,785,000,000; Net Income: 56,022,000,000; Total Debt: 471,828,000,000; Stockholders' Equity: 1,135,853,000,000.
+- **ind-01** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) metrics for the 3-month period ending 2026-06-30 (CNY): Revenue: 204,785,000,000; Net Income: 56,022,000,000; Total Debt: 471,828,000,000; Stockholders' Equity: 1,135,853,000,000.
+- **ind-01** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) metrics for the 3-month period ending 2026-06-30 (CNY): Revenue: 204,785,000,000; Net Income: 56,022,000,000; Total Debt: 471,828,000,000; Stockholders' Equity: 1,135,853,000,000.
+- **ind-01** turn 1, number `0700.HK Historical volatility` (expected `33.843934520367455`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) metrics for the 3-month period ending 2026-06-30 (CNY): Revenue: 204,785,000,000; Net Income: 56,022,000,000; Total Debt: 471,828,000,000; Stockholders' Equity: 1,135,853,000,000.
+- **ind-02** turn 1, number `1698.HK Revenue growth` (expected `5.648115325534686`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: Tencent Music Entertainment (1698.HK) core metrics for the 3-month period ending 2026-09-30: Revenue: 8,941,000,000 CNY; Net Income: 2,154,000,000 CNY; Total Debt: 16,884,000,000 CNY; Stockholders' Equity: 78,272,000,000 CNY.
+- **ind-02** turn 1, number `1698.HK Net profit margin` (expected `24.091264959176826`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: Tencent Music Entertainment (1698.HK) core metrics for the 3-month period ending 2026-09-30: Revenue: 8,941,000,000 CNY; Net Income: 2,154,000,000 CNY; Total Debt: 16,884,000,000 CNY; Stockholders' Equity: 78,272,000,000 CNY.
+- **ind-02** turn 1, number `1698.HK Debt-to-equity` (expected `0.21570932134096485`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: Tencent Music Entertainment (1698.HK) core metrics for the 3-month period ending 2026-09-30: Revenue: 8,941,000,000 CNY; Net Income: 2,154,000,000 CNY; Total Debt: 16,884,000,000 CNY; Stockholders' Equity: 78,272,000,000 CNY.
+- **ind-02** turn 1, number `1698.HK Historical volatility` (expected `48.74248102440263`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: Tencent Music Entertainment (1698.HK) core metrics for the 3-month period ending 2026-09-30: Revenue: 8,941,000,000 CNY; Net Income: 2,154,000,000 CNY; Total Debt: 16,884,000,000 CNY; Stockholders' Equity: 78,272,000,000 CNY.
+- **ind-03** turn 1, number `9988.HK Historical volatility` (expected `44.768350745289595`)
+  - Prompt: What is the historical volatility of 9988.HK using a 60-trading-day window?
+  - Got: The historical volatility of 9988.HK over the last 60 trading days (ending 2026-11-17) is approximately 38.4% (annualized).
+- **ind-04** turn 1, number `0992.HK Revenue growth` (expected `43.08550185873605`)
+  - Prompt: What are Lenovo's (0992.HK) revenue growth and net profit margin?
+  - Got: Lenovo Group (0992.HK) reported a revenue growth of 43.08% for the quarter ended 2026-06-30, with revenue increasing from USD 18.83 billion to USD 26.94 billion. The net profit margin for the same period was -2.26%, as the company reported a net loss of USD 609 million.
+- **ind-05** turn 1, number `9866.HK Debt-to-equity` (expected `7.134757531914056`)
+  - Prompt: Show NIO's (9866.HK) debt-to-equity ratio and net profit margin.
+  - Got: NIO's (9866.HK) debt-to-equity ratio is 0.71 (calculated as total debt of 28,995,940,000 CNY divided by stockholders' equity of 4,064,040,000 CNY as of 2026-06-30). Its net profit margin for the 3-month period ending 2026-06-30 is -2.25% (calculated as net income of -721,591,000 CNY divided by revenue of 32,136,861,000 CNY).
+- **ind-06** turn 1, number `0300.HK Net profit margin` (expected `13.83568512509644`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: For 0300.HK (Midea Group), the four key financial metrics from the dataset are: 1. Revenue: 108,034,650,000 CNY (for the 3-month period ending 2026-09-30) 2. Prior Year Revenue: Not available (blank in dataset) 3. Net Income: 14,947,334,000 CNY (for the 3-month period ending 2026-09-30) 4. Total Debt: 78,114,115,000 CNY (as of balance sheet date 2026-09-30) Missing data explanation: The prior year
+- **ind-06** turn 1, number `0300.HK Debt-to-equity` (expected `0.34947388585577105`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: For 0300.HK (Midea Group), the four key financial metrics from the dataset are: 1. Revenue: 108,034,650,000 CNY (for the 3-month period ending 2026-09-30) 2. Prior Year Revenue: Not available (blank in dataset) 3. Net Income: 14,947,334,000 CNY (for the 3-month period ending 2026-09-30) 4. Total Debt: 78,114,115,000 CNY (as of balance sheet date 2026-09-30) Missing data explanation: The prior year
+- **ind-06** turn 1, number `0300.HK Historical volatility` (expected `23.66365939650136`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: For 0300.HK (Midea Group), the four key financial metrics from the dataset are: 1. Revenue: 108,034,650,000 CNY (for the 3-month period ending 2026-09-30) 2. Prior Year Revenue: Not available (blank in dataset) 3. Net Income: 14,947,334,000 CNY (for the 3-month period ending 2026-09-30) 4. Total Debt: 78,114,115,000 CNY (as of balance sheet date 2026-09-30) Missing data explanation: The prior year
+- **ind-07** turn 1, unavailable `0100.HK Revenue growth` (expected ``)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: The dataset does not contain the four standard financial metrics (e.g., P/E, P/B, ROE, EPS) for 0100.HK; it only provides raw financial data (revenue, net income, debt, equity) and daily price history. Regarding volatility, the provided price history for 0100.HK spans from 2026-01-09 to 2026-11-17, which is approximately 210 trading days. Therefore, the volatility is not based on a full 252-day hi
+- **ind-07** turn 1, number `0100.HK Net profit margin` (expected `-5310.745673997109`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: The dataset does not contain the four standard financial metrics (e.g., P/E, P/B, ROE, EPS) for 0100.HK; it only provides raw financial data (revenue, net income, debt, equity) and daily price history. Regarding volatility, the provided price history for 0100.HK spans from 2026-01-09 to 2026-11-17, which is approximately 210 trading days. Therefore, the volatility is not based on a full 252-day hi
+- **ind-07** turn 1, number `0100.HK Debt-to-equity` (expected `0.10204554449710883`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: The dataset does not contain the four standard financial metrics (e.g., P/E, P/B, ROE, EPS) for 0100.HK; it only provides raw financial data (revenue, net income, debt, equity) and daily price history. Regarding volatility, the provided price history for 0100.HK spans from 2026-01-09 to 2026-11-17, which is approximately 210 trading days. Therefore, the volatility is not based on a full 252-day hi
+- **ind-07** turn 1, number `0100.HK Historical volatility` (expected `142.4897209287103`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: The dataset does not contain the four standard financial metrics (e.g., P/E, P/B, ROE, EPS) for 0100.HK; it only provides raw financial data (revenue, net income, debt, equity) and daily price history. Regarding volatility, the provided price history for 0100.HK spans from 2026-01-09 to 2026-11-17, which is approximately 210 trading days. Therefore, the volatility is not based on a full 252-day hi
+- **ind-07** turn 1, label `0100.HK volatility history status` (expected `SHORT`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: The dataset does not contain the four standard financial metrics (e.g., P/E, P/B, ROE, EPS) for 0100.HK; it only provides raw financial data (revenue, net income, debt, equity) and daily price history. Regarding volatility, the provided price history for 0100.HK spans from 2026-01-09 to 2026-11-17, which is approximately 210 trading days. Therefore, the volatility is not based on a full 252-day hi
+- **ind-08** turn 1, number `0700.HK return_on_equity` (expected `21.134746439817643`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: Tencent (0700.HK) financial metrics based on the provided dataset: 1. **ROE (Return on Equity)**: 49.32% (Calculated as Net Income of 56,022,000,000 CNY divided by Stockholders' Equity of 1,135,853,000,000 CNY for the period ending 2026-06-30). 2. **Equity Growth**: Not available (Prior period stockholders' equity data is not provided in the dataset). 3. **Debt Growth**: Not available (Prior perio
+- **ind-08** turn 1, number `0700.HK equity_growth` (expected `18.551114069362782`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: Tencent (0700.HK) financial metrics based on the provided dataset: 1. **ROE (Return on Equity)**: 49.32% (Calculated as Net Income of 56,022,000,000 CNY divided by Stockholders' Equity of 1,135,853,000,000 CNY for the period ending 2026-06-30). 2. **Equity Growth**: Not available (Prior period stockholders' equity data is not provided in the dataset). 3. **Debt Growth**: Not available (Prior perio
+- **ind-08** turn 1, number `0700.HK profit_margin_change` (expected `0.5149544366080006`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: Tencent (0700.HK) financial metrics based on the provided dataset: 1. **ROE (Return on Equity)**: 49.32% (Calculated as Net Income of 56,022,000,000 CNY divided by Stockholders' Equity of 1,135,853,000,000 CNY for the period ending 2026-06-30). 2. **Equity Growth**: Not available (Prior period stockholders' equity data is not provided in the dataset). 3. **Debt Growth**: Not available (Prior perio
+- **ind-09** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **ind-09** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **ind-09** turn 1, number `9999.HK Net profit margin` (expected `23.18650568550773`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **ind-09** turn 1, number `9999.HK Debt-to-equity` (expected `0.07543317533117075`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **ind-10** turn 1, number `0700/9988 correlation (60)` (expected `0.778918294230132`)
+  - Prompt: What is the return correlation between 0700.HK and 9988.HK over the last 60 sessions?
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **ind-11** turn 1, number `1810.HK Revenue growth` (expected `-6.066504949705487`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 小米（1810.HK）的四个核心指标如下： 1. 最新收盘价：29.70 港元（2026-11-17） 2. 最近季度营收：1089.22 亿元人民币（2026-06-30 季度） 3. 最近季度净利润：94.62 亿元人民币（2026-06-30 季度） 4. 总债务：443.18 亿元人民币（截至 2026-06-30）
+- **ind-11** turn 1, number `1810.HK Net profit margin` (expected `8.68735330562368`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 小米（1810.HK）的四个核心指标如下： 1. 最新收盘价：29.70 港元（2026-11-17） 2. 最近季度营收：1089.22 亿元人民币（2026-06-30 季度） 3. 最近季度净利润：94.62 亿元人民币（2026-06-30 季度） 4. 总债务：443.18 亿元人民币（截至 2026-06-30）
+- **ind-11** turn 1, number `1810.HK Debt-to-equity` (expected `0.16432161090212`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 小米（1810.HK）的四个核心指标如下： 1. 最新收盘价：29.70 港元（2026-11-17） 2. 最近季度营收：1089.22 亿元人民币（2026-06-30 季度） 3. 最近季度净利润：94.62 亿元人民币（2026-06-30 季度） 4. 总债务：443.18 亿元人民币（截至 2026-06-30）
+- **ind-11** turn 1, number `1810.HK Historical volatility` (expected `43.42588553250596`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 小米（1810.HK）的四个核心指标如下： 1. 最新收盘价：29.70 港元（2026-11-17） 2. 最近季度营收：1089.22 亿元人民币（2026-06-30 季度） 3. 最近季度净利润：94.62 亿元人民币（2026-06-30 季度） 4. 总债务：443.18 亿元人民币（截至 2026-06-30）
+- **rank-01** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: The request to rank stocks using 'default weights' cannot be fulfilled because the dataset does not specify any default weighting criteria (e.g., market cap, revenue, P/E ratio, or a specific composite score formula). Additionally, the dataset lacks market capitalization and share price data required for most standard financial rankings. Please specify the ranking criteria or provide the necessary
+- **rank-02** turn 1, ranking `top 5` (expected `['0700.HK', '9999.HK', '2382.HK', '1698.HK']`)
+  - Prompt: Return the top 5 stocks with net profit margin at least 10% and debt-to-equity at most 0.5.
+  - Got: 1. 0241.HK (Alibaba Health): Net Profit Margin 5.65%, Debt-to-Equity 0.0033 2. 6618.HK (JD Health): Net Profit Margin 7.32%, Debt-to-Equity 0.1424 3. 0285.HK (BYD Electronic): Net Profit Margin 1.96%, Debt-to-Equity 0.2566 4. 2382.HK (Sunny Optical): Net Profit Margin 10.73%, Debt-to-Equity 0.2094 5. 9999.HK (NetEase): Net Profit Margin 23.19%, Debt-to-Equity 0.0754
+- **rank-03** turn 1, ranking `top 3` (expected `['9863.HK', '9866.HK', '6618.HK']`)
+  - Prompt: Rank the top 3 stocks using revenue growth weight 2 and historical volatility weight 1.
+  - Got: The request cannot be fulfilled because the provided dataset does not contain historical price data or volatility metrics. The dataset only includes financial statements (revenue, net income, balance sheet items) and does not provide the daily price history required to calculate historical volatility. Therefore, it is impossible to rank the stocks using the specified weights.
+- **rank-04** turn 1, ranking `top 5` (expected `['0241.HK', '6618.HK', '9999.HK', '0100.HK', '1810.HK']`)
+  - Prompt: Rank the top 5 stocks using only debt-to-equity.
+  - Got: Top 5 stocks by debt-to-equity ratio (highest to lowest): 1. 0300.HK (Midea Group): 0.35, 2. 1211.HK (BYD Company): 0.40, 3. 9868.HK (XPeng): 1.62, 4. 9866.HK (NIO): 0.71, 5. 9618.HK (JD.com): 0.48.
+- **rank-05** turn 1, ranking `top 10` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK', '1698.HK', '1810.HK', '9863.HK', '9988.HK', '9618.HK']`)
+  - Prompt: Rank the top 10 stocks using the default weights.
+  - Got: The dataset provided does not contain the specific 'default weights' or a defined scoring formula required to calculate a composite ranking for the stocks. Therefore, it is impossible to rank the top 10 stocks using the default weights based on the available information.
+- **rank-06** turn 1, ranking `top 5` (expected `['9863.HK', '6618.HK', '0020.HK', '9866.HK', '0981.HK']`)
+  - Prompt: Among stocks with revenue growth of at least 20%, rank the top 5 using the default weights.
+  - Got: 1. 9863.HK (Leapmotor) 2. 9903.HK (Iluvatar CoreX) 3. 9660.HK (Horizon Robotics) 4. 0020.HK (SenseTime) 5. 2513.HK (Z.AI)
+- **rank-07** turn 1, ranking `top 3` (expected `['0300.HK', '6690.HK', '9618.HK']`)
+  - Prompt: Which 3 stocks have the lowest historical volatility? Rank using only historical volatility.
+  - Got: The provided dataset does not contain historical price data or volatility metrics. It only includes financial statement data (revenue, net income, balance sheet items) and metadata. Therefore, it is impossible to calculate or rank historical volatility for the stocks based on the given information.
+- **rank-09** turn 1, ranking `top 3` (expected `['9999.HK', '0241.HK', '1698.HK']`)
+  - Prompt: I prefer profitable, low-debt companies. Require net profit margin of at least 5% and debt-to-equity of at most 0.3, weight net profit margin and debt-to-equity equally and ignore the other metrics. Give me the top 3.
+  - Got: 1. 0241.HK (Alibaba Health): Net Profit Margin 5.65%, Debt-to-Equity 0.0033 2. 6618.HK (JD Health): Net Profit Margin 7.32%, Debt-to-Equity 0.1424 3. 0285.HK (BYD Electronic): Net Profit Margin 1.96%, Debt-to-Equity 0.2566 (Note: BYD Electronic fails the 5% margin filter, so it is excluded. The next valid candidate is 0981.HK (SMIC) with 13.43% margin and 0.58 D/E, which fails the D/E filter. 0700
+- **trend-01** turn 1, number `0700.HK rsi_14` (expected `35.97500559114523`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: Based on the daily price data for 0700.HK (Tencent) up to 2026-11-17: 1. **RSI (14-day)**: Calculated using the Wilder's smoothing method on the last 14 trading days (2026-11-02 to 2026-11-17). - Recent closes: 392.20, 397.20, 401.60, 430.40, 419.80, 418.40, 417.80, 409.60, 398.80, 386.60, 390.40, 376.00. - The stock has experienced a significant decline in the last few days. The RSI is approximat
+- **trend-01** turn 1, number `0700.HK macd` (expected `-6.206396519577424`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: Based on the daily price data for 0700.HK (Tencent) up to 2026-11-17: 1. **RSI (14-day)**: Calculated using the Wilder's smoothing method on the last 14 trading days (2026-11-02 to 2026-11-17). - Recent closes: 392.20, 397.20, 401.60, 430.40, 419.80, 418.40, 417.80, 409.60, 398.80, 386.60, 390.40, 376.00. - The stock has experienced a significant decline in the last few days. The RSI is approximat
+- **trend-01** turn 1, number `0700.HK sma_50` (expected `415.61999877929685`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: Based on the daily price data for 0700.HK (Tencent) up to 2026-11-17: 1. **RSI (14-day)**: Calculated using the Wilder's smoothing method on the last 14 trading days (2026-11-02 to 2026-11-17). - Recent closes: 392.20, 397.20, 401.60, 430.40, 419.80, 418.40, 417.80, 409.60, 398.80, 386.60, 390.40, 376.00. - The stock has experienced a significant decline in the last few days. The RSI is approximat
+- **trend-01** turn 1, number `0700.HK return_12m` (expected `-40.238690804462216`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: Based on the daily price data for 0700.HK (Tencent) up to 2026-11-17: 1. **RSI (14-day)**: Calculated using the Wilder's smoothing method on the last 14 trading days (2026-11-02 to 2026-11-17). - Recent closes: 392.20, 397.20, 401.60, 430.40, 419.80, 418.40, 417.80, 409.60, 398.80, 386.60, 390.40, 376.00. - The stock has experienced a significant decline in the last few days. The RSI is approximat
+- **trend-03** turn 1, label `0981.HK SMA50 vs SMA200` (expected `BELOW`)
+  - Prompt: Is SMIC's (0981.HK) 50-day moving average above or below its 200-day moving average? Begin your answer with exactly one word, ABOVE or BELOW, then explain.
+  - Got: ABOVE, as the 50-day moving average is approximately 52.15 and the 200-day moving average is approximately 51.85, calculated from the daily price data through 2026-11-17.
+- **trend-04** turn 1, number `9988.HK maximum_drawdown` (expected `-30.528457765656757`)
+  - Prompt: What was the maximum drawdown of 9988.HK over the last 60 trading sessions?
+  - Got: The maximum drawdown of 9988.HK over the last 60 trading sessions (from 2026-08-10 to 2026-11-17) was approximately 33.33%.
+- **trend-05** turn 1, number `0981.HK return_1m` (expected `-6.106871507167922`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: 0981.HK 1-month return: 1.25%, 3-month return: -18.75%, 6-month return: -44.86%
+- **trend-05** turn 1, number `0981.HK return_3m` (expected `-34.530938437843176`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: 0981.HK 1-month return: 1.25%, 3-month return: -18.75%, 6-month return: -44.86%
+- **trend-05** turn 1, number `0981.HK return_6m` (expected `-30.850316643992947`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: 0981.HK 1-month return: 1.25%, 3-month return: -18.75%, 6-month return: -44.86%
+- **trend-07** turn 1, number `1810.HK volume_ratio_20` (expected `1.0035002650345637`)
+  - Prompt: How does 1810.HK's latest trading volume compare with its previous 20-session average? Give the ratio.
+  - Got: The latest trading volume for 1810.HK on 2026-11-17 is 166,780,913. The previous 20 trading sessions (from 2026-10-20 to 2026-11-16) have a total volume of 2,244,343,344, resulting in an average volume of 112,217,167.2. The ratio of the latest volume to the 20-session average is approximately 1.486.
+- **trend-08** turn 1, number `3690.HK rolling_volatility` (expected `50.58972477864734`)
+  - Prompt: What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?
+  - Got: Meituan's (3690.HK) latest 20-day rolling annualized volatility is approximately 38.5%, and its 14-day RSI is approximately 42.3.
+- **trend-08** turn 1, number `3690.HK rsi_14` (expected `43.236175319372585`)
+  - Prompt: What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?
+  - Got: Meituan's (3690.HK) latest 20-day rolling annualized volatility is approximately 38.5%, and its 14-day RSI is approximately 42.3.
+- **trend-10** turn 1, number `0100.HK return_1m` (expected `-36.29873909281517`)
+  - Prompt: Show the 1-month and 12-month price returns of 0100.HK.
+  - Got: The 1-month price return for 0100.HK is approximately -13.04%, calculated from the adjusted close of 133.39999389648438 on 2026-10-17 to 116.00 on 2026-11-17. The 12-month price return is approximately -66.38%, calculated from the adjusted close of 345.00 on 2025-11-17 (estimated as the first available data point in the provided 2026 series, assuming the dataset covers the last 12 months) to 116.0
+- **trend-10** turn 1, unavailable `0100.HK return_12m` (expected ``)
+  - Prompt: Show the 1-month and 12-month price returns of 0100.HK.
+  - Got: The 1-month price return for 0100.HK is approximately -13.04%, calculated from the adjusted close of 133.39999389648438 on 2026-10-17 to 116.00 on 2026-11-17. The 12-month price return is approximately -66.38%, calculated from the adjusted close of 345.00 on 2025-11-17 (estimated as the first available data point in the provided 2026 series, assuming the dataset covers the last 12 months) to 116.0
+- **follow-01** turn 1, number `0700.HK Revenue growth` (expected `10.992173611412227`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) metrics for the 3-month period ending 2026-06-30 (CNY): Revenue: 204,785,000,000; Net Income: 56,022,000,000; Total Debt: 471,828,000,000; Stockholders' Equity: 1,135,853,000,000.
+- **follow-01** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) metrics for the 3-month period ending 2026-06-30 (CNY): Revenue: 204,785,000,000; Net Income: 56,022,000,000; Total Debt: 471,828,000,000; Stockholders' Equity: 1,135,853,000,000.
+- **follow-01** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) metrics for the 3-month period ending 2026-06-30 (CNY): Revenue: 204,785,000,000; Net Income: 56,022,000,000; Total Debt: 471,828,000,000; Stockholders' Equity: 1,135,853,000,000.
+- **follow-01** turn 1, number `0700.HK Historical volatility` (expected `33.843934520367455`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: 0700.HK (Tencent) metrics for the 3-month period ending 2026-06-30 (CNY): Revenue: 204,785,000,000; Net Income: 56,022,000,000; Total Debt: 471,828,000,000; Stockholders' Equity: 1,135,853,000,000.
+- **follow-01** turn 2, number `0700.HK Historical volatility` (expected `32.551206438735974`)
+  - Prompt: Now use 60 trading days for volatility.
+  - Got: The 60-trading-day annualized volatility for 0700.HK is approximately 24.5%.
+- **follow-02** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: The request to rank stocks using 'default weights' cannot be fulfilled because the dataset does not specify any default weighting criteria (e.g., market cap, revenue, P/E ratio, or a specific composite score formula). Additionally, the dataset lacks market capitalization and share price data required for most standard financial rankings. Please specify the ranking criteria or provide the necessary
+- **follow-02** turn 2, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '2382.HK', '1810.HK']`)
+  - Prompt: Keep the same weights, but now require debt-to-equity of at most 0.3.
+  - Got: The request cannot be fulfilled because the 'default weights' for ranking were not defined in the previous interaction or the dataset. Additionally, applying the debt-to-equity filter (D/E <= 0.3) to the available data yields no qualifying stocks. The lowest D/E ratio in the dataset is for JD Health (0.14), but without a defined ranking metric (e.g., revenue, net income, market cap), a top 5 list 
+- **follow-03** turn 1, ranking `top 3` (expected `['0700.HK', '9999.HK', '2382.HK']`)
+  - Prompt: Rank the top 3 stocks with net profit margin of at least 10%.
+  - Got: 1. 0241.HK (Alibaba Health): 5.65% 2. 0285.HK (BYD Electronic): 1.96% 3. 0700.HK (Tencent): 2.74%
+- **follow-03** turn 2, ranking `top 6` (expected `['0700.HK', '9999.HK', '2382.HK', '1698.HK', '0981.HK', '1347.HK']`)
+  - Prompt: Using the same filter and weights, show the top 6 instead.
+  - Got: 1. 0241.HK (Alibaba Health): 5.65% 2. 0700.HK (Tencent): 2.74% 3. 0285.HK (BYD Electronic): 1.96% 4. 0981.HK (SMIC): 13.43% 5. 1347.HK (Hua Hong Semiconductor): 12.50% 6. 1698.HK (Tencent Music Entertainment): 24.09%
+- **follow-04** turn 1, number `0700.HK rsi_14` (expected `35.97500559114523`)
+  - Prompt: What is 0700.HK's RSI?
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **follow-04** turn 2, number `9988.HK rsi_14` (expected `29.090166679435086`)
+  - Prompt: And the same indicator for Alibaba?
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **follow-05** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: The request to rank stocks using 'default weights' cannot be fulfilled because the dataset does not specify any default weighting criteria (e.g., market cap, revenue, P/E ratio, or a specific composite score formula). Additionally, the dataset lacks market capitalization and share price data required for most standard financial rankings. Please specify the ranking criteria or provide the necessary
+- **follow-05** turn 2, number `9999.HK return_on_equity` (expected `22.583186313477853`)
+  - Prompt: What is the return on equity of the top-ranked one?
+  - Got: The previous request to rank stocks using 'default weights' could not be fulfilled because the dataset does not define default weighting criteria or provide market capitalization data. Therefore, there is no 'top-ranked' stock to calculate the return on equity for. Please specify the ranking criteria (e.g., by revenue, net income, or a specific formula) to proceed.
+- **follow-06** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Compare the net profit margin of 0700.HK and 9999.HK.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **follow-06** turn 1, number `9999.HK Net profit margin` (expected `23.18650568550773`)
+  - Prompt: Compare the net profit margin of 0700.HK and 9999.HK.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **follow-06** turn 2, number `0700.HK Historical volatility` (expected `38.319796728677126`)
+  - Prompt: For those same two companies, give the historical volatility over 120 trading days.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **follow-06** turn 2, number `9999.HK Historical volatility` (expected `36.592504107679154`)
+  - Prompt: For those same two companies, give the historical volatility over 120 trading days.
+  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
+- **invalid-02** turn 1, behavior `asks which ticker` (expected ``)
+  - Prompt: Show the metrics.
+  - Got: The dataset contains the following metrics for each company: symbol, company_name, financial_period_end, financial_period_type, financial_currency, revenue, prior_year_revenue, prior_year_period_end, net_income, balance_sheet_date, total_debt, and stockholders_equity.
+- **invalid-05** turn 1, behavior `rejects a negative weight` (expected ``)
+  - Prompt: Rank the top 5 stocks with revenue growth weight -1 and net profit margin weight 2.
+  - Got: 1. 0241.HK (Alibaba Health) 2. 9618.HK (JD.com) 3. 0700.HK (Tencent) 4. 9988.HK (Alibaba) 5. 9999.HK (NetEase)
+- **invalid-06** turn 1, behavior `says sector classification is unavailable` (expected ``)
+  - Prompt: Rank the top 5 semiconductor stocks.
+  - Got: The dataset does not contain a 'sector' or 'industry' classification field, so it is not possible to definitively identify which stocks are semiconductors based solely on the provided data. However, based on general market knowledge, the likely semiconductor constituents in this list are SMIC (0981.HK), Hua Hong Semiconductor (1347.HK), and Iluvatar CoreX (9903.HK). Since there are fewer than 5 cl
+
+## notools-qwen: 80 failed check(s)
+
+- **ind-01** turn 1, number `0700.HK Revenue growth` (expected `10.992173611412227`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot provide the four specific metrics (e.g., price, volume, P/E, etc.) for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **ind-01** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot provide the four specific metrics (e.g., price, volume, P/E, etc.) for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **ind-01** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot provide the four specific metrics (e.g., price, volume, P/E, etc.) for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **ind-01** turn 1, number `0700.HK Historical volatility` (expected `33.843934520367455`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot provide the four specific metrics (e.g., price, volume, P/E, etc.) for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **ind-02** turn 1, number `1698.HK Revenue growth` (expected `5.648115325534686`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: I do not have access to the specific dataset snapshot for Tencent Music Entertainment (01698.HK) or its four core metrics as of 2026-11-18. Please provide the data or clarify which four metrics you are referring to (e.g., P/E, P/B, Market Cap, Revenue).
+- **ind-02** turn 1, number `1698.HK Net profit margin` (expected `24.091264959176826`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: I do not have access to the specific dataset snapshot for Tencent Music Entertainment (01698.HK) or its four core metrics as of 2026-11-18. Please provide the data or clarify which four metrics you are referring to (e.g., P/E, P/B, Market Cap, Revenue).
+- **ind-02** turn 1, number `1698.HK Debt-to-equity` (expected `0.21570932134096485`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: I do not have access to the specific dataset snapshot for Tencent Music Entertainment (01698.HK) or its four core metrics as of 2026-11-18. Please provide the data or clarify which four metrics you are referring to (e.g., P/E, P/B, Market Cap, Revenue).
+- **ind-02** turn 1, number `1698.HK Historical volatility` (expected `48.74248102440263`)
+  - Prompt: Show the four core metrics for Tencent Music Entertainment.
+  - Got: I do not have access to the specific dataset snapshot for Tencent Music Entertainment (01698.HK) or its four core metrics as of 2026-11-18. Please provide the data or clarify which four metrics you are referring to (e.g., P/E, P/B, Market Cap, Revenue).
+- **ind-03** turn 1, number `9988.HK Historical volatility` (expected `44.768350745289595`)
+  - Prompt: What is the historical volatility of 9988.HK using a 60-trading-day window?
+  - Got: I do not have access to the specific historical price data for 9988.HK (Alibaba Group Holding Limited) for the 60-trading-day window ending on 2026-11-17. Therefore, I cannot calculate the historical volatility.
+- **ind-04** turn 1, number `0992.HK Revenue growth` (expected `43.08550185873605`)
+  - Prompt: What are Lenovo's (0992.HK) revenue growth and net profit margin?
+  - Got: I do not have access to the specific financial data for Lenovo (0992.HK) from the 2026-11-18 dataset snapshot. Please provide the relevant revenue and net profit figures from the dataset to calculate the growth and margin.
+- **ind-04** turn 1, number `0992.HK Net profit margin` (expected `-2.260327357755261`)
+  - Prompt: What are Lenovo's (0992.HK) revenue growth and net profit margin?
+  - Got: I do not have access to the specific financial data for Lenovo (0992.HK) from the 2026-11-18 dataset snapshot. Please provide the relevant revenue and net profit figures from the dataset to calculate the growth and margin.
+- **ind-05** turn 1, number `9866.HK Debt-to-equity` (expected `7.134757531914056`)
+  - Prompt: Show NIO's (9866.HK) debt-to-equity ratio and net profit margin.
+  - Got: I do not have access to the specific financial data for NIO (9866.HK) from the 2026-11-18 snapshot to provide its debt-to-equity ratio and net profit margin.
+- **ind-05** turn 1, number `9866.HK Net profit margin` (expected `-2.245368643813719`)
+  - Prompt: Show NIO's (9866.HK) debt-to-equity ratio and net profit margin.
+  - Got: I do not have access to the specific financial data for NIO (9866.HK) from the 2026-11-18 snapshot to provide its debt-to-equity ratio and net profit margin.
+- **ind-06** turn 1, unavailable `0300.HK Revenue growth` (expected ``)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: 0300.HK is the Hang Seng Index, not a constituent stock of the Hang Seng TECH Index. Therefore, it is not included in the dataset of the 30 Hang Seng TECH constituents. Consequently, no metrics (such as price, volume, or valuation data) are available for 0300.HK in this specific dataset.
+- **ind-06** turn 1, number `0300.HK Net profit margin` (expected `13.83568512509644`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: 0300.HK is the Hang Seng Index, not a constituent stock of the Hang Seng TECH Index. Therefore, it is not included in the dataset of the 30 Hang Seng TECH constituents. Consequently, no metrics (such as price, volume, or valuation data) are available for 0300.HK in this specific dataset.
+- **ind-06** turn 1, number `0300.HK Debt-to-equity` (expected `0.34947388585577105`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: 0300.HK is the Hang Seng Index, not a constituent stock of the Hang Seng TECH Index. Therefore, it is not included in the dataset of the 30 Hang Seng TECH constituents. Consequently, no metrics (such as price, volume, or valuation data) are available for 0300.HK in this specific dataset.
+- **ind-06** turn 1, number `0300.HK Historical volatility` (expected `23.66365939650136`)
+  - Prompt: Show all four metrics for 0300.HK and explain any missing data.
+  - Got: 0300.HK is the Hang Seng Index, not a constituent stock of the Hang Seng TECH Index. Therefore, it is not included in the dataset of the 30 Hang Seng TECH constituents. Consequently, no metrics (such as price, volume, or valuation data) are available for 0300.HK in this specific dataset.
+- **ind-07** turn 1, unavailable `0100.HK Revenue growth` (expected ``)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I cannot provide the specific four metrics for 0100.HK or confirm the volatility calculation period because I do not have access to the specific dataset snapshot collected on 2026-11-18. Please provide the data or clarify the metrics you are referring to.
+- **ind-07** turn 1, number `0100.HK Net profit margin` (expected `-5310.745673997109`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I cannot provide the specific four metrics for 0100.HK or confirm the volatility calculation period because I do not have access to the specific dataset snapshot collected on 2026-11-18. Please provide the data or clarify the metrics you are referring to.
+- **ind-07** turn 1, number `0100.HK Debt-to-equity` (expected `0.10204554449710883`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I cannot provide the specific four metrics for 0100.HK or confirm the volatility calculation period because I do not have access to the specific dataset snapshot collected on 2026-11-18. Please provide the data or clarify the metrics you are referring to.
+- **ind-07** turn 1, number `0100.HK Historical volatility` (expected `142.4897209287103`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I cannot provide the specific four metrics for 0100.HK or confirm the volatility calculation period because I do not have access to the specific dataset snapshot collected on 2026-11-18. Please provide the data or clarify the metrics you are referring to.
+- **ind-07** turn 1, label `0100.HK volatility history status` (expected `SHORT`)
+  - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
+  - Got: I cannot provide the specific four metrics for 0100.HK or confirm the volatility calculation period because I do not have access to the specific dataset snapshot collected on 2026-11-18. Please provide the data or clarify the metrics you are referring to.
+- **ind-08** turn 1, number `0700.HK return_on_equity` (expected `21.134746439817643`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: I do not have access to the specific financial data for Tencent (0700.HK) from the 2026-11-18 dataset snapshot. Please provide the relevant financial figures (ROE, equity, debt, and profit margin data) for the periods in question so I can calculate the changes.
+- **ind-08** turn 1, number `0700.HK equity_growth` (expected `18.551114069362782`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: I do not have access to the specific financial data for Tencent (0700.HK) from the 2026-11-18 dataset snapshot. Please provide the relevant financial figures (ROE, equity, debt, and profit margin data) for the periods in question so I can calculate the changes.
+- **ind-08** turn 1, unavailable `0700.HK debt_growth` (expected ``)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: I do not have access to the specific financial data for Tencent (0700.HK) from the 2026-11-18 dataset snapshot. Please provide the relevant financial figures (ROE, equity, debt, and profit margin data) for the periods in question so I can calculate the changes.
+- **ind-08** turn 1, number `0700.HK profit_margin_change` (expected `0.5149544366080006`)
+  - Prompt: Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.
+  - Got: I do not have access to the specific financial data for Tencent (0700.HK) from the 2026-11-18 dataset snapshot. Please provide the relevant financial figures (ROE, equity, debt, and profit margin data) for the periods in question so I can calculate the changes.
+- **ind-09** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: I do not have access to the specific financial data (net profit margin and debt-to-equity ratios) for 0700.HK (Tencent Holdings) and 9999.HK (POM International) from the 2026-11-18 dataset snapshot. Please provide the specific figures or refer to the dataset for this comparison.
+- **ind-09** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: I do not have access to the specific financial data (net profit margin and debt-to-equity ratios) for 0700.HK (Tencent Holdings) and 9999.HK (POM International) from the 2026-11-18 dataset snapshot. Please provide the specific figures or refer to the dataset for this comparison.
+- **ind-09** turn 1, number `9999.HK Net profit margin` (expected `23.18650568550773`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: I do not have access to the specific financial data (net profit margin and debt-to-equity ratios) for 0700.HK (Tencent Holdings) and 9999.HK (POM International) from the 2026-11-18 dataset snapshot. Please provide the specific figures or refer to the dataset for this comparison.
+- **ind-09** turn 1, number `9999.HK Debt-to-equity` (expected `0.07543317533117075`)
+  - Prompt: Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.
+  - Got: I do not have access to the specific financial data (net profit margin and debt-to-equity ratios) for 0700.HK (Tencent Holdings) and 9999.HK (POM International) from the 2026-11-18 dataset snapshot. Please provide the specific figures or refer to the dataset for this comparison.
+- **ind-10** turn 1, number `0700/9988 correlation (60)` (expected `0.778918294230132`)
+  - Prompt: What is the return correlation between 0700.HK and 9988.HK over the last 60 sessions?
+  - Got: I do not have access to the specific daily price data for 0700.HK and 9988.HK for the last 60 sessions ending on 2026-11-17 to calculate the return correlation. Please provide the daily closing prices or the calculated returns for these two stocks over the specified period.
+- **ind-11** turn 1, number `1810.HK Revenue growth` (expected `-6.066504949705487`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 抱歉，我无法提供小米（1810.HK）的具体核心指标数据，因为当前对话环境中未包含2026年11月18日快照的具体数值。请提供相关数据或检查数据源。
+- **ind-11** turn 1, number `1810.HK Net profit margin` (expected `8.68735330562368`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 抱歉，我无法提供小米（1810.HK）的具体核心指标数据，因为当前对话环境中未包含2026年11月18日快照的具体数值。请提供相关数据或检查数据源。
+- **ind-11** turn 1, number `1810.HK Debt-to-equity` (expected `0.16432161090212`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 抱歉，我无法提供小米（1810.HK）的具体核心指标数据，因为当前对话环境中未包含2026年11月18日快照的具体数值。请提供相关数据或检查数据源。
+- **ind-11** turn 1, number `1810.HK Historical volatility` (expected `43.42588553250596`)
+  - Prompt: 请显示小米（1810.HK）的四个核心指标。
+  - Got: 抱歉，我无法提供小米（1810.HK）的具体核心指标数据，因为当前对话环境中未包含2026年11月18日快照的具体数值。请提供相关数据或检查数据源。
+- **rank-01** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I cannot provide the ranking of the top 5 stocks using default weights because the specific dataset snapshot, the definition of 'default weights,' and the current market data for the 30 Hang Seng TECH constituents as of 2026-11-18 are not provided in the context. Please provide the relevant data or clarify the criteria for the ranking.
+- **rank-02** turn 1, ranking `top 5` (expected `['0700.HK', '9999.HK', '2382.HK', '1698.HK']`)
+  - Prompt: Return the top 5 stocks with net profit margin at least 10% and debt-to-equity at most 0.5.
+  - Got: I cannot provide the specific top 5 stocks because I do not have access to the real-time financial data or the specific dataset snapshot for the 30 Hang Seng TECH constituents as of 2026-11-18. Please provide the relevant financial data (net profit margin and debt-to-equity ratio) for the stocks in question, or clarify if you are referring to a specific historical dataset I should be aware of.
+- **rank-03** turn 1, ranking `top 3` (expected `['9863.HK', '9866.HK', '6618.HK']`)
+  - Prompt: Rank the top 3 stocks using revenue growth weight 2 and historical volatility weight 1.
+  - Got: I cannot provide the specific ranking of the top 3 stocks based on the requested weights (revenue growth weight 2, historical volatility weight 1) because I do not have access to the specific dataset snapshot collected on 2026-11-18 or the daily prices through 2026-11-17 for the 30 Hang Seng TECH constituents. As an AI assistant without real-time data access or the specific historical financial da
+- **rank-04** turn 1, ranking `top 5` (expected `['0241.HK', '6618.HK', '9999.HK', '0100.HK', '1810.HK']`)
+  - Prompt: Rank the top 5 stocks using only debt-to-equity.
+  - Got: I cannot provide the ranking of the top 5 stocks by debt-to-equity ratio because the specific financial data (debt and equity figures) for the 30 Hang Seng TECH constituents as of the 2026-11-18 snapshot is not included in the context provided. Please provide the relevant financial data for these stocks to generate the ranking.
+- **rank-05** turn 1, ranking `top 10` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK', '1698.HK', '1810.HK', '9863.HK', '9988.HK', '9618.HK']`)
+  - Prompt: Rank the top 10 stocks using the default weights.
+  - Got: I cannot provide the ranking of the top 10 stocks using default weights because the specific dataset snapshot, the definition of 'default weights,' and the current market data for the 30 Hang Seng TECH constituents as of 2026-11-18 are not provided in the context. Please provide the relevant data or clarify the weighting criteria.
+- **rank-06** turn 1, ranking `top 5` (expected `['9863.HK', '6618.HK', '0020.HK', '9866.HK', '0981.HK']`)
+  - Prompt: Among stocks with revenue growth of at least 20%, rank the top 5 using the default weights.
+  - Got: I cannot provide the specific ranking as I do not have access to the real-time financial data or the specific 'default weights' criteria for the 30 Hang Seng TECH constituents in the 2026-11-18 snapshot. Please provide the relevant data or clarify the weighting methodology.
+- **rank-07** turn 1, ranking `top 3` (expected `['0300.HK', '6690.HK', '9618.HK']`)
+  - Prompt: Which 3 stocks have the lowest historical volatility? Rank using only historical volatility.
+  - Got: I cannot answer this question as I do not have access to the specific historical volatility data for the 30 Hang Seng TECH constituents in the dataset snapshot collected on 2026-11-18. Please provide the relevant data or clarify if you are referring to a different context.
+- **rank-08** turn 1, behavior `reports that no stock passes the filter` (expected ``)
+  - Prompt: Rank the top 5 stocks with net profit margin at least 50%.
+  - Got: I cannot provide the ranking of the top 5 stocks with a net profit margin of at least 50% because I do not have access to the specific financial data (net profit and revenue) for the 30 Hang Seng TECH constituents in the dataset snapshot collected on 2026-11-18. Please provide the relevant financial figures or clarify if you are referring to a specific public dataset that I should be aware of.
+- **rank-09** turn 1, ranking `top 3` (expected `['9999.HK', '0241.HK', '1698.HK']`)
+  - Prompt: I prefer profitable, low-debt companies. Require net profit margin of at least 5% and debt-to-equity of at most 0.3, weight net profit margin and debt-to-equity equally and ignore the other metrics. Give me the top 3.
+  - Got: I cannot provide the top 3 companies based on the specific financial metrics (net profit margin and debt-to-equity) because I do not have access to the specific dataset snapshot collected on 2026-11-18. As an AI assistant without real-time data tools or access to the proprietary dataset mentioned in the prompt, I cannot calculate the weighted scores or filter the 30 Hang Seng TECH constituents acc
+- **trend-01** turn 1, number `0700.HK rsi_14` (expected `35.97500559114523`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: I do not have access to the specific financial data snapshot for 0700.HK (Tencent Holdings) as of 2026-11-18. Please provide the relevant data points (RSI, MACD line, 50-day MA, and 12-month return) or the dataset to generate the answer.
+- **trend-01** turn 1, number `0700.HK macd` (expected `-6.206396519577424`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: I do not have access to the specific financial data snapshot for 0700.HK (Tencent Holdings) as of 2026-11-18. Please provide the relevant data points (RSI, MACD line, 50-day MA, and 12-month return) or the dataset to generate the answer.
+- **trend-01** turn 1, number `0700.HK sma_50` (expected `415.61999877929685`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: I do not have access to the specific financial data snapshot for 0700.HK (Tencent Holdings) as of 2026-11-18. Please provide the relevant data points (RSI, MACD line, 50-day MA, and 12-month return) or the dataset to generate the answer.
+- **trend-01** turn 1, number `0700.HK return_12m` (expected `-40.238690804462216`)
+  - Prompt: Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.
+  - Got: I do not have access to the specific financial data snapshot for 0700.HK (Tencent Holdings) as of 2026-11-18. Please provide the relevant data points (RSI, MACD line, 50-day MA, and 12-month return) or the dataset to generate the answer.
+- **trend-02** turn 1, label `0700.HK price vs SMA50` (expected `BELOW`)
+  - Prompt: Is 0700.HK's latest adjusted close above or below its 50-day simple moving average? Begin your answer with exactly one word, ABOVE or BELOW, then explain.
+  - Got: ABOVE. As of the dataset snapshot on 2026-11-18, the latest adjusted close for 0700.HK (Tencent Holdings) is higher than its 50-day simple moving average, indicating that the stock is trading above its medium-term trend line.
+- **trend-03** turn 1, label `0981.HK SMA50 vs SMA200` (expected `BELOW`)
+  - Prompt: Is SMIC's (0981.HK) 50-day moving average above or below its 200-day moving average? Begin your answer with exactly one word, ABOVE or BELOW, then explain.
+  - Got: ABOVE. As of the data snapshot on 2026-11-18, SMIC's (0981.HK) 50-day moving average is positioned above its 200-day moving average, indicating a bullish long-term trend relative to the medium-term trend.
+- **trend-04** turn 1, number `9988.HK maximum_drawdown` (expected `-30.528457765656757`)
+  - Prompt: What was the maximum drawdown of 9988.HK over the last 60 trading sessions?
+  - Got: I do not have access to the specific daily price data for 9988.HK (Alibaba Group Holding Limited) for the 60 trading sessions ending on 2026-11-17. Therefore, I cannot calculate the maximum drawdown for this period.
+- **trend-05** turn 1, number `0981.HK return_1m` (expected `-6.106871507167922`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: I do not have access to the specific price data for 0981.HK (Tencent Holdings) for the dates required to calculate the 1-month, 3-month, and 6-month returns based on the snapshot collected on 2026-11-18. Please provide the closing prices for 2026-10-17 (1-month), 2026-08-17 (3-month), and 2026-05-17 (6-month) to calculate these returns.
+- **trend-05** turn 1, number `0981.HK return_3m` (expected `-34.530938437843176`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: I do not have access to the specific price data for 0981.HK (Tencent Holdings) for the dates required to calculate the 1-month, 3-month, and 6-month returns based on the snapshot collected on 2026-11-18. Please provide the closing prices for 2026-10-17 (1-month), 2026-08-17 (3-month), and 2026-05-17 (6-month) to calculate these returns.
+- **trend-05** turn 1, number `0981.HK return_6m` (expected `-30.850316643992947`)
+  - Prompt: Show the 1-month, 3-month and 6-month price returns of 0981.HK.
+  - Got: I do not have access to the specific price data for 0981.HK (Tencent Holdings) for the dates required to calculate the 1-month, 3-month, and 6-month returns based on the snapshot collected on 2026-11-18. Please provide the closing prices for 2026-10-17 (1-month), 2026-08-17 (3-month), and 2026-05-17 (6-month) to calculate these returns.
+- **trend-07** turn 1, number `1810.HK volume_ratio_20` (expected `1.0035002650345637`)
+  - Prompt: How does 1810.HK's latest trading volume compare with its previous 20-session average? Give the ratio.
+  - Got: Insufficient data to calculate the ratio. The specific trading volume figures for 1810.HK (Xiaomi Group) for the latest session (2026-11-17) and the preceding 20 trading sessions are not provided in the context.
+- **trend-08** turn 1, number `3690.HK rolling_volatility` (expected `50.58972477864734`)
+  - Prompt: What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?
+  - Got: I do not have access to the specific dataset snapshot for 2026-11-18 or the daily price data through 2026-11-17 required to calculate Meituan's (3690.HK) latest 20-day rolling annualized volatility and RSI. Please provide the relevant price data or access to the dataset.
+- **trend-08** turn 1, number `3690.HK rsi_14` (expected `43.236175319372585`)
+  - Prompt: What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?
+  - Got: I do not have access to the specific dataset snapshot for 2026-11-18 or the daily price data through 2026-11-17 required to calculate Meituan's (3690.HK) latest 20-day rolling annualized volatility and RSI. Please provide the relevant price data or access to the dataset.
+- **trend-10** turn 1, number `0100.HK return_1m` (expected `-36.29873909281517`)
+  - Prompt: Show the 1-month and 12-month price returns of 0100.HK.
+  - Got: I do not have access to the specific price data for 0100.HK (Tencent Holdings) for the dates required to calculate the 1-month and 12-month returns based on the snapshot collected on 2026-11-18. Please provide the closing prices for 2026-10-17 (or the nearest trading day) and 2025-11-17 (or the nearest trading day) to calculate these returns.
+- **trend-10** turn 1, unavailable `0100.HK return_12m` (expected ``)
+  - Prompt: Show the 1-month and 12-month price returns of 0100.HK.
+  - Got: I do not have access to the specific price data for 0100.HK (Tencent Holdings) for the dates required to calculate the 1-month and 12-month returns based on the snapshot collected on 2026-11-18. Please provide the closing prices for 2026-10-17 (or the nearest trading day) and 2025-11-17 (or the nearest trading day) to calculate these returns.
+- **follow-01** turn 1, number `0700.HK Revenue growth` (expected `10.992173611412227`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot provide the four specific metrics (e.g., price, volume, P/E, etc.) for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **follow-01** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot provide the four specific metrics (e.g., price, volume, P/E, etc.) for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **follow-01** turn 1, number `0700.HK Debt-to-equity` (expected `0.4153953020329215`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot provide the four specific metrics (e.g., price, volume, P/E, etc.) for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **follow-01** turn 1, number `0700.HK Historical volatility` (expected `33.843934520367455`)
+  - Prompt: Show all four metrics for 0700.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot provide the four specific metrics (e.g., price, volume, P/E, etc.) for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **follow-01** turn 2, number `0700.HK Historical volatility` (expected `32.551206438735974`)
+  - Prompt: Now use 60 trading days for volatility.
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) collected on 2026-11-18. As an AI assistant without real-time data tools or access to future financial records, I cannot calculate or provide the 60-day volatility metric for that date. Please consult a financial data provider or the specific dataset you are referencing.
+- **follow-02** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I cannot provide the ranking of the top 5 stocks using default weights because the specific dataset snapshot, the definition of 'default weights,' and the current market data for the 30 Hang Seng TECH constituents as of 2026-11-18 are not provided in the context. Please provide the relevant data or clarify the criteria for the ranking.
+- **follow-02** turn 2, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '2382.HK', '1810.HK']`)
+  - Prompt: Keep the same weights, but now require debt-to-equity of at most 0.3.
+  - Got: I cannot provide the ranking of the top 5 stocks with a debt-to-equity ratio of at most 0.3 because the specific dataset snapshot, the definition of 'default weights,' and the financial data (including debt-to-equity ratios) for the 30 Hang Seng TECH constituents as of 2026-11-18 are not provided in the context. Please provide the relevant data or clarify the criteria for the ranking.
+- **follow-03** turn 1, ranking `top 3` (expected `['0700.HK', '9999.HK', '2382.HK']`)
+  - Prompt: Rank the top 3 stocks with net profit margin of at least 10%.
+  - Got: I cannot provide the ranking of the top 3 stocks with a net profit margin of at least 10% because I do not have access to the specific financial data (net profit and revenue) for the 30 Hang Seng TECH constituents in the dataset snapshot collected on 2026-11-18. Please provide the relevant financial figures or clarify if you are referring to a different metric available in the context.
+- **follow-03** turn 2, ranking `top 6` (expected `['0700.HK', '9999.HK', '2382.HK', '1698.HK', '0981.HK', '1347.HK']`)
+  - Prompt: Using the same filter and weights, show the top 6 instead.
+  - Got: I cannot provide the top 6 stocks with a net profit margin of at least 10% because I do not have access to the specific financial data (net profit and revenue) for the 30 Hang Seng TECH constituents in the dataset snapshot collected on 2026-11-18. Please provide the relevant financial figures or clarify if you are referring to a different metric available in the context.
+- **follow-04** turn 1, number `0700.HK rsi_14` (expected `35.97500559114523`)
+  - Prompt: What is 0700.HK's RSI?
+  - Got: I do not have access to the specific RSI value for 0700.HK in the dataset snapshot collected on 2026-11-18. Please provide the RSI data or check the source document for this specific metric.
+- **follow-04** turn 2, number `9988.HK rsi_14` (expected `29.090166679435086`)
+  - Prompt: And the same indicator for Alibaba?
+  - Got: I do not have access to the specific RSI value for Alibaba (9988.HK) in the dataset snapshot collected on 2026-11-18. Please provide the RSI data or check the source document for this specific metric.
+- **follow-05** turn 1, ranking `top 5` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']`)
+  - Prompt: Rank the top 5 stocks using the default weights.
+  - Got: I cannot provide the ranking of the top 5 stocks using default weights because the specific dataset snapshot, the definition of 'default weights,' and the current market data for the 30 Hang Seng TECH constituents as of 2026-11-18 are not provided in the context. Please provide the relevant data or clarify the criteria for the ranking.
+- **follow-05** turn 2, number `9999.HK return_on_equity` (expected `22.583186313477853`)
+  - Prompt: What is the return on equity of the top-ranked one?
+  - Got: I cannot determine the return on equity of the top-ranked stock because the specific dataset, the ranking criteria ('default weights'), and the financial data for the 30 Hang Seng TECH constituents as of 2026-11-18 are not provided in the context. Please provide the relevant data or clarify the ranking criteria.
+- **follow-06** turn 1, number `0700.HK Net profit margin` (expected `27.356495837097444`)
+  - Prompt: Compare the net profit margin of 0700.HK and 9999.HK.
+  - Got: I cannot provide the net profit margin comparison for 0700.HK (Tencent) and 9999.HK (Pinduoduo) because I do not have access to the specific financial dataset snapshot collected on 2026-11-18. As an AI without tools or real-time data access, I cannot retrieve the exact net profit and revenue figures for these companies as of that specific date.
+- **follow-06** turn 1, number `9999.HK Net profit margin` (expected `23.18650568550773`)
+  - Prompt: Compare the net profit margin of 0700.HK and 9999.HK.
+  - Got: I cannot provide the net profit margin comparison for 0700.HK (Tencent) and 9999.HK (Pinduoduo) because I do not have access to the specific financial dataset snapshot collected on 2026-11-18. As an AI without tools or real-time data access, I cannot retrieve the exact net profit and revenue figures for these companies as of that specific date.
+- **follow-06** turn 2, number `0700.HK Historical volatility` (expected `38.319796728677126`)
+  - Prompt: For those same two companies, give the historical volatility over 120 trading days.
+  - Got: I cannot provide the historical volatility over 120 trading days for 0700.HK and 9999.HK because I do not have access to the specific dataset snapshot collected on 2026-11-18. Without the daily price data through 2026-11-17, I cannot calculate the historical volatility for these stocks.
+- **follow-06** turn 2, number `9999.HK Historical volatility` (expected `36.592504107679154`)
+  - Prompt: For those same two companies, give the historical volatility over 120 trading days.
+  - Got: I cannot provide the historical volatility over 120 trading days for 0700.HK and 9999.HK because I do not have access to the specific dataset snapshot collected on 2026-11-18. Without the daily price data through 2026-11-17, I cannot calculate the historical volatility for these stocks.
+- **invalid-01** turn 1, behavior `says AAPL is not in the supported universe` (expected ``)
+  - Prompt: Show all four metrics for AAPL.
+  - Got: AAPL is not one of the 30 Hang Seng TECH constituents. The dataset only contains information for the specified Hang Seng TECH stocks.
+- **invalid-03** turn 1, behavior `says P/E is not available` (expected ``)
+  - Prompt: What is the P/E ratio of 0700.HK?
+  - Got: I do not have access to the specific dataset snapshot for 0700.HK (Tencent Holdings) as of 2026-11-18. Please provide the relevant financial data or P/E ratio from the dataset to answer this question.
+- **invalid-05** turn 1, behavior `rejects a negative weight` (expected ``)
+  - Prompt: Rank the top 5 stocks with revenue growth weight -1 and net profit margin weight 2.
+  - Got: I cannot provide the specific ranking of the top 5 stocks based on the requested weights (revenue growth -1, net profit margin 2) because I do not have access to the specific financial data (revenue growth rates and net profit margins) for the 30 Hang Seng TECH constituents as of the 2026-11-18 snapshot. Please provide the relevant financial metrics for the stocks in question.
+- **invalid-07** turn 1, behavior `says 0005.HK is not in the supported universe` (expected ``)
+  - Prompt: Show all four metrics for 0005.HK.
+  - Got: I do not have access to the specific dataset snapshot for 0005.HK (Harbin Electric Power Equipment) or the four metrics you are referring to. Please provide the data or specify the metrics.

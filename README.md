@@ -191,7 +191,7 @@ Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysi
 | 11 | Build the web interface | Support natural-language requests, execution progress, metrics, rankings, charts, and follow-up questions. | Partial Complete | DUAN Zihang Raymond |
 | 12 | Create the evaluation set | Cover all three workflows, follow-ups, and invalid/incomplete inputs; verify reference calculations, filters, rankings, and tool outputs. | ✅ | horoling |
 | 13 | Implement the baseline | Use another provider's general-purpose LLM without custom tools; keep prompts and applicable company context identical; record model/API settings. | ✅ | horoling |
-| 14 | Run and compare evaluations | Report numerical accuracy, recommendation quality, trend grounding, explanation grounding, follow-up success, and response time. | In progress | horoling |
+| 14 | Run and compare evaluations | Report numerical accuracy, recommendation quality, trend grounding, explanation grounding, follow-up success, and response time. | ✅ | horoling |
 | 15 | Analyze failures and limitations | Document at least one observed failure, its cause, and mitigation; acknowledge that different models prevent isolating tool-use effects. | X | |
 | 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | X | |
 
@@ -325,4 +325,23 @@ Task 12: 43 cases (85 checks) covering individual analysis, ranking, trend, foll
 
 Task 13: a no-tools baseline on DeepSeek, plus the same TACC Qwen model without tools, so the effect of tools can be separated from the effect of the model.
 
-Task 14: scripts to run and score all systems are ready. Only a one-case smoke run on TACC Qwen has completed so far; the full comparison still needs to be run and reported.
+Task 14: all five systems were run on the same 43 cases on 21 November 2026. Full tables are in [evaluation/results/summary.md](evaluation/results/summary.md), every failed check in [failures.md](evaluation/results/failures.md).
+
+| Metric | Qwen agent (tools) | Qwen, no tools | Qwen, no tools + raw data | DeepSeek, no tools | DeepSeek, no tools + raw data |
+|---|---|---|---|---|---|
+| Cases fully passed | 88.4% (38/43) | 11.6% | 18.6% | 7.0% | 30.2% |
+| Numerical accuracy | 98.2% (54/55) | 0.0% | 3.6% | 0.0% | 34.5% |
+| Ranking in exact order | 92.3% (12/13) | 0.0% | 0.0% | 0.0% | 0.0% |
+| Trend analysis grounding | 100% (17/17) | 11.8% | 17.6% | 5.9% | 52.9% |
+| Follow-up success | 83.3% (5/6) | 0.0% | 0.0% | 0.0% | 0.0% |
+| Mean response time per turn | 12.9 s | 1.3 s | 5.4 s | 1.1 s | 1.6 s |
+
+Scoring is automatic and heuristic; spot-check before quoting. Known issues from this run, kept as input for task 15:
+
+- `rank-05` (top 10 ranking): the answer exceeds the 1,800 output-token limit, the truncated JSON is rejected nine times, and the conversation then overflows the 32K context (HTTP 400).
+- `follow-01`: asked to switch volatility to a 60-day window, the model answered without calling the tool again.
+- `ind-07`: the model did not state that MiniMax volatility uses a short history.
+- `invalid-04`: asked for a 1-day window, the model silently used 2 days instead of rejecting the request.
+- `invalid-03` is a scorer false negative: the answer correctly says P/E is unavailable, in words the keyword list does not cover.
+- "Qwen, no tools + raw data" has 4 cases that the service rejected with HTTP 400 (prompt too long for the 32K context), so that column is incomplete.
+- `results/old-agent-8-steps/` keeps the run made with the previous agent (6 tools, 8-step limit) for comparison.

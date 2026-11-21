@@ -33,7 +33,8 @@ def model_view(result):
 def check_turn(check, answer, names):
     """Return (passed, detail dict) for one check against one answer."""
     kind = check['type']
-    low = answer.lower()
+    # Models often write typographic apostrophes (can’t); keyword lists use plain ones.
+    low = answer.lower().replace('\u2019', "'").replace('\u2018', "'")
     if kind == 'number':
         return has_number(answer, check['expected']), {}
     if kind == 'unavailable':
