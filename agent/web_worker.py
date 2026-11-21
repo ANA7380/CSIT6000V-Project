@@ -23,7 +23,10 @@ def process(path, sessions, base_url):
             raise ValueError('Enter a question of up to 8000 characters.')
         if session not in sessions:
             sessions[session] = ChatAgent(base_url, path.parent / (session + '.jsonl'))
-        result = {'answer': sessions[session].ask(question)}
+        agent = sessions[session]
+        result = {'answer': agent.ask(question)}
+        if agent.charts:
+            result['charts'] = [Path(chart).read_text(encoding='utf-8') for chart in agent.charts]
     except Exception as exc:
         result = {'error': str(exc)}
     temp = reply.with_suffix('.tmp')

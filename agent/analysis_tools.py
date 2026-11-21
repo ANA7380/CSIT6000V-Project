@@ -2,6 +2,7 @@
 import math
 import statistics
 from datetime import date
+from xml.sax.saxutils import escape
 from agent import number
 
 
@@ -45,6 +46,77 @@ class AnalysisTools:
         row = self.engine.snapshot[symbol]
         return dict(symbol=symbol, company=row['company_name'], snapshot_cutoff=row['snapshot_cutoff'],
                     data_notice='Fixed snapshot, not live data. Historical indicators do not predict future prices.')
+
+    def price_chart(self, ticker, window=252):
+        """Adjusted-close line chart with SMA20/50/200 as a standalone SVG; history only."""
+        symbol, rows = self.prices(ticker)
+        prices = positive_prices(rows)
+        out = self.context(symbol)
+        currency = self.engine.snapshot[symbol]['price_currency']
+        count = min(window + 1, len(prices))
+        first = len(prices) - count
+        shown, dates = prices[first:], [r['date'] for r in rows[first:]]
+        colors = {'Adjusted close': '#1f4e79', 'SMA20': '#d9822b', 'SMA50': '#2e8b57', 'SMA200': '#8e44ad'}
+        series = {'Adjusted close': shown}
+        for n in (20, 50, 200):
+            # Averages use the full history so the lines are complete inside the plotted window.
+            line = [statistics.mean(prices[i - n + 1:i + 1]) if i >= n - 1 else None for i in range(first, len(prices))]
+            if any(v is not None for v in line):
+                series[f'SMA{n}'] = line
+        values = [v for line in series.values() for v in line if v is not None]
+        low, high = min(values), max(values)
+        pad = (high - low) * 0.06 or max(high * 0.01, 0.01)
+        low, high = low - pad, high + pad
+        width, height, left, right, top, bottom = 760, 380, 64, 20, 46, 44
+        plot_w, plot_h = width - left - right, height - top - bottom
+
+        def x(i):
+            return left + (plot_w * i / (count - 1) if count > 1 else plot_w / 2)
+
+        def y(v):
+            return top + plot_h * (high - v) / (high - low)
+
+        parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
+                 f'font-family="Arial, sans-serif" font-size="12" role="img">',
+                 f'<title>{symbol} adjusted close, {dates[0]} to {dates[-1]}</title>',
+                 f'<rect width="{width}" height="{height}" fill="#ffffff"/>',
+                 f'<text x="{left}" y="20" font-size="14" fill="#1a1a1a">{symbol} {escape(out["company"])} '
+                 f'adjusted close ({currency}), {dates[0]} to {dates[-1]}</text>']
+        for k in range(5):
+            value = low + (high - low) * k / 4
+            parts.append(f'<line x1="{left}" y1="{y(value):.1f}" x2="{width - right}" y2="{y(value):.1f}" stroke="#e3e3e3"/>')
+            parts.append(f'<text x="{left - 8}" y="{y(value) + 4:.1f}" text-anchor="end" fill="#555555">{value:.2f}</text>')
+        ticks = sorted({0, (count - 1) // 3, 2 * (count - 1) // 3, count - 1})
+        for i in ticks:
+            anchor = 'start' if i == 0 else ('end' if i == count - 1 else 'middle')
+            parts.append(f'<line x1="{x(i):.1f}" y1="{top + plot_h}" x2="{x(i):.1f}" y2="{top + plot_h + 5}" stroke="#555555"/>')
+            parts.append(f'<text x="{x(i):.1f}" y="{top + plot_h + 20}" text-anchor="{anchor}" fill="#555555">{dates[i]}</text>')
+        parts.append(f'<rect x="{left}" y="{top}" width="{plot_w}" height="{plot_h}" fill="none" stroke="#555555"/>')
+        for offset, (name, line) in enumerate(series.items()):
+            points = ' '.join(f'{x(i):.1f},{y(v):.1f}' for i, v in enumerate(line) if v is not None)
+            if count == 1:
+                parts.append(f'<circle cx="{x(0):.1f}" cy="{y(line[0]):.1f}" r="3" fill="{colors[name]}"/>')
+            else:
+                parts.append(f'<polyline points="{points}" fill="none" stroke="{colors[name]}" '
+                             f'stroke-width="{2 if name == "Adjusted close" else 1.2}"/>')
+            lx = left + offset * 130
+            parts.append(f'<line x1="{lx}" y1="34" x2="{lx + 22}" y2="34" stroke="{colors[name]}" stroke-width="2"/>')
+            parts.append(f'<text x="{lx + 28}" y="38" fill="#1a1a1a">{name}</text>')
+        parts.append(f'<text x="{width - right}" y="{height - 6}" text-anchor="end" font-size="11" fill="#777777">'
+                     'Fixed snapshot; historical prices only, not a forecast.</text></svg>')
+        top_i, bottom_i = shown.index(max(shown)), shown.index(min(shown))
+        out.update(points=count, requested_returns=window, start_date=dates[0], end_date=dates[-1],
+                   status='ok' if count == window + 1 else 'short_history',
+                   price_basis='adjusted_close', price_currency=currency,
+                   source_url=self.engine.snapshot[symbol]['price_source_url'],
+                   series_plotted=list(series),
+                   summary={'start_price': shown[0], 'end_price': shown[-1],
+                            'change_pct': (shown[-1] / shown[0] - 1) * 100 if count > 1 else None,
+                            'high': {'value': shown[top_i], 'date': dates[top_i]},
+                            'low': {'value': shown[bottom_i], 'date': dates[bottom_i]},
+                            'latest_sma': {name: line[-1] for name, line in series.items() if name != 'Adjusted close'}},
+                   svg='\n'.join(parts))
+        return out
 
     def price_analysis(self, ticker, window=252, rolling_window=20):
         symbol, rows = self.prices(ticker)

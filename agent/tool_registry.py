@@ -16,6 +16,10 @@ TOOLS = {
         'description': 'Calendar 1/3/6/12-month returns, SMA20/50/200 and latest crossover, Wilder RSI14, MACD12/26/9, maximum drawdown, rolling annualized volatility and latest volume divided by previous 20-session average. window controls drawdown lookback and number of rolling points; rolling_window controls volatility estimation. Defaults 252 and 20. All use adjusted close except volume.',
         'parameters': {'ticker': 'string', 'window': 'integer:2:5000', 'rolling_window': 'integer:2:5000'}, 'required': ['ticker'],
         'example': {'ticker': '0700.HK', 'window': 252, 'rolling_window': 20}},
+    'price_chart': {
+        'description': 'Save a line chart (SVG image) of adjusted close with SMA20/50/200 for one ticker. Use only when the user asks for a chart, plot or graph. window is the number of daily returns shown, default 252. Returns the file path, date range, start/end price, change, high and low with dates, and latest SMA values. History only.',
+        'parameters': {'ticker': 'string', 'window': 'integer:2:5000'}, 'required': ['ticker'],
+        'example': {'ticker': '0700.HK', 'window': 120}},
     'stock_correlation': {
         'description': 'Pearson correlation between two stocks using matched adjusted-close log-return intervals. window defaults to 252 returns. Not market beta.',
         'parameters': {'ticker': 'string', 'other_ticker': 'string', 'window': 'integer:2:5000'}, 'required': ['ticker', 'other_ticker'],
