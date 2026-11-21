@@ -1,0 +1,21 @@
+sequenceDiagram
+  participant B as 浏览器
+  participant W as 本机网页桥
+  participant S as SDK共享目录
+  participant A as worker和Agent
+  participant Q as Qwen
+  B->>W: POST /ask
+  W->>S: 上传ID.request
+  W->>S: 上传ID.ask提交标记
+  W-->>B: 202及请求ID
+  S->>A: worker扫描并读取请求
+  loop 模型选择工具或结束 最多12次
+    A->>Q: system 状态 历史 工具观察
+    Q-->>A: tool或answer JSON
+    Note over A: 执行工具并追加观察 或验证最终解释
+    A->>S: 更新status
+  end
+  A->>S: 保存会话state和reply
+  B->>W: GET /reply/ID
+  S-->>W: SDK下载reply
+  W-->>B: 200及解释 证据 图表
