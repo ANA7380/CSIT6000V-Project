@@ -13,6 +13,7 @@ header p,label {margin:0;color:#435e55}
 #messages {flex:1;padding:1.5rem 0}
 article {margin:0 0 1rem;padding:1rem 1.25rem;border:1px solid #d4dfdb;background:white;border-radius:.75rem;white-space:pre-wrap;overflow-wrap:anywhere}
 article.user {margin-left:12%;background:#e1eee8}
+article img {display:block;max-width:100%;height:auto;margin-top:.8rem;border:1px solid #d4dfdb;border-radius:.5rem}
 article strong {display:block;font-size:.88rem;color:#23604d;margin-bottom:.3rem}
 form {position:sticky;bottom:0;background:#f3f6f5;padding:.6rem 0 1rem}
 textarea {width:100%;resize:vertical;min-height:4rem;font:inherit;padding:.7rem;border:1px solid #88a49a;border-radius:.5rem}
@@ -37,12 +38,19 @@ const question = document.querySelector('#question');
 const button = document.querySelector('button');
 const statusText = document.querySelector('#status');
 let pending = null;
-function message(author, text) {
+function message(author, text, charts) {
   const card = document.createElement('article');
   const label = document.createElement('strong');
   label.textContent = author;
   if (author === 'You') card.className = 'user';
   card.append(label, document.createTextNode(text));
+  for (const svg of charts || []) {
+    // Shown as an image so markup inside a chart can never run as page script.
+    const image = document.createElement('img');
+    image.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    image.alt = 'Price chart';
+    card.append(image);
+  }
   document.querySelector('#messages').append(card);
   form.scrollIntoView({block:'end'});
 }
@@ -76,7 +84,7 @@ form.onsubmit = async event => {
       }
       pending = null;
       if (data.error) {question.value = text; throw Error(data.error);}
-      message('Qwen', data.answer);
+      message('Qwen', data.answer, data.charts);
       statusText.textContent = '';
     }
   } catch (error) {

@@ -28,6 +28,15 @@ Reference: https://api-docs.deepseek.com/quick_start
 
 
 
+### Browser chat on your own machine (DeepSeek)
+
+```bash
+cd agent
+python3 web_local.py
+```
+
+Set `DEEPSEEK_API_KEY` first, then open the printed `http://127.0.0.1:8765/` URL. It serves the same page as the TACC chat, but the agent and its tools run locally and the model is DeepSeek. Charts requested in the conversation are shown under the answer. Logs and chart files are written to `agent/logs/web/`.
+
 ### Browser chat on TACC
 
 ```bash
@@ -149,7 +158,7 @@ Volatility uses the latest 253 observations by default, yielding 252 returns. A 
 
 The data is a fixed 18 November 2026 snapshot, with completed prices through 17 November. It is not a live feed. Financial statement dates differ by company; vendor reporting labels and debt definitions retain the limitations in [the dataset notes](agent/data/README.md).
 
-The chat log (`logs/chat.jsonl`, or `--log PATH`) timestamps every event. Model calls and tool executions record their duration in seconds, model service failures are logged as `model_error`, and each turn ends with a `turn` event holding its status, total time, and model/tool call counts. Charts are saved as SVG files in a `charts/` folder next to the chat log and the path is printed after the answer; the web chat does not display them yet.
+The chat log (`logs/chat.jsonl`, or `--log PATH`) timestamps every event. Model calls and tool executions record their duration in seconds, model service failures are logged as `model_error`, and each turn ends with a `turn` event holding its status, total time, and model/tool call counts. Charts are saved as SVG files in a `charts/` folder next to the chat log and the path is printed after the answer; the web chat shows them under the answer.
 
 Each successful request appends parameters, calculation time, formulas, inputs, dates, source URLs, underlying financial observations, values, and statuses to `logs/requests.jsonl` (or `--log PATH`). `--json` also prints the full result.
 
