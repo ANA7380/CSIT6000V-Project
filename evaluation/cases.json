@@ -1,0 +1,2038 @@
+{
+ "snapshot_cutoff": "Wed Nov 18 2026 15:37:56 GMT+0800 (中国标准时间)",
+ "latest_price_date": "2026-11-17",
+ "cases": [
+  {
+   "id": "ind-01",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "Show all four metrics for 0700.HK.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0700.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK Revenue growth",
+       "expected": 10.992173611412227,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK Net profit margin",
+       "expected": 27.356495837097444,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK Debt-to-equity",
+       "expected": 0.4153953020329215,
+       "unit": "x"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK Historical volatility",
+       "expected": 33.843934520367455,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-02",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "Show the four core metrics for Tencent Music Entertainment.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "1698.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "1698.HK Revenue growth",
+       "expected": 5.648115325534686,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "1698.HK Net profit margin",
+       "expected": 24.091264959176826,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "1698.HK Debt-to-equity",
+       "expected": 0.21570932134096485,
+       "unit": "x"
+      },
+      {
+       "type": "number",
+       "label": "1698.HK Historical volatility",
+       "expected": 48.74248102440263,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-03",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "What is the historical volatility of 9988.HK using a 60-trading-day window?",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "9988.HK",
+        "window": 60
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "9988.HK Historical volatility",
+       "expected": 44.768350745289595,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-04",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "What are Lenovo's (0992.HK) revenue growth and net profit margin?",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0992.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0992.HK Revenue growth",
+       "expected": 43.08550185873605,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0992.HK Net profit margin",
+       "expected": -2.260327357755261,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-05",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "Show NIO's (9866.HK) debt-to-equity ratio and net profit margin.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "9866.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "9866.HK Debt-to-equity",
+       "expected": 7.134757531914056,
+       "unit": "x"
+      },
+      {
+       "type": "number",
+       "label": "9866.HK Net profit margin",
+       "expected": -2.245368643813719,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-06",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "Show all four metrics for 0300.HK and explain any missing data.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0300.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "unavailable",
+       "label": "0300.HK Revenue growth",
+       "reason": "Required financial input is missing."
+      },
+      {
+       "type": "number",
+       "label": "0300.HK Net profit margin",
+       "expected": 13.83568512509644,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0300.HK Debt-to-equity",
+       "expected": 0.34947388585577105,
+       "unit": "x"
+      },
+      {
+       "type": "number",
+       "label": "0300.HK Historical volatility",
+       "expected": 23.66365939650136,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-07",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0100.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "unavailable",
+       "label": "0100.HK Revenue growth",
+       "reason": "Required financial input is missing."
+      },
+      {
+       "type": "number",
+       "label": "0100.HK Net profit margin",
+       "expected": -5310.745673997109,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0100.HK Debt-to-equity",
+       "expected": 0.10204554449710883,
+       "unit": "x"
+      },
+      {
+       "type": "number",
+       "label": "0100.HK Historical volatility",
+       "expected": 142.4897209287103,
+       "unit": "%"
+      },
+      {
+       "type": "label",
+       "label": "0100.HK volatility history status",
+       "expected": "SHORT",
+       "options": [
+        "FULL",
+        "SHORT"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-08",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "Show Tencent's (0700.HK) ROE, equity growth, debt growth and change in profit margin.",
+     "reference_calls": [
+      {
+       "tool": "financial_trends",
+       "arguments": {
+        "ticker": "0700.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK return_on_equity",
+       "expected": 21.134746439817643,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK equity_growth",
+       "expected": 18.551114069362782,
+       "unit": "%"
+      },
+      {
+       "type": "unavailable",
+       "label": "0700.HK debt_growth",
+       "reason": "No comparable annual pair with positive prior value."
+      },
+      {
+       "type": "number",
+       "label": "0700.HK profit_margin_change",
+       "expected": 0.5149544366080006,
+       "unit": "percentage points"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-09",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "Compare the net profit margin and debt-to-equity of 0700.HK and 9999.HK.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0700.HK"
+       }
+      },
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "9999.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK Net profit margin",
+       "expected": 27.356495837097444,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK Debt-to-equity",
+       "expected": 0.4153953020329215,
+       "unit": "x"
+      },
+      {
+       "type": "number",
+       "label": "9999.HK Net profit margin",
+       "expected": 23.18650568550773,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "9999.HK Debt-to-equity",
+       "expected": 0.07543317533117075,
+       "unit": "x"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-10",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "What is the return correlation between 0700.HK and 9988.HK over the last 60 sessions?",
+     "reference_calls": [
+      {
+       "tool": "stock_correlation",
+       "arguments": {
+        "ticker": "0700.HK",
+        "other_ticker": "9988.HK",
+        "window": 60
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700/9988 correlation (60)",
+       "expected": 0.778918294230132,
+       "unit": "correlation (-1 to 1)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ind-11",
+   "category": "individual",
+   "turns": [
+    {
+     "prompt": "请显示小米（1810.HK）的四个核心指标。",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "1810.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "1810.HK Revenue growth",
+       "expected": -6.066504949705487,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "1810.HK Net profit margin",
+       "expected": 8.68735330562368,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "1810.HK Debt-to-equity",
+       "expected": 0.16432161090212,
+       "unit": "x"
+      },
+      {
+       "type": "number",
+       "label": "1810.HK Historical volatility",
+       "expected": 43.42588553250596,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-01",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "Rank the top 5 stocks using the default weights.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 5
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 5",
+       "k": 5,
+       "expected": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "0700.HK",
+        "2382.HK"
+       ],
+       "eligible": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "0700.HK",
+        "2382.HK",
+        "1698.HK",
+        "1810.HK",
+        "9863.HK",
+        "9988.HK",
+        "9618.HK",
+        "0981.HK",
+        "9961.HK",
+        "0285.HK",
+        "0020.HK",
+        "1347.HK",
+        "9626.HK",
+        "3690.HK",
+        "9888.HK",
+        "9866.HK",
+        "2015.HK",
+        "9660.HK",
+        "0992.HK",
+        "1024.HK",
+        "9868.HK"
+       ],
+       "scores": {
+        "9999.HK": 77.1739,
+        "6618.HK": 76.087,
+        "0241.HK": 73.913,
+        "0700.HK": 73.913,
+        "2382.HK": 64.1304
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-02",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "Return the top 5 stocks with net profit margin at least 10% and debt-to-equity at most 0.5.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 5,
+        "filters": {
+         "net_profit_margin": {
+          "min": 10
+         },
+         "debt_to_equity": {
+          "max": 0.5
+         }
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 5",
+       "k": 5,
+       "expected": [
+        "0700.HK",
+        "9999.HK",
+        "2382.HK",
+        "1698.HK"
+       ],
+       "eligible": [
+        "0700.HK",
+        "9999.HK",
+        "2382.HK",
+        "1698.HK"
+       ],
+       "scores": {
+        "0700.HK": 66.6667,
+        "9999.HK": 58.3333,
+        "2382.HK": 50.0,
+        "1698.HK": 25.0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-03",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "Rank the top 3 stocks using revenue growth weight 2 and historical volatility weight 1.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 3,
+        "weights": {
+         "revenue_growth": 2,
+         "historical_volatility": 1
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 3",
+       "k": 3,
+       "expected": [
+        "9863.HK",
+        "9866.HK",
+        "6618.HK"
+       ],
+       "eligible": [
+        "9863.HK",
+        "9866.HK",
+        "6618.HK",
+        "0700.HK",
+        "9660.HK",
+        "0241.HK",
+        "0020.HK",
+        "0992.HK",
+        "0981.HK",
+        "2382.HK",
+        "9999.HK",
+        "3690.HK",
+        "9868.HK",
+        "9988.HK",
+        "9618.HK",
+        "9626.HK",
+        "1347.HK",
+        "9961.HK",
+        "0285.HK",
+        "1698.HK",
+        "1810.HK",
+        "9888.HK",
+        "2015.HK",
+        "1024.HK"
+       ],
+       "scores": {
+        "9863.HK": 79.7101,
+        "9866.HK": 72.4638,
+        "6618.HK": 72.4638
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-04",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "Rank the top 5 stocks using only debt-to-equity.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 5,
+        "weights": {
+         "debt_to_equity": 1
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 5",
+       "k": 5,
+       "expected": [
+        "0241.HK",
+        "6618.HK",
+        "9999.HK",
+        "0100.HK",
+        "1810.HK"
+       ],
+       "eligible": [
+        "0241.HK",
+        "6618.HK",
+        "9999.HK",
+        "0100.HK",
+        "1810.HK",
+        "9961.HK",
+        "0020.HK",
+        "2382.HK",
+        "1698.HK",
+        "2015.HK",
+        "9988.HK",
+        "0285.HK",
+        "9863.HK",
+        "0300.HK",
+        "1211.HK",
+        "6690.HK",
+        "0700.HK",
+        "9888.HK",
+        "9903.HK",
+        "9618.HK",
+        "9660.HK",
+        "3690.HK",
+        "1347.HK",
+        "0981.HK",
+        "2513.HK",
+        "9626.HK",
+        "0992.HK",
+        "1024.HK",
+        "9868.HK",
+        "9866.HK"
+       ],
+       "scores": {
+        "0241.HK": 100.0,
+        "6618.HK": 96.5517,
+        "9999.HK": 93.1034,
+        "0100.HK": 89.6552,
+        "1810.HK": 86.2069
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-05",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "Rank the top 10 stocks using the default weights.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 10
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 10",
+       "k": 10,
+       "expected": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "0700.HK",
+        "2382.HK",
+        "1698.HK",
+        "1810.HK",
+        "9863.HK",
+        "9988.HK",
+        "9618.HK"
+       ],
+       "eligible": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "0700.HK",
+        "2382.HK",
+        "1698.HK",
+        "1810.HK",
+        "9863.HK",
+        "9988.HK",
+        "9618.HK",
+        "0981.HK",
+        "9961.HK",
+        "0285.HK",
+        "0020.HK",
+        "1347.HK",
+        "9626.HK",
+        "3690.HK",
+        "9888.HK",
+        "9866.HK",
+        "2015.HK",
+        "9660.HK",
+        "0992.HK",
+        "1024.HK",
+        "9868.HK"
+       ],
+       "scores": {
+        "9999.HK": 77.1739,
+        "6618.HK": 76.087,
+        "0241.HK": 73.913,
+        "0700.HK": 73.913,
+        "2382.HK": 64.1304,
+        "1698.HK": 57.6087,
+        "1810.HK": 56.5217,
+        "9863.HK": 56.5217,
+        "9988.HK": 52.1739,
+        "9618.HK": 51.087
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-06",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "Among stocks with revenue growth of at least 20%, rank the top 5 using the default weights.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 5,
+        "filters": {
+         "revenue_growth": {
+          "min": 20
+         }
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 5",
+       "k": 5,
+       "expected": [
+        "9863.HK",
+        "6618.HK",
+        "0020.HK",
+        "9866.HK",
+        "0981.HK"
+       ],
+       "eligible": [
+        "9863.HK",
+        "6618.HK",
+        "0020.HK",
+        "9866.HK",
+        "0981.HK",
+        "9660.HK",
+        "0992.HK"
+       ],
+       "scores": {
+        "9863.HK": 79.1667,
+        "6618.HK": 70.8333,
+        "0020.HK": 45.8333,
+        "9866.HK": 45.8333,
+        "0981.HK": 45.8333
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-07",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "Which 3 stocks have the lowest historical volatility? Rank using only historical volatility.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 3,
+        "weights": {
+         "historical_volatility": 1
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 3",
+       "k": 3,
+       "expected": [
+        "0300.HK",
+        "6690.HK",
+        "9618.HK"
+       ],
+       "eligible": [
+        "0300.HK",
+        "6690.HK",
+        "9618.HK",
+        "0700.HK",
+        "9999.HK",
+        "1211.HK",
+        "0285.HK",
+        "9961.HK",
+        "0241.HK",
+        "3690.HK",
+        "6618.HK",
+        "1810.HK",
+        "2015.HK",
+        "9626.HK",
+        "9988.HK",
+        "9888.HK",
+        "2382.HK",
+        "9863.HK",
+        "1698.HK",
+        "0020.HK",
+        "9866.HK",
+        "1024.HK",
+        "9868.HK",
+        "9660.HK",
+        "0981.HK",
+        "0992.HK",
+        "1347.HK"
+       ],
+       "scores": {
+        "0300.HK": 100.0,
+        "6690.HK": 96.1538,
+        "9618.HK": 92.3077
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-08",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "Rank the top 5 stocks with net profit margin at least 50%.",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "reports that no stock passes the filter",
+       "groups": [
+        [
+         "no stock",
+         "no stocks",
+         "no compan",
+         "none of",
+         "no eligible",
+         "zero",
+         "no results",
+         "0 eligible",
+         "not any",
+         "no candidates",
+         "没有",
+         "无符合"
+        ]
+       ],
+       "forbid_numeric_claims": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rank-09",
+   "category": "ranking",
+   "turns": [
+    {
+     "prompt": "I prefer profitable, low-debt companies. Require net profit margin of at least 5% and debt-to-equity of at most 0.3, weight net profit margin and debt-to-equity equally and ignore the other metrics. Give me the top 3.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 3,
+        "weights": {
+         "net_profit_margin": 1,
+         "debt_to_equity": 1
+        },
+        "filters": {
+         "net_profit_margin": {
+          "min": 5
+         },
+         "debt_to_equity": {
+          "max": 0.3
+         }
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 3",
+       "k": 3,
+       "expected": [
+        "9999.HK",
+        "0241.HK",
+        "1698.HK"
+       ],
+       "eligible": [
+        "9999.HK",
+        "0241.HK",
+        "1698.HK",
+        "6618.HK",
+        "1810.HK",
+        "2382.HK"
+       ],
+       "scores": {
+        "9999.HK": 70.0,
+        "0241.HK": 50.0,
+        "1698.HK": 50.0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-01",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "Show 0700.HK's RSI, MACD line, 50-day moving average and 12-month return.",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "0700.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK rsi_14",
+       "expected": 35.97500559114523,
+       "unit": "index (0-100)"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK macd",
+       "expected": -6.206396519577424,
+       "unit": "HKD"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK sma_50",
+       "expected": 415.61999877929685,
+       "unit": "HKD"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK return_12m",
+       "expected": -40.238690804462216,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-02",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "Is 0700.HK's latest adjusted close above or below its 50-day simple moving average? Begin your answer with exactly one word, ABOVE or BELOW, then explain.",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "0700.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "label",
+       "label": "0700.HK price vs SMA50",
+       "expected": "BELOW",
+       "options": [
+        "ABOVE",
+        "BELOW"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-03",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "Is SMIC's (0981.HK) 50-day moving average above or below its 200-day moving average? Begin your answer with exactly one word, ABOVE or BELOW, then explain.",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "0981.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "label",
+       "label": "0981.HK SMA50 vs SMA200",
+       "expected": "BELOW",
+       "options": [
+        "ABOVE",
+        "BELOW"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-04",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "What was the maximum drawdown of 9988.HK over the last 60 trading sessions?",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "9988.HK",
+        "window": 60
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "9988.HK maximum_drawdown",
+       "expected": -30.528457765656757,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-05",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "Show the 1-month, 3-month and 6-month price returns of 0981.HK.",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "0981.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0981.HK return_1m",
+       "expected": -6.106871507167922,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0981.HK return_3m",
+       "expected": -34.530938437843176,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0981.HK return_6m",
+       "expected": -30.850316643992947,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-06",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "Did 1810.HK have a 50/200-day moving-average crossover in the latest session? Begin your answer with exactly one word: UP, DOWN or NONE.",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "1810.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "label",
+       "label": "1810.HK latest 50/200 crossover",
+       "expected": "NONE",
+       "options": [
+        "DOWN",
+        "NONE",
+        "UP"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-07",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "How does 1810.HK's latest trading volume compare with its previous 20-session average? Give the ratio.",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "1810.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "1810.HK volume_ratio_20",
+       "expected": 1.0035002650345637,
+       "unit": "x"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-08",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "What is Meituan's (3690.HK) latest 20-day rolling annualized volatility and its RSI?",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "3690.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "3690.HK rolling_volatility",
+       "expected": 50.58972477864734,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "3690.HK rsi_14",
+       "expected": 43.236175319372585,
+       "unit": "index (0-100)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-09",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "Will 0700.HK go up next month? Give me a price target.",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "declines to predict future prices",
+       "groups": [
+        [
+         "cannot predict",
+         "can't predict",
+         "can not predict",
+         "not predict",
+         "no prediction",
+         "unable to predict",
+         "not a forecast",
+         "not forecast",
+         "no forecast",
+         "cannot forecast",
+         "not able to predict",
+         "no price target",
+         "not provide a price target",
+         "cannot provide a price target",
+         "无法预测",
+         "不能预测",
+         "不预测",
+         "不作预测"
+        ]
+       ],
+       "forbid_numeric_claims": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trend-10",
+   "category": "trend",
+   "turns": [
+    {
+     "prompt": "Show the 1-month and 12-month price returns of 0100.HK.",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "0100.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0100.HK return_1m",
+       "expected": -36.29873909281517,
+       "unit": "%"
+      },
+      {
+       "type": "unavailable",
+       "label": "0100.HK return_12m",
+       "reason": "Insufficient history for full calendar-month window."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "follow-01",
+   "category": "followup",
+   "turns": [
+    {
+     "prompt": "Show all four metrics for 0700.HK.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0700.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK Revenue growth",
+       "expected": 10.992173611412227,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK Net profit margin",
+       "expected": 27.356495837097444,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK Debt-to-equity",
+       "expected": 0.4153953020329215,
+       "unit": "x"
+      },
+      {
+       "type": "number",
+       "label": "0700.HK Historical volatility",
+       "expected": 33.843934520367455,
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "prompt": "Now use 60 trading days for volatility.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0700.HK",
+        "window": 60
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK Historical volatility",
+       "expected": 32.551206438735974,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "follow-02",
+   "category": "followup",
+   "turns": [
+    {
+     "prompt": "Rank the top 5 stocks using the default weights.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 5
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 5",
+       "k": 5,
+       "expected": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "0700.HK",
+        "2382.HK"
+       ],
+       "eligible": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "0700.HK",
+        "2382.HK",
+        "1698.HK",
+        "1810.HK",
+        "9863.HK",
+        "9988.HK",
+        "9618.HK",
+        "0981.HK",
+        "9961.HK",
+        "0285.HK",
+        "0020.HK",
+        "1347.HK",
+        "9626.HK",
+        "3690.HK",
+        "9888.HK",
+        "9866.HK",
+        "2015.HK",
+        "9660.HK",
+        "0992.HK",
+        "1024.HK",
+        "9868.HK"
+       ],
+       "scores": {
+        "9999.HK": 77.1739,
+        "6618.HK": 76.087,
+        "0241.HK": 73.913,
+        "0700.HK": 73.913,
+        "2382.HK": 64.1304
+       }
+      }
+     ]
+    },
+    {
+     "prompt": "Keep the same weights, but now require debt-to-equity of at most 0.3.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 5,
+        "filters": {
+         "debt_to_equity": {
+          "max": 0.3
+         }
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 5",
+       "k": 5,
+       "expected": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "2382.HK",
+        "1810.HK"
+       ],
+       "eligible": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "2382.HK",
+        "1810.HK",
+        "1698.HK",
+        "9961.HK",
+        "0285.HK",
+        "9988.HK",
+        "0020.HK",
+        "9863.HK",
+        "2015.HK"
+       ],
+       "scores": {
+        "9999.HK": 79.5455,
+        "6618.HK": 75.0,
+        "0241.HK": 72.7273,
+        "2382.HK": 56.8182,
+        "1810.HK": 52.2727
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "follow-03",
+   "category": "followup",
+   "turns": [
+    {
+     "prompt": "Rank the top 3 stocks with net profit margin of at least 10%.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 3,
+        "filters": {
+         "net_profit_margin": {
+          "min": 10
+         }
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 3",
+       "k": 3,
+       "expected": [
+        "0700.HK",
+        "9999.HK",
+        "2382.HK"
+       ],
+       "eligible": [
+        "0700.HK",
+        "9999.HK",
+        "2382.HK",
+        "1698.HK",
+        "0981.HK",
+        "1347.HK"
+       ],
+       "scores": {
+        "0700.HK": 70.0,
+        "9999.HK": 65.0,
+        "2382.HK": 50.0
+       }
+      }
+     ]
+    },
+    {
+     "prompt": "Using the same filter and weights, show the top 6 instead.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 6,
+        "filters": {
+         "net_profit_margin": {
+          "min": 10
+         }
+        }
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 6",
+       "k": 6,
+       "expected": [
+        "0700.HK",
+        "9999.HK",
+        "2382.HK",
+        "1698.HK",
+        "0981.HK",
+        "1347.HK"
+       ],
+       "eligible": [
+        "0700.HK",
+        "9999.HK",
+        "2382.HK",
+        "1698.HK",
+        "0981.HK",
+        "1347.HK"
+       ],
+       "scores": {
+        "0700.HK": 70.0,
+        "9999.HK": 65.0,
+        "2382.HK": 50.0,
+        "1698.HK": 45.0,
+        "0981.HK": 40.0,
+        "1347.HK": 30.0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "follow-04",
+   "category": "followup",
+   "turns": [
+    {
+     "prompt": "What is 0700.HK's RSI?",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "0700.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK rsi_14",
+       "expected": 35.97500559114523,
+       "unit": "index (0-100)"
+      }
+     ]
+    },
+    {
+     "prompt": "And the same indicator for Alibaba?",
+     "reference_calls": [
+      {
+       "tool": "price_analysis",
+       "arguments": {
+        "ticker": "9988.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "9988.HK rsi_14",
+       "expected": 29.090166679435086,
+       "unit": "index (0-100)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "follow-05",
+   "category": "followup",
+   "turns": [
+    {
+     "prompt": "Rank the top 5 stocks using the default weights.",
+     "reference_calls": [
+      {
+       "tool": "rank_stocks",
+       "arguments": {
+        "top_k": 5
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "ranking",
+       "label": "top 5",
+       "k": 5,
+       "expected": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "0700.HK",
+        "2382.HK"
+       ],
+       "eligible": [
+        "9999.HK",
+        "6618.HK",
+        "0241.HK",
+        "0700.HK",
+        "2382.HK",
+        "1698.HK",
+        "1810.HK",
+        "9863.HK",
+        "9988.HK",
+        "9618.HK",
+        "0981.HK",
+        "9961.HK",
+        "0285.HK",
+        "0020.HK",
+        "1347.HK",
+        "9626.HK",
+        "3690.HK",
+        "9888.HK",
+        "9866.HK",
+        "2015.HK",
+        "9660.HK",
+        "0992.HK",
+        "1024.HK",
+        "9868.HK"
+       ],
+       "scores": {
+        "9999.HK": 77.1739,
+        "6618.HK": 76.087,
+        "0241.HK": 73.913,
+        "0700.HK": 73.913,
+        "2382.HK": 64.1304
+       }
+      }
+     ]
+    },
+    {
+     "prompt": "What is the return on equity of the top-ranked one?",
+     "reference_calls": [
+      {
+       "tool": "financial_trends",
+       "arguments": {
+        "ticker": "9999.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "9999.HK return_on_equity",
+       "expected": 22.583186313477853,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "follow-06",
+   "category": "followup",
+   "turns": [
+    {
+     "prompt": "Compare the net profit margin of 0700.HK and 9999.HK.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0700.HK"
+       }
+      },
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "9999.HK"
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK Net profit margin",
+       "expected": 27.356495837097444,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "9999.HK Net profit margin",
+       "expected": 23.18650568550773,
+       "unit": "%"
+      }
+     ]
+    },
+    {
+     "prompt": "For those same two companies, give the historical volatility over 120 trading days.",
+     "reference_calls": [
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "0700.HK",
+        "window": 120
+       }
+      },
+      {
+       "tool": "ticker_metrics",
+       "arguments": {
+        "ticker": "9999.HK",
+        "window": 120
+       }
+      }
+     ],
+     "checks": [
+      {
+       "type": "number",
+       "label": "0700.HK Historical volatility",
+       "expected": 38.319796728677126,
+       "unit": "%"
+      },
+      {
+       "type": "number",
+       "label": "9999.HK Historical volatility",
+       "expected": 36.592504107679154,
+       "unit": "%"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "invalid-01",
+   "category": "invalid",
+   "turns": [
+    {
+     "prompt": "Show all four metrics for AAPL.",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "says AAPL is not in the supported universe",
+       "groups": [
+        [
+         "not supported",
+         "unsupported",
+         "unknown ticker",
+         "not in the",
+         "not available",
+         "unavailable",
+         "not part of",
+         "not covered",
+         "not included",
+         "cannot find",
+         "could not find",
+         "couldn't find",
+         "no data",
+         "not found",
+         "outside",
+         "不支持",
+         "未知",
+         "不在",
+         "无法",
+         "没有",
+         "未包含",
+         "不包含"
+        ]
+       ],
+       "forbid_numeric_claims": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "invalid-02",
+   "category": "invalid",
+   "turns": [
+    {
+     "prompt": "Show the metrics.",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "asks which ticker",
+       "groups": [
+        [
+         "which ticker",
+         "which stock",
+         "which company",
+         "specify",
+         "provide a ticker",
+         "provide the ticker",
+         "please provide",
+         "let me know which",
+         "what ticker",
+         "哪只",
+         "哪个",
+         "请提供",
+         "请指定"
+        ]
+       ],
+       "forbid_numeric_claims": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "invalid-03",
+   "category": "invalid",
+   "turns": [
+    {
+     "prompt": "What is the P/E ratio of 0700.HK?",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "says P/E is not available",
+       "groups": [
+        [
+         "not available",
+         "unavailable",
+         "not supported",
+         "cannot provide",
+         "no p/e",
+         "not provide",
+         "does not include",
+         "doesn't include",
+         "not included",
+         "n/a",
+         "不可用",
+         "无法提供",
+         "不提供",
+         "没有",
+         "不支持"
+        ]
+       ],
+       "forbid_numeric_claims": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "invalid-04",
+   "category": "invalid",
+   "turns": [
+    {
+     "prompt": "Show the historical volatility of 0700.HK using a window of 1 trading day.",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "rejects a 1-day volatility window",
+       "groups": [
+        [
+         "at least 2",
+         "between 2",
+         "invalid",
+         "must be",
+         "not valid",
+         "cannot be",
+         "nonnegative",
+         "non-negative",
+         "negative",
+         "至少",
+         "无效",
+         "必须",
+         "不能"
+        ]
+       ],
+       "forbid_numeric_claims": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "invalid-05",
+   "category": "invalid",
+   "turns": [
+    {
+     "prompt": "Rank the top 5 stocks with revenue growth weight -1 and net profit margin weight 2.",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "rejects a negative weight",
+       "groups": [
+        [
+         "at least 2",
+         "between 2",
+         "invalid",
+         "must be",
+         "not valid",
+         "cannot be",
+         "nonnegative",
+         "non-negative",
+         "negative",
+         "至少",
+         "无效",
+         "必须",
+         "不能"
+        ]
+       ],
+       "forbid_numeric_claims": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "invalid-06",
+   "category": "invalid",
+   "turns": [
+    {
+     "prompt": "Rank the top 5 semiconductor stocks.",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "says sector classification is unavailable",
+       "groups": [
+        [
+         "sector",
+         "classification",
+         "industry",
+         "行业",
+         "板块"
+        ],
+        [
+         "not available",
+         "unavailable",
+         "not supported",
+         "cannot provide",
+         "no p/e",
+         "not provide",
+         "does not include",
+         "doesn't include",
+         "not included",
+         "n/a",
+         "不可用",
+         "无法提供",
+         "不提供",
+         "没有",
+         "不支持",
+         "not supported",
+         "unsupported",
+         "unknown ticker",
+         "not in the",
+         "not available",
+         "unavailable",
+         "not part of",
+         "not covered",
+         "not included",
+         "cannot find",
+         "could not find",
+         "couldn't find",
+         "no data",
+         "not found",
+         "outside",
+         "不支持",
+         "未知",
+         "不在",
+         "无法",
+         "没有",
+         "未包含",
+         "不包含"
+        ]
+       ],
+       "forbid_numeric_claims": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "invalid-07",
+   "category": "invalid",
+   "turns": [
+    {
+     "prompt": "Show all four metrics for 0005.HK.",
+     "reference_calls": [],
+     "checks": [
+      {
+       "type": "behavior",
+       "label": "says 0005.HK is not in the supported universe",
+       "groups": [
+        [
+         "not supported",
+         "unsupported",
+         "unknown ticker",
+         "not in the",
+         "not available",
+         "unavailable",
+         "not part of",
+         "not covered",
+         "not included",
+         "cannot find",
+         "could not find",
+         "couldn't find",
+         "no data",
+         "not found",
+         "outside",
+         "不支持",
+         "未知",
+         "不在",
+         "无法",
+         "没有",
+         "未包含",
+         "不包含"
+        ]
+       ],
+       "forbid_numeric_claims": true
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
