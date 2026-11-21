@@ -40,7 +40,7 @@ def render_launcher(source, port, config):
 
 
 def load_config(path):
-    config = dict(mode='web', port=42865, startup_timeout=1800,
+    config = dict(mode='web', port=42866, startup_timeout=1800,
                   gpu_memory_utilization=0.55, max_model_len=16384,
                   smoke=True, namespace=None)
     if path.exists():
@@ -124,6 +124,7 @@ def run():
     with socket.socket() as probe:
         probe.bind(('127.0.0.1', config['port']))
     os.environ['QWEN_BASE_URL'] = base
+    os.environ['QWEN_CONTEXT_WINDOW'] = str(config['max_model_len'])
     os.environ['no_proxy'] = os.environ.get('no_proxy', '') + ',127.0.0.1,localhost'
     os.environ['NO_PROXY'] = os.environ['no_proxy']
     # Application uses a conservative character budget; the service enforces

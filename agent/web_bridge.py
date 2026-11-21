@@ -96,16 +96,16 @@ class Bridge(BaseHTTPRequestHandler):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('job', type=int, help='running stock-chat job ID')
+    parser.add_argument('job', type=int, help='running online-stock-chat job ID')
     parser.add_argument('--port', type=int, default=8765)
     args = parser.parse_args()
-    remote = f'stock-chat/{args.job}/'
+    remote = f'online-stock-chat/{args.job}/'
     with tempfile.TemporaryDirectory() as temp:
         connection = Path(temp) / 'connection.json'
-        if transfer('download', f'stock-research/{args.job}/connection.json', connection, allow_missing=True):
+        if transfer('download', f'online-stock-research/{args.job}/connection.json', connection, allow_missing=True):
             config = json.loads(connection.read_text(encoding='utf-8'))
             remote = config.get('remote', '')
-            if not re.fullmatch(r'stock-chat/[A-Za-z0-9_-]{1,80}/', remote):
+            if not re.fullmatch(r'online-stock-chat/[A-Za-z0-9_-]{1,80}/', remote):
                 raise ValueError('Invalid server connection manifest')
         page = Path(temp) / 'chat.html'
         transfer('download', remote + page.name, page)

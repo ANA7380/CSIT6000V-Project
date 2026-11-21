@@ -1,6 +1,5 @@
+var/
+agent/logs/
 __pycache__/
 *.py[cod]
-agent/logs/
-var/
-evaluation/runs/
 .env

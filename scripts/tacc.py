@@ -16,15 +16,17 @@ from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parents[1]
 APP_FILES = ('agent.py','analysis_tools.py','chat_agent.py','tool_registry.py','qwen_client.py',
-             'evidence.py','session_store.py','web_worker.py','chat.html')
+             'evidence.py','web_tools.py','session_store.py','web_worker.py','chat.html')
 
 
 def sdk_binary(explicit=None):
     command = explicit or os.environ.get('TCLOUD_BIN') or shutil.which('tcloud')
     if not command:
-        candidate = ROOT.parent.parent/'mpi-assignment'/'linux-amd64-v0.4.1'/'tcloud'
-        if candidate.is_file():
-            command = str(candidate)
+        for ancestor in ROOT.parents:
+            candidate = ancestor/'mpi-assignment'/'linux-amd64-v0.4.1'/'tcloud'
+            if candidate.is_file():
+                command = str(candidate)
+                break
     if not command:
         raise RuntimeError('tcloud not found. Source your SDK env.sh or set TCLOUD_BIN.')
     return command
@@ -40,27 +42,27 @@ def sdk_call(command, args, cwd=None, timeout=120):
     return output
 
 
-def package(output, mode='web', namespace=None, port=42865, smoke=True, minutes=60):
+def package(output, mode='web', namespace=None, port=42866, smoke=True, minutes=60):
     if mode not in ('web','smoke','diagnostic') or type(port) is not int or not 1024 <= port <= 65535:
         raise ValueError('Invalid mode or port')
     if namespace is not None and not re.fullmatch(r'[A-Za-z0-9_-]{1,80}',namespace):
         raise ValueError('Namespace must contain 1..80 letters, digits, underscores or hyphens.')
     if type(minutes) is not int or not 1 <= minutes <= 60:
         raise ValueError('Job duration must be 1..60 minutes')
-    name='stock-research-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid4().hex[:8]
+    name='online-stock-research-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid4().hex[:8]
     folder=output.resolve()/name
     folder.mkdir(parents=True,exist_ok=False)
     (folder/'agent'/'data').mkdir(parents=True)
     (folder/'deploy'/'tacc').mkdir(parents=True)
     files=list(APP_FILES)
     if mode=='diagnostic':
-        files += ['web_bridge.py','local_web.py','demo_web.py','deepseek_client.py']
+        files += ['web_bridge.py','local_web.py','deepseek_client.py']
         files += [p.name for p in sorted((ROOT/'agent').glob('test_*.py'))]
     for name in files:
         shutil.copyfile(ROOT/'agent'/name,folder/'agent'/name)
     for name in ('hk_tech30_snapshot.csv','hk_tech30_financials.csv','hk_tech30_daily_prices.csv','README.md'):
         shutil.copyfile(ROOT/'agent'/'data'/name,folder/'agent'/'data'/name)
-    for name in ('supervisor.py','server_entry.py','diagnose.py','job.sh','tuxiv.conf'):
+    for name in ('supervisor.py','server_entry.py','diagnose.py','network_check.py','context_check.py','job.sh','tuxiv.conf'):
         shutil.copyfile(ROOT/'deploy'/'tacc'/name,folder/'deploy'/'tacc'/name)
     shutil.copyfile(ROOT/'deploy'/'tacc'/'job.sh',folder/'job.sh')
     config=(ROOT/'deploy'/'tacc'/'tuxiv.conf').read_text()
@@ -95,7 +97,7 @@ def main():
         p.add_argument('--output',type=Path,default=ROOT/'var'/'tacc')
         p.add_argument('--mode',choices=['web','smoke','diagnostic'],default='web')
         p.add_argument('--namespace',help='Stable server-side conversation namespace; never run two workers with the same name')
-        p.add_argument('--port',type=int,default=42865)
+        p.add_argument('--port',type=int,default=42866)
         p.add_argument('--skip-smoke',action='store_true')
         p.add_argument('--minutes',type=int,default=60)
     sub.add_parser('preflight')
@@ -118,7 +120,7 @@ def main():
         job=int(match[1])
         (folder.parent/('submitted-'+str(job)+'.json')).write_text(json.dumps(dict(job=job,package=str(folder),mode=args.mode,namespace=args.namespace),indent=2))
         print('JOB_ID='+str(job))
-        print('LOG=slurm_log/stock-research-'+str(job)+'.log')
+        print('LOG=slurm_log/online-stock-research-'+str(job)+'.log')
         if args.mode=='web':
             print('BRIDGE=python3 scripts/tacc.py bridge '+str(job))
         return
@@ -130,7 +132,7 @@ def main():
     elif args.command=='status':
         print(sdk_call(sdk,['ps','-j',args.job]))
         try:
-            print(sdk_call(sdk,['cat','slurm_log/stock-research-{}.log'.format(args.job)]))
+            print(sdk_call(sdk,['cat','slurm_log/online-stock-research-{}.log'.format(args.job)]))
         except RuntimeError as exc:
             if 'no such file' not in str(exc).lower():
                 raise
@@ -138,8 +140,8 @@ def main():
     elif args.command=='download':
         target=args.output.resolve()/str(args.job)
         target.parent.mkdir(parents=True,exist_ok=True)
-        print(sdk_call(sdk,['download','-r','stock-research/'+str(args.job),target.parent],timeout=300))
-        print(sdk_call(sdk,['download','slurm_log/stock-research-{}.log'.format(args.job),target/'slurm.log']))
+        print(sdk_call(sdk,['download','-r','online-stock-research/'+str(args.job),target.parent],timeout=300))
+        print(sdk_call(sdk,['download','slurm_log/online-stock-research-{}.log'.format(args.job),target/'slurm.log']))
         print('DOWNLOADED='+str(target))
     elif args.command=='bridge':
         # Reuse the browser bridge. Its authenticated SDK traffic stays local.

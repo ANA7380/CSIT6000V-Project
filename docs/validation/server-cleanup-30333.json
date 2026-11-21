@@ -1,9 +1,0 @@
-{
-  "state": "stopped",
-  "returncode": 143,
-  "base_url": "http://127.0.0.1:42865/v1",
-  "job_id": 30333,
-  "reason": "Explicitly stopped after successful real-model and browser validation",
-  "scheduler_job_absent": true,
-  "local_bridge_closed": true
-}

@@ -56,7 +56,7 @@ def main():
     namespace = os.environ.get('STOCK_CHAT_NAMESPACE', job)
     if not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', namespace):
         raise ValueError('Invalid conversation namespace')
-    folder = Path(os.environ['TACC_USERDIR']) / 'stock-chat' / namespace
+    folder = Path(os.environ['TACC_USERDIR']) / 'online-stock-chat' / namespace
     folder.mkdir(mode=0o700, parents=True)
     lock = (folder / '.worker.lock').open('a')
     try:
@@ -69,7 +69,7 @@ def main():
     temp.replace(page)
     if os.environ.get('STOCK_RESULT_DIR'):
         atomic_json(Path(os.environ['STOCK_RESULT_DIR']) / 'connection.json',
-                    {'protocol': 2, 'job_id': job, 'remote': 'stock-chat/' + namespace + '/',
+                    {'protocol': 2, 'job_id': job, 'remote': 'online-stock-chat/' + namespace + '/',
                      'model_base_url': os.environ['QWEN_BASE_URL']})
     print(f'Chat ready. On your SDK machine run: python3 web_bridge.py {job}', flush=True)
     sessions = {}

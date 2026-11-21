@@ -1,4 +1,4 @@
-"""Numerical prose is rejected; exact values are rendered from tool evidence.
+"""Cited numeric tokens and exact tool evidence support online research output.
 
 This is a conservative numerical guard, not a proof that qualitative prose is true.
 """
@@ -21,28 +21,30 @@ def validate_answer(answer, evidence, requested_ids=None, require_evidence=False
     if require_evidence and not cited:
         raise GroundingError('Cite available results as [E1], or call a tool before answering this data request.')
     cleaned = re.sub(r'\[E\d+\]', '', answer)
-    symbols = set()
+    # Ordered-list markers are formatting, not financial numeric claims.
+    cleaned = re.sub(r'(?m)^\s*\d+[.)]\s+', '', cleaned)
     for item in evidence:
-        result = item['result']
-        if item['tool'] == 'list_tickers':
-            symbols.update(result)
-        elif result.get('symbol'):
-            symbols.add(result['symbol'])
-        symbols.update(row['symbol'] for row in result.get('results', []))
-    for symbol in symbols:
-        cleaned = cleaned.replace(symbol, '')
-    cleaned = re.sub(r'\b(?:SMA(?:20|50|200)|RSI14|MACD(?:12/26/9)?)\b', '', cleaned, flags=re.I)
-    if any('latest_50_200_crossover' in item['result'].get('trend_comparison', {}) for item in evidence):
-        # This is an indicator label, not a numerical financial claim. Permit it
-        # only when that crossover was actually returned by a price tool.
-        cleaned = re.sub(r'\b(?:SMA)?(?:50|fifty)\s*/\s*(?:SMA)?(?:200|two hundred)\s+(?:moving-average\s+)?crossover\b', '', cleaned, flags=re.I)
-    offending = next((i for i, ch in enumerate(cleaned) if ch.isdigit()), None)
-    if offending is not None:
-        start, end = offending, offending + 1
-        snippet = cleaned[max(0, start-24):end+32]
-        raise GroundingError('Unverified numerical text near ' + repr(snippet) + '. Remove numbers/dates from explanation prose or use a catalog indicator label. The application renders exact tool values. Do not repeat the previous invalid sentence.')
-    if re.search(r'https?://', cleaned):
-        raise GroundingError('Source links are rendered from tools; do not invent links in prose.')
+        symbol=item['result'].get('symbol')
+        if symbol:cleaned=cleaned.replace(symbol,'')
+        for row in item['result'].get('results',[]):
+            if isinstance(row,dict) and row.get('symbol'):cleaned=cleaned.replace(row['symbol'],'')
+    cleaned=re.sub(r'\b(?:SMA(?:20|50|200)|RSI14|MACD(?:12/26/9)?)\b','',cleaned,flags=re.I)
+    if re.search(r'https?://',cleaned):
+        raise GroundingError('Do not write URLs in prose; source links are rendered from tool evidence.')
+    # A numeric-token guard is a plausibility check, not semantic fact verification.
+    pattern=r'\d+(?:,\d{3})*(?:\.\d+)?'
+    requested=re.findall(pattern,cleaned)
+    if requested:
+        if not cited:raise GroundingError('Numeric claims need cited tool evidence IDs.')
+        material=json.dumps([known[i]['result'] for i in cited],ensure_ascii=False)
+        supported=[]
+        for token in re.findall(pattern,material):
+            try:supported.append(float(token.replace(',','')))
+            except ValueError:pass
+        for token in requested:
+            value=float(token.replace(',',''))
+            if not any(abs(value-v)<=max(0.005,abs(v)*1e-6) for v in supported):
+                raise GroundingError('Number '+token+' is absent from cited evidence. Remove or correct that claim; do not repeat the invalid answer.')
     return sorted(cited, key=lambda x: int(x[1:]))
 
 
@@ -50,6 +52,8 @@ def model_result(result):
     out = copy.deepcopy(result)
     out.pop('financial_observations', None)
     out.pop('chart', None)
+    if out.get('kind') in ('web_search','webpage'):
+        out.pop('sources', None)  # Duplicate excerpts/long URLs remain in full UI evidence.
     if 'metrics' in out and 'rolling_volatility' in out['metrics']:
         rolling = out['metrics']['rolling_volatility']
         rolling['series_points_logged'] = len(rolling.get('series', []))
@@ -86,11 +90,16 @@ def view(item):
             'symbol': r.get('symbol'), 'company': r.get('company'),
             'snapshot_cutoff': r.get('snapshot_cutoff'), 'as_of': r.get('as_of'),
             'metrics': metric_rows(r), 'chart': r.get('chart'),
-            'ranking': r.get('results'), 'excluded': r.get('excluded', []),
+            'ranking': r.get('results') if item['tool']=='rank_stocks' else None, 'excluded': r.get('excluded', []),
             'weights': r.get('weights'), 'filters': r.get('filters'),
             'eligible_count': r.get('eligible_count'), 'trend_comparison': r.get('trend_comparison'),
             'lookup': r if item['tool'] == 'list_tickers' else None,
             'caveats': r.get('caveats', []), 'notes': r.get('notes', []),
+            'sources': r.get('sources', []), 'retrieved_at': r.get('retrieved_at'),
+            'web_results': r.get('results') if r.get('kind') == 'web_search' else None,
+            'quotes': r.get('quotes'), 'news': r.get('news'),
+            'page_excerpt': r.get('text', '')[:1200] if r.get('kind') == 'webpage' else None,
+            'warnings': r.get('warnings', []),
             'reused': item.get('reused', False)}
 
 
@@ -134,5 +143,8 @@ def render_text(views, chinese=False):
         if item['lookup'] is not None:
             lines.append('Lookup: ' + json.dumps(item['lookup'], ensure_ascii=False))
         lines.extend(item['caveats'] + item['notes'])
-    lines.append('固定历史快照；指标不构成未来价格预测。' if chinese else 'Fixed historical snapshot; indicators do not predict future prices.')
+    lines.append('离线快照与联网证据的日期分别标注；历史指标不保证未来表现。' if chinese else 'Offline snapshots and network evidence have separate dates; historical indicators do not guarantee future performance.')
+    for e in views:
+        for source in e.get('sources', []):
+            lines.append('['+e['id']+'] '+source.get('title','Source')+' | '+source.get('url','')+' | retrieved '+str(source.get('retrieved_at','')))
     return '\n'.join(lines)

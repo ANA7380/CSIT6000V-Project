@@ -1,361 +1,117 @@
-# An Explainable AI Agent for Stock Screening and Analysis
+# 联网股票研究 Agent 独立版本
 
-## Deploy on the course server
+本项目与同级的 `CSIT6000V-Project/` 离线版本完全分开，拥有独立的代码、数据、部署脚本、测试记录和 `.git`，不依赖离线项目目录。业务基于提交 `4bb2784`，联网实现见历史提交 `00550df`。新版本可以研究离线 30 家港股之外的公司和股票，原三份 CSV 逐字节保留。模型仍通过一个有界单 Agent 循环选择工具。
 
-The recommended server deployment runs Qwen and the Agent in **one GPU allocation**. It uses the provided fix's loopback endpoint `127.0.0.1:42865`; a separate CPU job on another node cannot reach that loopback address.
+## 已确认的服务器网络条件
+
+2026 年 11 月 21 日在 TACC 课程 Python 中实测：DNS 和公网 HTTPS 可用。最初请求全部出现证书链校验失败；显式使用服务器现有 `/etc/ssl/certs/ca-certificates.crt` 后，官方微软页面、Yahoo 行情、GitHub 均成功。新版 `web_tools.tls_context()`优先使用 `STOCK_CA_BUNDLE`、`SSL_CERT_FILE`，否则使用该系统 CA，始终保留证书与主机名校验。
+
+课程 rootfs 还缺少 IANA 时区数据库。新版 job.sh 把宿主 `/usr/share/zoneinfo` 复制进本次私有 `QWEN_RUN_DIR`，设置 `PYTHONTZPATH` 后再运行课程 Python。不会向公共 Python 安装 tzdata，不修改课程公共文件。
+
+原始探测作业 30346、指定系统 CA 的作业 30347，以及新版 CPU 作业 30351 和最终作业 30356 的结果记录在 `docs/validation/` 和下载的 `var/tacc-results/`。搜索服务的单站限制与服务器网络权限是两回事：本次 DuckDuckGo 返回挑战页，Bing RSS 曾返回不相关内容；新版不把这些页面当作有效结果。当前实际通过的搜索回退提供者是 Google News RSS。
+
+## 快速部署
+
+在本项目根目录运行：
 
 ```bash
-# Reuse your configured tcloud SDK (or export TCLOUD_BIN=/path/to/tcloud).
-python3 scripts/tacc.py submit --mode web --namespace hk-research --minutes 60
-python3 scripts/tacc.py status YOUR_JOB_ID
-# Wait for MODEL_READY, LIVE_SMOKE_PASSED, and Chat ready, then:
-python3 scripts/tacc.py bridge YOUR_JOB_ID
+source /home/zyh/桌面/mpi-assignment/env.sh
+cd /home/zyh/桌面/fin_project/CSIT6000V-Project-online
+python3 scripts/tacc.py preflight
+python3 scripts/tacc.py submit --mode web --namespace online-research --minutes 60
+python3 scripts/tacc.py status JOB_ID
+# 等待 MODEL_READY、LIVE_SMOKE_PASSED、Chat ready
+python3 scripts/tacc.py bridge JOB_ID --port 8766
 ```
 
-The last command prints the laptop browser URL. Model inference, stock calculations, conversation snapshots and request processing all run on the server. The local bridge uses the authenticated course SDK for file transfer; it does not need direct access to a compute-node HTTP port.
+浏览器打开输出的本机地址。默认模型地址自动设为计算节点内 `http://127.0.0.1:42866/v1`，与原版默认端口不同；更换端口用 submit 的 `--port`。新版本默认使用 `online-stock-research/JOB_ID` 结果目录和 `online-stock-chat/NAMESPACE` 会话目录，浏览器 localStorage key 也独立。
 
 ```bash
-# Optional CPU-only runtime verification (no GPU/model request):
+python3 scripts/tacc.py download JOB_ID
+python3 scripts/tacc.py stop JOB_ID
+```
+
+停止本机桥不会取消 GPU 作业。相同 namespace 不能同时运行两个 worker；重启同 namespace 可以恢复服务器会话，浏览器也要保留原会话 ID。
+
+可先执行 CPU 诊断，不申请 GPU，不请求模型：
+
+```bash
 python3 scripts/tacc.py submit --mode diagnostic --minutes 5
-# Save results and release your allocation when finished:
-python3 scripts/tacc.py download YOUR_JOB_ID
-python3 scripts/tacc.py stop YOUR_JOB_ID
 ```
 
-See the [server deployment guide](docs/服务器部署指南.md) for configuration, persistent conversation namespaces, process cleanup and troubleshooting. Each submission uses a unique staged folder to avoid overwriting an active WORKDIR. The course's public environment and model files are never edited.
+首次账户缺少 proxy 入口时，可先从本目录执行 `bash agent/setup-sdk-account.sh`，使用本项目自带的账户注册脚本。
 
-The [Chinese technical architecture report](docs/项目技术架构报告.md) explains the TACC environment, frontend/backend data flow, Agent loop, actual prompts and all six tools. A [standalone HTML reading version](docs/项目技术架构报告.html) includes embedded diagrams.
-
-## Implementation update on the proposal-completion branch
-
-This branch adds deterministic evidence tables, historical price/SMA and rolling-volatility charts, validated numerical presentation, reusable ranking preferences, multiple browser conversations, private restart snapshots, worker progress events, a local browser server, independent offline references and a genuine **no-tool** baseline runner. It keeps the original fixed CSVs and the single-agent architecture.
-
-Start an explicitly scripted preview without any model or key:
+本机调试需要可达的模型地址：
 
 ```bash
-python3 agent/demo_web.py
+python3 agent/local_web.py --provider qwen --base-url http://实际可达地址:端口/v1 --port 8766
+# 或在本机环境变量配置 DEEPSEEK_API_KEY 后
+python3 agent/local_web.py --provider deepseek --port 8766
 ```
 
-Connect a real model from the repository root:
+TACC 上的 Qwen 回环地址不能直接给笔记本上的 local_web 使用。不要在聊天或提交包中填写密钥。
 
-```bash
-# Fill agent/server-url.txt with the actual /v1 URL, or pass it explicitly:
-python3 agent/local_web.py --provider qwen --base-url http://ACTUAL_SERVICE_HOST:8000/v1
-# Local DeepSeek browser alternative, after exporting DEEPSEEK_API_KEY:
-python3 agent/local_web.py --provider deepseek
-```
+## 能力与工具路由
 
-Only use the local Qwen option where its internal service address is reachable. The existing TACC `submit-web.sh` / `web_bridge.py` deployment remains supported. Configure credentials in environment variables; `.env.example` is an example and is not loaded automatically.
+原有六个离线工具仍保留，不对其输入 CSV 做刷新或混合覆盖：
 
-Run offline verification from the repository root:
+- list_tickers：仅列出离线数据可用的 30 家公司，不再被解释为整个 Agent 的查询范围。
+- ticker_metrics、financial_trends、price_analysis、stock_correlation：按原算法读取离线数据。
+- rank_stocks：仍在离线集合内筛选和排名；没有把它伪装成全市场扫描器。
 
-```bash
-python3 -m unittest discover -s agent -v
-python3 scripts/export_snapshot.py --check
-python3 evaluation/run.py --mode offline --output evaluation/runs/offline-001
-```
+新增四个联网工具，集中在 `agent/web_tools.py`：
 
-See the [Chinese implementation and connection guide](docs/实施说明与接入指南.md), [evaluation protocol](evaluation/README.md) and [validation record](docs/VALIDATION.md). Full Qwen/DeepSeek comparative evaluation remains pending. For the current server deployment and real-model smoke-test status, see the [server validation record](docs/服务器部署实测记录.md). Do not interpret the offline scripted preview or calculation checks as live LLM performance.
-
-The current scope is financial-condition screening within a fixed thirty-company technology universe. Verified sub-sector metadata is unavailable. The UI and prompt explicitly disclose this limitation; a sub-sector filter still requires sourced metadata. Historical analysis does not require a future-price forecasting model.
-
-
-## Local chat with DeepSeek (start here)
-
-The Python agent and CSV tools run locally. The LLM runs at DeepSeek's API; your messages and selected tool results are sent there. No TACC job is needed. API usage is billed to your DeepSeek account.
-
-From the repository root, run the following in PowerShell.
-
-```powershell
-cd agent
-powershell -NoProfile -ExecutionPolicy Bypass -File .\start-local.ps1
-```
-
-The launcher asks for your key with hidden input and starts chat. It does not save the key to disk. Type `Show all four metrics for 0700.HK`, then a follow-up such as `Now use 60 trading days for volatility`. Enter `/quit` to exit.
-
-Alternatively, from the agent folder, set `DEEPSEEK_API_KEY` in your current terminal and run:
-
-```powershell
-uv run --no-project python chat_agent.py --provider deepseek
-uv run --no-project python chat_agent.py --provider deepseek --prompt "Show Tencent metrics"
-```
-
-No additional Python packages are needed. The default provider is DeepSeek, with model `deepseek-flash`; override via the `DEEPSEEK_MODEL` environment variable if needed. The client uses JSON-mode requests and the existing application-managed tool protocol. Credentials are sent only to the official HTTPS endpoint and are not written to the audit log. Logs do contain conversation text and calculation results.
-
-HTTP 401 means check the key; 402 means check API balance; 429 means wait before retrying. Local mocked transport and tool-loop tests do not constitute a live API verification.
-
-Reference: https://api-docs.deepseek.com/quick_start
-
-
-
-### Browser chat on TACC
-
-```bash
-bash submit-web.sh
-```
-
-The script now defaults to one GPU allocation containing both Qwen and the Agent. It stages only the runtime files and invokes the same `scripts/tacc.py` workflow described above. Use `bash submit-web.sh --external-model` only for a separately deployed model whose non-loopback address is reachable from the CPU job. Use the returned **chat job ID** in both commands below. Wait for `Chat ready` in the log before launching the bridge.
-
-```bash
-tcloud cat slurm_log/stock-chat-JOB_ID.log
-python3 web_bridge.py JOB_ID
-```
-
-Open the printed loopback URL (default `http://127.0.0.1:8765/`). Ask “Show all four metrics for 0700.HK”, then “Now use 60 trading days for volatility”. Keep the same page open for follow-ups. The browser saves conversation IDs and display history; New conversation creates a separate session. The worker restores private snapshots from the same job directory after a restart. Use `--port 8766` if the default local port is occupied.
-
-The job supplies the page and runs the agent and its tools. The laptop serves the page on loopback and uses the authenticated SDK to upload a question and poll for its reply. Transfers add a few seconds to each turn. Job-specific messages and audit logs are under `$TACC_USERDIR/stock-chat/JOB_ID/`. This setup uses the documented file-transfer interface. [TACC SDK](https://github.com/turingaicloud/tcloud-sdk) · [TACC SSH FAQ](https://github.com/turingaicloud/quickstart/blob/master/FAQ.md)
-
-Keep the single allocation running. Check it with `tcloud ps -j JOB_ID` if a reply stalls. The legacy external-model mode requires both its CPU job and separate model service. When finished, press Ctrl+C in the bridge terminal and cancel each active allocation with `tcloud cancel -j JOB_ID`.
-
-### Legacy single-question batch job with an external model
-
-The included `tuxiv.conf`, `job.sh`, and copied `setup-sdk-account.sh` target the course's existing tcloud/proxy environment, following the local `qwen27b-student-release` package. These are not generic Texas TACC Slurm instructions. The batch launcher now runs the LLM chat agent; start the course model service first. The standalone `agent.py` still works without a model.
-
-From the agent folder, set the question and submit the batch job.
-
-```bash
-printf '%s\n' 'Show all four metrics for 0700.HK' > question.txt
-tcloud submit
-```
-
-Use the returned job ID:
-
-```bash
-tcloud ps -j YOUR_JOB_ID
-tcloud cat "slurm_log/agent-YOUR_JOB_ID.log"
-```
-
-The LLM answer appears in the client job log. Full results and tool calls are saved under `$TACC_USERDIR/ticker-metrics-results/job-JOB_ID.jsonl`. Batch jobs do not accept interactive stdin; change `question.txt` and resubmit for each new message. Each batch submission is a fresh conversation. Keep the model service running while clients execute, update the URL after restarting it, and stop it afterwards with `tcloud cancel -j SERVICE_JOB_ID`.
-
-In an interactive course compute allocation, source `/mnt/home/public/course-envs/CSIT6000V/project/activate.sh` and run `qwen-python chat_agent.py --provider qwen --base-url http://ACTUAL_SERVICE_HOST:8000/v1` for a multi-turn chat prompt. The service is internal to TACC; this command is not intended to connect directly from your Windows laptop. For proxy issues, use the same `no_proxy` settings as `job.sh`. Cluster execution has not been verified from this workstation.
-
-
-## Standalone ticker calculations (for playing around)
-
-A deterministic Python agent for the 30 Hong Kong tickers in the supplied CSVs. It accepts a ticker and invokes financial and price calculations at runtime. No LLM, GPU, API key, network request, or third-party Python package is required. Requires Python 3.9 or later.
-
-The [agent data folder](agent/data/) contains byte-for-byte copies of the project's three CSVs and their original documentation. Original project data is untouched.
-
-Run the following from the `agent/` folder, locally or in a TACC terminal.
-
-```bash
-python agent.py
-python agent.py 0700.HK
-python agent.py 700 --window 60
-python agent.py --list
-python agent.py 700 --json
-```
-
-On this Windows workstation Python is available through uv; use `uv run --no-project python agent.py` if `python` is unavailable. Interactive mode accepts a ticker, `list`, and `quit`. Unknown tickers produce a clear error. Numeric HKEX codes, leading zeros, and case-insensitive `.HK` suffixes are accepted.
-
-## Submit to the course TACC environment
-
-Use Bash with your course `tcloud` account configured. On Windows, use your SDK-enabled WSL shell. Follow the [course setup guide](qwen27b-student-release/README.md) for `tcloud config` and `tcloud init`. If the shared proxy entry point is missing, run `bash setup-sdk-account.sh` from `agent/`.
-
-From the repository root, submit the Qwen service. Replace JOB_ID with the returned service job ID.
-
-```bash
-cd qwen27b-student-release/qwen-public-serve
-tcloud submit
-tcloud cat slurm_log/qwen-public-serve-JOB_ID.log
-```
-
-Wait for `Application startup complete`. Replace the example URL below with the log's `SERVICE_BASE_URL`.
-
-```bash
-cd ../../agent
-printf '%s\n' 'http://ACTUAL_SERVICE_HOST:8000/v1' > server-url.txt
-```
-
-
-## How the LLM uses tools
-
-`question.txt → chat_agent.py → TACC Qwen → JSON tool request → Python CSV calculation → Qwen → final answer`
-
-The chat client selects `deepseek_client.py` for local DeepSeek use or the course's unmodified `qwen_client.py` for TACC. The model requests tools via a prompted JSON protocol. `tool_registry.py` supplies the descriptions, argument types, required fields and examples included in the system prompt, and validates each request before dispatch. The dispatcher executes only the allowlisted Python tools and sends their results back to the model. This is application-managed tool calling, not native API `tools` mode. Malformed requests are returned to the LLM for correction, with at most twelve steps per turn. Final prose contains qualitative explanation and evidence IDs; numbers, dates, sources and score breakdowns are rendered by the application, with bounded repair or a clearly marked tool-only fallback. The audit log records model input messages, outputs, token usage, requests, tool results, errors and duration, with session/turn identifiers. Numerical calculations are deterministic; the LLM's summary still requires review against the logged results.
-
-### Available tool groups
-
-| Tool | Parameters | Calculations |
-| --- | --- | --- |
-| `list_tickers` | None | Supported symbols and company names; use to resolve names |
-| `ticker_metrics` | `ticker`, optional `window=252` | Original four metrics |
-| `financial_trends` | `ticker` | Annual profit-margin change, debt/equity growth, ROE |
-| `price_analysis` | `ticker`, optional `window=252`, `rolling_window=20` | Calendar 1/3/6/12-month returns, SMA20/50/200, RSI14, MACD12/26/9, maximum drawdown, rolling volatility, volume ratio, latest 50/200 crossover |
-| `stock_correlation` | `ticker`, `other_ticker`, optional `window=252` | Correlation of log returns over identical date intervals |
-| `rank_stocks` | Optional `top_k=5`, `weights`, `filters`, `window=252` | Filtered, weighted percentile ranking using the original four metrics |
-
-New implementations are in `analysis_tools.py`. Examples to type into the existing local chat:
-
-- "Show Tencent's ROE, debt growth and change in profit margin."
-- "Show 0700.HK's RSI, MACD, moving averages and 12-month return."
-- "What was Tencent's maximum drawdown over 60 trading sessions? Use 20-day rolling volatility."
-- "Compare the return correlation of 0700.HK and 9988.HK over 60 sessions."
-- "Rank the top 5 stocks with net margins at least 0% and debt-to-equity at most 1. Weight revenue growth twice as much as low volatility."
-
-For the last example, the tool arguments should use `weights={"revenue_growth":2,"historical_volatility":1}` and `filters={"net_profit_margin":{"min":0},"debt_to_equity":{"max":1}}`. Bounds are inclusive; say "at least" or "at most" for exact inclusive semantics. Ranking keys are `revenue_growth`, `net_profit_margin`, `debt_to_equity`, and `historical_volatility`. Percent values use whole percentages (10 = 10%); debt-to-equity uses multiples (1 = 1x).
-
-`test_analysis_tools.py` covers independent numeric fixtures, all 30 tickers, currency mismatches, missing dates, ties/filters, and mocked model roundtrips for every tool. It does not prove live-model tool selection; live verification requires `DEEPSEEK_API_KEY` in the running process.
-
-`qwen-python chat_agent.py --provider qwen --prompt "Show 9988.HK metrics" --base-url http://ACTUAL_SERVICE_HOST:8000/v1` runs one question without a file. Interactive mode retains conversation history until exit; restart it for a fresh conversation if it becomes long. `ticker.txt` is retained for the earlier direct-calculation workflow but is no longer read by the batch launcher.
-
-## Data and audit logs
-
-Net profit margin uses profit attributable to the parent. Financial ratios use the curated snapshot's selected inputs, including issuer supplements and restated comparatives. They preserve its reporting periods and currencies; financial observations from the long-form CSV are included as audit evidence rather than summed or substituted across incompatible series. This relies on the source snapshot's period matching and currency metadata. Balance-sheet dates are shown separately from income periods.
-
-Volatility uses the latest 253 observations by default, yielding 252 returns. A shorter available history is used and explicitly labeled `short_history`. The actual start/end dates and observation count are shown. Missing/nonpositive prices inside the selected window produce N/A, not an interpolated or skipped return. Missing financial inputs and nonpositive denominators produce N/A with reasons. Negative net income remains a valid loss margin.
-
-The data is a fixed 18 November 2026 snapshot, with completed prices through 17 November. It is not a live feed. Financial statement dates differ by company; vendor reporting labels and debt definitions retain the limitations in [the dataset notes](agent/data/README.md).
-
-Each successful request appends parameters, calculation time, formulas, inputs, dates, source URLs, underlying financial observations, values, and statuses to `logs/requests.jsonl` (or `--log PATH`). `--json` also prints the full result.
-
-## Verify
-
-Run the test suite from the agent folder.
-
-```bash
-python -m unittest -v
-```
-
-Tests cover all tickers, normalization, unknown symbols, independent numeric examples, loss margins, unavailable inputs, invalid prices, and short histories.
-
-# Project Tasks
-
-Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysis**. Tasks are listed in suggested implementation order; statuses below distinguish implemented code from pending real-model acceptance. Historical task ownership is retained; this branch does not assign new team responsibilities.
-
-| # | Task | Description | Done? | Responsible |
-|---|------|-----------|-------|-------------|
-| 1 | Define scope and calculation rules | Select 30 technology stocks; agree on date range, metric formulas, ranking weights, and trend indicators. | ✅ | DUAN Zihang Raymond |
-| 2 | Build the fixed dataset | Collect and clean financial statements and historical prices; save sources, snapshot date, and missing-data flags. | ✅ | DUAN Zihang Raymond |
-| 3 | Implement financial tools | Calculate and verify revenue growth, net profit margin, debt-to-equity, and historical volatility. | ✅ | DUAN Zihang Raymond |
-| 4 | Implement screening and ranking | Apply mandatory filters, normalize metrics, calculate weighted scores, and return configurable Top-K with score breakdowns. | ✅ | DUAN Zihang Raymond |
-| 5 | Implement historical trend tools | Calculate indicators and generate price charts; explain historical bullish/bearish signals without predicting prices. | Implemented indicators and charts; live explanation review pending | |
-| 6 | Connect the TACC model | Confirm backend access, configure model calls, and validate structured tool requests and parameters. | Client/deployment implemented; live acceptance pending | DUAN Zihang Raymond |
-| 7 | Build the three agent workflows | Route requests to individual stock analysis, recommendations, or trend analysis; execute the appropriate tools. | Implemented shared tool loop; live routing acceptance pending | |
-| 8 | Add grounded explanations | Explain performance, risks, rankings, and trends using tool results; display the data date and check numerical consistency. | Deterministic numbers and citation guard implemented; qualitative review pending | |
-| 9 | Add conversation memory | Preserve results and preferences; support comparisons, indicator questions, and revised screening criteria. | Implemented state, conversations and restart snapshots; live follow-up acceptance pending | DUAN Zihang Raymond |
-| 10 | Build backend reliability and logging | Handle invalid inputs, missing data, and service/tool errors; log model calls, tool executions, errors, and timings. | Implemented validation, failure rollback, progress and timing logs | |
-| 11 | Build the web interface | Support natural-language requests, execution progress, metrics, rankings, charts, and follow-up questions. | Implemented charts, tables and conversation UI; local browser tested | DUAN Zihang Raymond |
-| 12 | Create the evaluation set | Cover all three workflows, follow-ups, and invalid/incomplete inputs; verify reference calculations, filters, rankings, and tool outputs. | Implemented 30 scenarios / 42 turns and independent numeric references | |
-| 13 | Implement the baseline | Use another provider's general-purpose LLM without custom tools; keep prompts and applicable company context identical; record model/API settings. | Implemented separate no-tool baseline runner; live execution pending | |
-| 14 | Run and compare evaluations | Report numerical accuracy, recommendation quality, trend grounding, explanation grounding, follow-up success, and response time. | Offline numeric evaluation complete; live comparison pending | |
-| 15 | Analyze failures and limitations | Document at least one observed failure, its cause, and mitigation; acknowledge that different models prevent isolating tool-use effects. | Simulated failure documented; real-model failure analysis pending | |
-| 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | Runnable app, tests and instructions provided; live demo/final results pending | |
-
-## Task 1
-
-30 Technology stocks and its raw data downloaded.
-Daily price data covers 2024/11/18 to 2026/11/17, collected on 2026/11/18. Some stocks have shorter histories. Financial reporting periods vary by company.
-
-### Implemented metrics and formulas
-
-These formulas reflect `agent/agent.py` and `agent/analysis_tools.py`.
-
-Notation: `P[t]` = adjusted closing price; `V[t]` = trading volume; `r[t] = ln(P[t] / P[t-1])`; `s()` = sample standard deviation (denominator `n - 1`). Percentage formulas below return whole percentages, e.g. `10` means `10%`.
-
-#### Core metrics for ranking
-
-| Metric | Formula | Period / interpretation | Weight |
+| 工具 | 能力 | 关键边界 |
 |---|---|---|
-| Revenue growth | `(revenue / prior-year revenue - 1) * 100` | Selected reporting period versus matching prior-year period; higher scores better. | 25% |
-| Net profit margin | `net income / revenue * 100` | Selected reporting period; higher scores better. | 25% |
-| Debt-to-equity | `total debt / stockholders equity` | Selected balance-sheet date; expressed as a multiple; lower scores better. | 25% |
-| Historical volatility | `s(daily log returns) * sqrt(252) * 100` | Defaults to the latest 252 returns (253 prices); lower scores better. | 25% |
+| web_search | 按公司名、股票、上市状态、新闻或业务问题搜索；依次尝试 Brave、Google、Google News RSS、Bing RSS，过滤空结果和明显不相关链接 | 免费页面可能挑战、限流或更改格式；回退到新闻搜索不等于已找到发行人原始披露 |
+| read_webpage | 读取任意公开 HTTP(S) 网页可见文本，返回标题、URL、获取时间与摘要；模型可见最多 16000 字符 | 不运行 JavaScript，不提取 PDF，不绕过验证码或付费墙 |
+| search_stocks | 查询 Yahoo Finance 的公司/股票代码匹配和相关新闻，支持其他市场 | 匹配可能歧义；没有匹配不能证明未上市，必须核实发行人与交易所 |
+| market_history | 对已核实的外部股票代码取两年日复权价格，再运行原历史指标算法并生成图表 | 依赖供应商支持的代码和数据，不保证实时；不从价格臆造财务报表指标 |
 
-#### Ranking calculation
+market_history 支持 window 2 至 500，默认 60；它控制最多 window+1 个价格点。Yahoo 未提供完整复权价格或存在缺值时明确失败，不静默换成未复权价格或跨缺口计算。时间戳按交易所 IANA 时区转换；去掉仍处于当日正常交易时段的未完成日线。
 
-Mandatory filters are applied first. Scores are calculated only among the remaining eligible stocks.
+来源 URL、获取时间、股票匹配和网页摘要由 `evidence.view()`传给前端，页面独立显示来源卡片和网络图表。网页文本不作为 HTML 执行。
 
-| Step | Formula / rule |
-|---|---|
-| Metric percentile | `Q = 100 * (count(values below x) + (count(values equal to x) - 1) / 2) / (N - 1)`, where `N` is the eligible stock count. Ties use midranks; a single eligible stock scores 50. |
-| Favorable direction | Growth and margin use `Q`; debt-to-equity and volatility use `100 - Q`. |
-| Normalize weights | `normalized weight = supplied weight / sum(supplied weights)`; weights must be nonnegative with a positive total. |
-| Final score | `sum(normalized weight * favorable percentile)`; defaults to 25% for each of the four core metrics. |
-| Output | Descending score, with ticker as tie-breaker; default Top-5. Custom weights can select a subset of the four core metrics. |
+## Prompt 与校验的变化
 
-Stocks missing required metrics or a complete requested volatility window are excluded from ranking. Results expose each company's reporting dates and period types. The dataset lacks sector metadata and inputs for additional valuation metrics. Ranking measures attractiveness under these metrics, not market popularity.
+`agent/chat_agent.py` 的 SYSTEM 现明确允许任意公司、股票、交易所和国家，包括私人公司；不得只因不在离线集合中而拒绝研究。每次上下文附加当前 UTC 日期，排名偏好和证据句柄继续持久化。单一首条 system 消息和最多 12 次模型调用的循环保留。课程 Qwen 使用 [`/tokenize` 协议](https://docs.vllm.ai/en/latest/api/vllm/entrypoints/serve/tokenize/protocol/)按相同聊天模板计算实际 token，预留 1800 输出 token 和 128 token 余量；超限时先移除完整旧轮次，必要时压缩工具观察，完整证据和页面结果仍保留。其他提供者继续使用字符预算，不能把字符数等同于 token 数。本版 Qwen 路径要求 vLLM `/tokenize` 可用，缺少该接口时会明确报错，不盲目发送长上下文。
 
-#### Price and trend indicators
+各阶段没有隐藏的额外限制 prompt：
 
-| Indicator | Formula / rule | Default window |
-|---|---|---|
-| Price return | `(end price / start price - 1) * 100`; start is the last observation on or before the calendar-month target date. | 1, 3, 6, and 12 months |
-| Simple moving average (SMA) | `mean(last n adjusted closes)` | 20, 50, and 200 sessions |
-| Distance from SMA | `(latest price / SMA - 1) * 100` | Each SMA above |
-| RSI14 | `100 - 100 / (1 + average gain / average loss)`; uses Wilder smoothing described below. | 14 changes for initialization |
-| MACD line | `EMA12(price) - EMA26(price)` | 12 / 26 sessions |
-| MACD signal | `EMA9(MACD line)` | 9 MACD observations |
-| MACD histogram | `MACD line - signal` | Latest value |
-| Maximum drawdown | `min(price / running peak - 1) * 100`, within the selected window; zero or negative. | 252 return intervals |
-| Rolling volatility | `s(last n daily log returns) * sqrt(252) * 100` | 20 returns; returns up to 252 rolling points |
-| Volume ratio | `latest volume / mean(previous 20 sessions' volumes)`; excludes today's volume from the average. | 20 prior sessions |
-| Price above SMA50 | `latest price > SMA50` | Latest session |
-| SMA50 above SMA200 | `SMA50 > SMA200` | Latest session |
-| Latest SMA50/200 crossover | Let `D = SMA50 - SMA200`: up if `previous D <= 0` and `current D > 0`; down if `previous D >= 0` and `current D < 0`; otherwise none. | Latest versus previous session |
+1. System 与 TOOL CATALOG 区分离线工具和联网工具；离线数据限制只描述那几个工具的数据覆盖。
+2. TOOL_RESULT 可反馈网络结果与错误，带实际来源和获取时间。
+3. SESSION_STATE 仍只提供状态和证据，不作为拒绝外部股票的名单。
+4. MODEL_FORMAT_ERROR、ANSWER_VALIDATION_ERROR 要求修正格式或无依据内容，不要求退回 30 家公司。
+5. 最终页面明确区分离线快照与网络证据日期。
 
-EMA uses `alpha = 2 / (n + 1)` and `EMA[t] = alpha * value[t] + (1 - alpha) * EMA[t-1]`, seeded with the mean of the first `n` observations.
+新版不再一律拒绝解释中的数字。数值 token 必须能在所引用的工具结果中找到，允许有限的小数四舍五入；引用 ID 必须存在。来源链接由程序生成，模型正文仍不直接写 URL。这个检查不能证明单位、对象、因果关系或整句语义正确；文字拼写数字也不在该 token 检查覆盖范围。需要人工检查重要财务事实。
 
-RSI uses `gain = max(price change, 0)` and `loss = max(-price change, 0)`. Initial average gain/loss is the mean of the first 14 changes. Subsequent averages use `(13 * previous average + current gain or loss) / 14`. A flat series returns RSI 50; positive average gain with zero average loss returns 100.
+上市传言、最新报价与市场消息必须先查网络证据，不能直接接受用户前提。业务护城垒等实质判断应读取相关一手页面。允许有明确条件与依据的情景讨论，不保证未来价格，不凭空构造预测值。
 
-Price returns and SMAs require a full lookback. The MACD signal requires 34 observations. Drawdown includes peak and trough dates. For rolling volatility, `rolling_window` sets the estimation window and `window` limits the number of returned points. The full series is logged and the model receives the last five points.
+## 网络边界
 
-#### Financial trends and stock comparison
+抓取只允许公共 HTTP(S) 地址的 80/443 端口，不接受 URL 内用户名/密码。检查 DNS 解析地址均为公网，每次连接固定到已验证的 IP，TLS 使用原主机名验证证书；每次跳转重新校验。拒绝回环、私网、链路本地和元数据地址。限制响应为 2 MB、最多四次重定向，使用有超时的 GET 请求。
 
-| Metric | Formula | Period / interpretation |
-|---|---|---|
-| Profit-margin change | `(current annual net income / current annual revenue - prior annual net income / prior annual revenue) * 100` | Percentage points, not percentage growth |
-| Debt growth | `(current debt / prior-year debt - 1) * 100` | Latest comparable annual pair |
-| Equity growth | `(current equity / prior-year equity - 1) * 100` | Latest comparable annual pair |
-| Return on equity (ROE) | `annual net income / ((opening equity + closing equity) / 2) * 100` | Annual profit and average equity |
-| Two-stock correlation | `sum((x - mean(x)) * (y - mean(y))) / sqrt(sum((x - mean(x))^2) * sum((y - mean(y))^2))` | Pearson correlation of matched log-return intervals; defaults to latest 252 matched intervals; not market beta |
+抓取器直接访问公网，不继承 HTTP 代理；本次服务器探测未配置代理。若以后集群改成必须经代理出网，需要独立配置和复验，不能通过关闭 TLS 检查解决。
 
-Financial trends require matching annual periods and currencies and may use older observations than the core snapshot. Growth requires a positive prior value; ROE requires positive opening and closing equity. Missing or invalid inputs return unavailable results. Standalone volatility, drawdown, and correlation can report shorter histories explicitly; ranking excludes incomplete required volatility histories.
+网页、搜索摘要和来源内容是非可信数据。Prompt 要求忽略其中的指令；工具白名单也不提供 shell、任意代码执行或私网读取能力。审计日志和会话快照会保存查询及工具证据，发布时应按项目数据管理要求处理。
 
-Annual trends exclude issuer quarterly supplements. Correlation matches both endpoints of each return interval. Invalid prices are rejected, and a constant return series yields undefined correlation.
+## 示例问题
 
-**Trend prediction status:** Indicator calculations are implemented, but there is no combined up/down/neutral forecast formula or model yet. Future-price prediction is outside the proposal scope; no forecast model or backtest is required for historical signal analysis. Historical indicators alone are not a validated prediction system.
+- `Fetch AAPL historical prices online and show a 60-return moving-average chart.`
+- `For the same stock, use a 120-return window.`
+- `Search Microsoft MSFT investor relations, then read an official page and cite your evidence.`
+- `有人声称 Anthropic 最近上市，请联网核实发行人和上市状态，区分已确认事实与未知信息。`
+- `用保留的离线快照分析腾讯，然后另查最新官方消息，分别标注日期。`
 
-## Task 2
+完整的探测、失败修复和真实模型验收记录见 [联网版实施与实测记录](docs/联网版实施与实测记录.md)。
 
-| File | What one row represents | Contents and purpose |
-|---|---|---|
-| hk_tech30_snapshot.csv | **One company** | A summary of the latest collected quote, previous daily close, revenue, prior-year revenue, net income, debt, equity, and source dates. Useful for company comparisons and calculating financial ratios. |
-| hk_tech30_daily_prices.csv | **One stock on one trading day** | Historical open, high, low, close, adjusted close, and trading volume. Useful for calculating returns, volatility, and price trends. |
-| hk_tech30_financials.csv | **One financial metric for one company and reporting period** | Historical revenue, net income, debt, and equity observations, with annual, quarterly, and trailing periods. Useful for selecting comparable periods and examining financial changes over time. |
+## 检查与代码位置
 
-## Task 3
+```bash
+python3 -m unittest discover -s agent -p 'test_*.py' -v
+```
 
-Revenue growth, net profit margin, debt-to-equity, and historical volatility tools.
+`agent/test_online.py` 当前 18 项测试覆盖精确 token 裁剪、完整证据保留、工具循环、外部股票图表、来源展示、离线计算、偏好继承、挑战页和不相关搜索过滤、私网与重定向拒绝、TLS 校验及数值引用。CPU 作业还执行 `deploy/tacc/network_check.py`，验证真实网络工具。
 
-## Task 4
-
-Default ranking scores: Final score = 25% x growth score + 25% x margin score + 25% x debt score + 25% x volatility score, where scores are the percentile.
-
-Example prompts:
-
-- Default ranking: Rank the top 5 stocks using the default weights. Show each stock's raw metrics, percentile scores, weights, and final score.
-
-- Mandatory filters: Return the top 5 stocks with net profit margin at least 10% and debt-to-equity at most 0.5.
-
-- Custom weights: Rank the top 3 stocks using revenue growth weight 2 and historical volatility weight 1. Show the normalized weights and score calculation.
-
-- Metric normalization: Rank the top 5 stocks using only debt-to-equity. Show raw debt-to-equity and percentile scores.
-
-- Score breakdown: For the highest-ranked stock, show each metric's weighted contribution and add them up to reproduce its final score.
-
-- Configurable Top-k stocks: Using the same filters and weights, return the top 10 instead of the top 3.
-
-
-## Task 6
-
-User can send and receive message to/from TACC with correct tool calls.
-
-
-## Task 9
-
-The agent retains bounded recent messages plus explicit ranking history, filters, weights, windows and focused symbols. `reuse_previous=true` preserves unmodified ranking parameters. Browser conversations have independent IDs, local display histories and private server JSON snapshots. Failed turns roll back state. Long-term semantic memory and cross-job migration are outside this implementation.
-
-## Task 11
-
-The browser renders financial tables, rankings, source/period details, historical adjusted-price/SMA and rolling-volatility charts, live worker phase updates and follow-ups. It supports new conversations, switching, reload recovery and JSON export. Model/user prose is rendered as text; numerical tables are built from evidence. Local browser smoke tests cover desktop and mobile behavior. Real TACC browser acceptance remains pending.
+主要修改点：`agent/chat_agent.py`、`agent/tool_registry.py`、`agent/web_tools.py`、`agent/evidence.py`、`agent/chat.html`；部署仍复用同作业 supervisor 结构。新版有独立的 `scripts/tacc.py` 和 `deploy/tacc/`，不会从原目录隐式导入代码。

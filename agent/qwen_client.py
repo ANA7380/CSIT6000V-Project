@@ -28,6 +28,26 @@ def normalize_base_url(base_url):
     return url
 
 
+def count_tokens(messages, base_url):
+    """Count the exact chat template with the serving model's tokenizer."""
+    base_url = normalize_base_url(base_url)
+    payload = {'model':'qwen3.8-27b', 'messages':messages,
+               'add_generation_prompt':True,
+               'chat_template_kwargs':{'enable_thinking':False}}
+    req = Request(base_url[:-3] + '/tokenize', data=json.dumps(payload).encode(),
+                  headers={'Content-Type':'application/json'})
+    try:
+        with urlopen(req, timeout=30) as response:
+            result = json.load(response)
+    except (HTTPError, URLError, TimeoutError, OSError, ValueError) as exc:
+        raise RuntimeError('Cannot count Qwen context tokens via /tokenize; check the course vLLM service before sending a long research request.') from exc
+    count = result.get('count')
+    limit = result.get('max_model_len', int(os.environ.get('QWEN_CONTEXT_WINDOW','16384')))
+    if type(count) is not int or type(limit) is not int or count < 0 or limit < 2048:
+        raise RuntimeError('Invalid tokenizer count/context limit returned by model service.')
+    return count, limit
+
+
 def chat(messages, base_url, max_tokens=256, temperature=0.7):
     """Return the full JSON response, including choices and token usage."""
     base_url = normalize_base_url(base_url)
@@ -47,10 +67,12 @@ def chat(messages, base_url, max_tokens=256, temperature=0.7):
         with urlopen(request, timeout=300) as response:
             result = json.load(response)
     except HTTPError as exc:
-        raise RuntimeError(
-            f"Qwen service returned HTTP {exc.code}. Check the current service "
-            "log, /v1 address, request length and model name qwen3.8-27b."
-        ) from exc
+        try:
+            body = json.loads(exc.read(4000))
+            detail = str(body.get('error', {}).get('message', ''))[:1200]
+        except (ValueError, AttributeError):
+            detail = ''
+        raise RuntimeError(f'Qwen HTTP {exc.code}: ' + (detail or 'Check the service URL, model and request format.')) from exc
     except (URLError, TimeoutError, OSError) as exc:
         raise RuntimeError(
             "Cannot reach the Qwen service or the request timed out. "
@@ -66,6 +88,9 @@ def chat(messages, base_url, max_tokens=256, temperature=0.7):
     except (KeyError, IndexError, TypeError) as exc:
         raise RuntimeError("Qwen response has no text answer; check the service log.") from exc
     return result
+
+
+chat.count_tokens = count_tokens
 
 
 if __name__ == "__main__":

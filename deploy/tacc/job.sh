@@ -7,7 +7,7 @@ export PS1="${PS1-}"
 : "${TACC_USERDIR:?Submit this package with tcloud submit}"
 : "${SLURM_JOB_ID:?Submit this package with tcloud submit}"
 cd "$TACC_WORKDIR"
-export STOCK_RESULT_DIR="$TACC_USERDIR/stock-research/$SLURM_JOB_ID"
+export STOCK_RESULT_DIR="$TACC_USERDIR/online-stock-research/$SLURM_JOB_ID"
 mkdir -p "$STOCK_RESULT_DIR"
 printf 'RESULT_DIR=%s\nHOST=%s\nWORKDIR=%s\n' "$STOCK_RESULT_DIR" "$(hostname)" "$TACC_WORKDIR"
 printf 'SDK_BOOTSTRAP=%s\n' "${CONDA_PREFIX:-unset}"
@@ -15,6 +15,14 @@ source /mnt/home/public/course-envs/CSIT6000V/project/activate.sh
 : "${QWEN_RUN_DIR:?Course activation did not prepare a runtime}"
 cleanup_runtime() { rm -rf -- "$QWEN_RUN_DIR"; }
 trap cleanup_runtime EXIT
+# The course rootfs omits IANA timezone data. Reuse the host database in this
+# allocation's private /tmp runtime; never install into the public Python env.
+if [[ ! -d /usr/share/zoneinfo ]]; then
+    echo 'Host IANA timezone database is required for exchange-calendar dates.' >&2
+    exit 1
+fi
+cp -a /usr/share/zoneinfo "$QWEN_RUN_DIR/zoneinfo"
+export PYTHONTZPATH="$QWEN_RUN_DIR/zoneinfo"
 export QWEN_CACHE_HOME="$TACC_USERDIR/CSIT6000V-project-cache"
 mkdir -p "$QWEN_CACHE_HOME"
 cp package-manifest.json "$STOCK_RESULT_DIR/package-manifest.json"
