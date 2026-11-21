@@ -2,23 +2,17 @@
 
 Use these to pick the failure case(s) for the report. Full transcripts are in the results/*.jsonl files and results/audit/.
 
-## agent-qwen: 5 failed check(s)
+## agent-qwen: 3 failed check(s)
 
 - **ind-07** turn 1, label `0100.HK volatility history status` (expected `SHORT`)
   - Prompt: Show all four metrics for 0100.HK. Is the volatility based on a full 252-day history?
-  - Got: For 0100.HK (MiniMax), the four metrics are: - Revenue growth: N/A. The tool returned this as unavailable because the required prior-year revenue input is missing. The current 3M revenue is USD 25,601,000 for the period ending 2025-12-31. - Net profit margin: -5310.75%. This is based on net income of USD -1,359,604,000 and revenue of USD 25,601,000 for the 3M period ending 2025-12-31. - Debt-to-eq
-- **rank-05** turn 1, ranking `top 10` (expected `['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK', '1698.HK', '1810.HK', '9863.HK', '9988.HK', '9618.HK']`)
-  - Prompt: Rank the top 10 stocks using the default weights.
-  - Got: RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.
-- **follow-01** turn 2, number `0700.HK Historical volatility` (expected `32.551206438735974`)
-  - Prompt: Now use 60 trading days for volatility.
-  - Got: Here are the four metrics for Tencent (0700.HK) with the historical volatility calculated over a 60-trading-day window: * **Revenue Growth:** 10.99% (3M period ending 2026-06-30, CNY) * **Net Profit Margin:** 27.36% (3M period ending 2026-06-30, CNY) * **Debt-to-Equity:** 0.42x (as of 2026-06-30, CNY) * **Historical Volatility:** 33.84% (annualized, based on 60 daily returns from 2026-08-21 to 202
+  - Got: For 0100.HK (MiniMax), the four metrics are: - Revenue growth: N/A. The tool returned this as unavailable because the required prior-year revenue input is missing. The current 3M revenue is USD 25,601,000 for the period ending 2025-12-31. - Net profit margin: -5,310.75%. This is based on net income of -USD 1,359,604,000 and revenue of USD 25,601,000 for the 3M period ending 2025-12-31. - Debt-to-e
 - **invalid-03** turn 1, behavior `says P/E is not available` (expected ``)
   - Prompt: What is the P/E ratio of 0700.HK?
   - Got: I can’t provide the P/E ratio for 0700.HK because P/E is not one of the metrics available in this dataset. The available metrics include revenue growth, net profit margin, debt-to-equity, historical volatility, financial trends (ROE, margin change, debt/equity growth), price analysis (returns, moving averages, RSI, MACD, drawdown, rolling volatility, volume), correlation, and screening/ranking. If
 - **invalid-04** turn 1, behavior `rejects a 1-day volatility window` (expected ``)
   - Prompt: Show the historical volatility of 0700.HK using a window of 1 trading day.
-  - Got: For 0700.HK (Tencent), the historical volatility calculated with a window of 2 daily returns (the minimum allowed, corresponding to 3 price observations) is 53.17%. Details: - Window: 2 daily returns (3 observations) - Start date: 2026-11-13 - End date: 2026-11-17 - Annualization: sqrt(252) - Formula: sample standard deviation of log returns × sqrt(252) × 100 - Data is a fixed snapshot as of Wed N
+  - Got: For 0700.HK (Tencent), the historical volatility calculated with a window of 2 daily returns (the minimum allowed, corresponding to 1 trading day of return data) is 53.17%. Details: - Window: 2 daily returns (3 observations) - Price window: 2026-11-13 to 2026-11-17 - Annualization: sqrt(252) - Formula: sample standard deviation of log returns × sqrt(252) × 100 - Status: ok Note: A 1-day window is 
 
 ## notools-deepseek-raw: 54 failed check(s)
 

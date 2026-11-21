@@ -38,7 +38,7 @@ agent-qwen,rank-01,ranking,1,ranking,top 5,"['9999.HK', '6618.HK', '0241.HK', '0
 agent-qwen,rank-02,ranking,1,ranking,top 5,"['0700.HK', '9999.HK', '2382.HK', '1698.HK']",True,1.0,1.0,True,0700.HK 9999.HK 2382.HK 1698.HK,
 agent-qwen,rank-03,ranking,1,ranking,top 3,"['9863.HK', '9866.HK', '6618.HK']",True,1.0,1.0,True,9863.HK 9866.HK 6618.HK,
 agent-qwen,rank-04,ranking,1,ranking,top 5,"['0241.HK', '6618.HK', '9999.HK', '0100.HK', '1810.HK']",True,1.0,1.0,True,0241.HK 6618.HK 9999.HK 0100.HK 1810.HK,
-agent-qwen,rank-05,ranking,1,ranking,top 10,"['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK', '1698.HK', '1810.HK', '9863.HK', '9988.HK', '9618.HK']",False,0.0,0.0,False,,"RuntimeError: Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b."
+agent-qwen,rank-05,ranking,1,ranking,top 10,"['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK', '1698.HK', '1810.HK', '9863.HK', '9988.HK', '9618.HK']",True,1.0,1.0,True,9999.HK 6618.HK 0241.HK 0700.HK 2382.HK 1698.HK 1810.HK 9863.HK 9988.HK 9618.HK,
 agent-qwen,rank-06,ranking,1,ranking,top 5,"['9863.HK', '6618.HK', '0020.HK', '9866.HK', '0981.HK']",True,1.0,1.0,True,9863.HK 6618.HK 0020.HK 9866.HK 0981.HK,
 agent-qwen,rank-07,ranking,1,ranking,top 3,"['0300.HK', '6690.HK', '9618.HK']",True,1.0,1.0,True,0300.HK 6690.HK 9618.HK,
 agent-qwen,rank-08,ranking,1,behavior,reports that no stock passes the filter,,True,,,,,
@@ -64,7 +64,7 @@ agent-qwen,follow-01,followup,1,number,0700.HK Revenue growth,10.992173611412227
 agent-qwen,follow-01,followup,1,number,0700.HK Net profit margin,27.356495837097444,True,,,,,
 agent-qwen,follow-01,followup,1,number,0700.HK Debt-to-equity,0.4153953020329215,True,,,,,
 agent-qwen,follow-01,followup,1,number,0700.HK Historical volatility,33.843934520367455,True,,,,,
-agent-qwen,follow-01,followup,2,number,0700.HK Historical volatility,32.551206438735974,False,,,,,
+agent-qwen,follow-01,followup,2,number,0700.HK Historical volatility,32.551206438735974,True,,,,,
 agent-qwen,follow-02,followup,1,ranking,top 5,"['9999.HK', '6618.HK', '0241.HK', '0700.HK', '2382.HK']",True,1.0,1.0,True,9999.HK 6618.HK 0241.HK 0700.HK 2382.HK,
 agent-qwen,follow-02,followup,2,ranking,top 5,"['9999.HK', '6618.HK', '0241.HK', '2382.HK', '1810.HK']",True,1.0,1.0,True,9999.HK 6618.HK 0241.HK 2382.HK 1810.HK,
 agent-qwen,follow-03,followup,1,ranking,top 3,"['0700.HK', '9999.HK', '2382.HK']",True,1.0,1.0,True,0700.HK 9999.HK 2382.HK,

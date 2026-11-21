@@ -329,21 +329,18 @@ Task 14: all five systems were run on the same 43 cases on 21 November 2026. Ful
 
 | Metric | Qwen agent (tools) | Qwen, no tools | Qwen, no tools + raw data | DeepSeek, no tools | DeepSeek, no tools + raw data |
 |---|---|---|---|---|---|
-| Cases fully passed | 88.4% (38/43) | 11.6% | 18.6% | 7.0% | 30.2% |
-| Numerical accuracy | 98.2% (54/55) | 0.0% | 3.6% | 0.0% | 34.5% |
-| Ranking in exact order | 92.3% (12/13) | 0.0% | 0.0% | 0.0% | 0.0% |
+| Cases fully passed | 93.0% (40/43) | 11.6% | 18.6% | 7.0% | 30.2% |
+| Numerical accuracy | 100% (55/55) | 0.0% | 3.6% | 0.0% | 34.5% |
+| Ranking in exact order | 100% (13/13) | 0.0% | 0.0% | 0.0% | 0.0% |
 | Trend analysis grounding | 100% (17/17) | 11.8% | 17.6% | 5.9% | 52.9% |
-| Follow-up success | 83.3% (5/6) | 0.0% | 0.0% | 0.0% | 0.0% |
-| Mean response time per turn | 12.9 s | 1.3 s | 5.4 s | 1.1 s | 1.6 s |
+| Follow-up success | 100% (6/6) | 0.0% | 0.0% | 0.0% | 0.0% |
+| Mean response time per turn | 13.2 s | 1.3 s | 5.4 s | 1.1 s | 1.6 s |
 
-Scoring is automatic and heuristic; spot-check before quoting. Known issues from this run, kept as input for task 15:
+The agent column is the third Qwen run, made after the ranking fix. Scoring is automatic and heuristic; spot-check before quoting. Notes on this table:
 
-- `rank-05` (top 10 ranking): the answer exceeds the 1,800 output-token limit, the truncated JSON is rejected nine times, and the conversation then overflows the 32K context (HTTP 400).
-- `follow-01`: asked to switch volatility to a 60-day window, the model answered without calling the tool again.
-- `ind-07`: the model did not state that MiniMax volatility uses a short history.
-- `invalid-04`: asked for a 1-day window, the model silently used 2 days instead of rejecting the request.
-- `invalid-03` is a scorer false negative: the answer correctly says P/E is unavailable, in words the keyword list does not cover.
+- The three remaining agent failures: `invalid-04` is real (asked for a 1-day window, the model used 2 days instead of rejecting the request); `ind-07` and `invalid-03` are scorer false negatives, where the answer is correct in words the checks do not cover.
+- Results vary between runs. `follow-01` failed in the second run (the model answered without calling the tool) and passed in the first and third.
 - "Qwen, no tools + raw data" has 4 cases that the service rejected with HTTP 400 (prompt too long for the 32K context), so that column is incomplete.
-Task 15: observed failures, their causes and mitigations, scorer errors and limitations are written up in [evaluation/FAILURE_ANALYSIS.md](evaluation/FAILURE_ANALYSIS.md).
+- Earlier agent runs are kept for comparison: `results/old-agent-8-steps/` (6 tools, 8-step limit, 38/43) and `results/old-agent-before-ranking-fix/` (12-step limit, 38/43).
 
-- `results/old-agent-8-steps/` keeps the run made with the previous agent (6 tools, 8-step limit) for comparison.
+Task 15: observed failures, their causes and mitigations, scorer errors and limitations are written up in [evaluation/FAILURE_ANALYSIS.md](evaluation/FAILURE_ANALYSIS.md).

@@ -1,6 +1,7 @@
 # Failure analysis and limitations (task 15)
 
-Based on the evaluation runs of 21 November 2026: 43 cases, five systems. Transcripts are in
+Based on the evaluation runs of 21 November 2026: 43 cases, five systems, three runs of the
+Qwen agent (before any fix, after raising the step limit, after the ranking fix). Transcripts are in
 `results/`, every failed check in `results/failures.md`. Case ids below refer to `cases.json`.
 
 ## Observed failures of the tool-augmented agent
@@ -35,17 +36,21 @@ to "context overflow". The first diagnosis (not enough steps) was wrong.
 - A response cut off at the output limit is now dropped from the conversation and the model
   is asked for a shorter answer, instead of being told its JSON was malformed.
 
+**Result.** In the next full Qwen run the case passed in 2 model calls, 1,509 output tokens
+and 31 s, and all 13 ranking checks were in the exact order. Cases passed rose from 38 to 40
+of 43.
+
 ### 2. A follow-up was answered without calling the tool (`follow-01`)
 
 **What happened.** Turn 1 asked for Tencent's four metrics (252-day volatility: 33.84%).
-Turn 2: "Now use 60 trading days for volatility." In one of two runs the model made no tool
+Turn 2: "Now use 60 trading days for volatility." In one of three runs the model made no tool
 call and answered "33.84% (annualized, based on 60 daily returns from 2026-08-21 to
 2026-11-17)". The correct 60-day value is 32.55%. The model reused the old number and
 attached a plausible new window to it.
 
 **Cause.** Model behaviour. Nothing in the application forces a tool call when a parameter
 changes; it relies on the instruction "Always call the appropriate tool before reporting
-metrics". The same case passed in the other run, so the behaviour is not deterministic even
+metrics". The same case passed in the other two runs, so the behaviour is not deterministic even
 at temperature 0 across service restarts.
 
 **Mitigation (not implemented).** Check each final answer against the tool results of that
@@ -57,7 +62,7 @@ would turn a silent wrong answer into a retry.
 
 **What happened.** "Show the historical volatility of 0700.HK using a window of 1 trading
 day." The tool requires at least 2 returns. The model used 2 and reported 53.17% from three
-prices, in both runs.
+prices, in all three runs.
 
 **Cause.** The validation error tells the model the allowed range, and the model chose to
 satisfy the range rather than report that the request cannot be met. The number is correctly
@@ -89,8 +94,8 @@ that not all were real.
 | `invalid-03` | False negative, open | The answer said "I can’t provide the P/E ratio … not one of the metrics available". The keyword list has "cannot provide" and "not available" but not these wordings. |
 | `ind-07` | False negative, open | The answer said "No, the volatility is not based on a full 252-day history … short_history". The check looks for the uppercase label `SHORT`, which the prompt never asked the model to use. |
 
-So the measured 88.4% (38/43) understates the agent: two of the five reported failures are
-correct answers. Keyword-based behaviour checks are the weakest part of the scoring and need
+So the measured pass rate understates the agent. In the final run it is 93.0% (40/43), and two
+of the three reported failures (`ind-07`, `invalid-03`) are correct answers. Keyword-based behaviour checks are the weakest part of the scoring and need
 manual review before any number is quoted.
 
 ## Limitations of the evaluation
@@ -98,7 +103,7 @@ manual review before any number is quoted.
 - **Different models prevent isolating the effect of tools.** The proposal's baseline is
   another provider's model (DeepSeek) without tools, so a difference between it and the agent
   mixes the effect of tools with the effect of the model. To address this, the same Qwen
-  model was also run without tools: 11.6% of cases passed, against 88.4% with tools. That
+  model was also run without tools: 11.6% of cases passed, against 93.0% with tools. That
   comparison is like-for-like; the DeepSeek comparison is system against system.
 - **Giving the baseline raw data is not the same as giving it tools.** With the raw financial
   inputs in the prompt, DeepSeek reached 34.5% numerical accuracy and Qwen 3.6%. Ranking
@@ -112,7 +117,7 @@ manual review before any number is quoted.
   are; the tools are checked by independent numeric fixtures in `agent/test_*.py`, not by a
   second data source.
 - **Response times are not comparable across providers.** Qwen ran on shared course GPUs,
-  DeepSeek on a commercial API. The agent's 12.9 s per turn against about 1.3 s without
+  DeepSeek on a commercial API. The agent's 13.2 s per turn against about 1.3 s without
   tools is comparable only within Qwen.
 
 ## Limitations of the system
