@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 077
+export PS1="${PS1-}"
 : "${TACC_WORKDIR:?Submit with tcloud submit}"
 : "${TACC_USERDIR:?Submit with tcloud submit}"
 source /mnt/home/public/course-envs/CSIT6000V/project/activate.sh
+trap 'rm -rf -- "$QWEN_RUN_DIR"' EXIT
 cd "$TACC_WORKDIR"
 mkdir -p "$TACC_USERDIR/ticker-metrics-results"
 QWEN_BASE_URL=$(qwen-python qwen_client.py --check-url --base-url "$(cat server-url.txt)")

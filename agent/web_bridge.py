@@ -1,6 +1,7 @@
 """Local HTTP bridge for a running TACC chat job. Requires the configured tcloud CLI."""
 import argparse
 import json
+import os
 import re
 import subprocess
 import tempfile
@@ -11,7 +12,7 @@ from uuid import uuid4
 
 
 def transfer(*args, allow_missing=False):
-    run = subprocess.run(['tcloud', *map(str, args)], stdout=subprocess.PIPE,
+    run = subprocess.run([os.environ.get('TCLOUD_BIN', 'tcloud'), *map(str, args)], stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT, timeout=60)
     output = run.stdout.replace(b'\0', b'').decode(errors='replace').lower()
     if allow_missing and ('no such file' in output or 'does not exist' in output):
@@ -81,9 +82,13 @@ class Bridge(BaseHTTPRequestHandler):
             if hasattr(self.server, 'started'):
                 self.server.started[turn] = time.perf_counter()
             with tempfile.TemporaryDirectory() as temp:
-                path = Path(temp) / (turn + '.ask')
-                path.write_text(json.dumps({'question': question, 'session': session}), encoding='utf-8')
-                transfer('upload', path, self.server.remote)
+                payload = Path(temp) / (turn + '.request')
+                payload.write_text(json.dumps({'question': question, 'session': session}), encoding='utf-8')
+                transfer('upload', payload, self.server.remote)
+                # Publish the commit marker only after payload upload completes.
+                marker = Path(temp) / (turn + '.ask')
+                marker.write_text(json.dumps({'protocol': 2, 'payload': payload.name}), encoding='utf-8')
+                transfer('upload', marker, self.server.remote)
             self.respond(202, {'turn': turn})
         except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
             self.respond(502, {'error': str(exc)})
@@ -96,6 +101,12 @@ def main():
     args = parser.parse_args()
     remote = f'stock-chat/{args.job}/'
     with tempfile.TemporaryDirectory() as temp:
+        connection = Path(temp) / 'connection.json'
+        if transfer('download', f'stock-research/{args.job}/connection.json', connection, allow_missing=True):
+            config = json.loads(connection.read_text(encoding='utf-8'))
+            remote = config.get('remote', '')
+            if not re.fullmatch(r'stock-chat/[A-Za-z0-9_-]{1,80}/', remote):
+                raise ValueError('Invalid server connection manifest')
         page = Path(temp) / 'chat.html'
         transfer('download', remote + page.name, page)
         html = page.read_bytes()

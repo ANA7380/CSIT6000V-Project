@@ -1,5 +1,29 @@
 # An Explainable AI Agent for Stock Screening and Analysis
 
+## Deploy on the course server
+
+The recommended server deployment runs Qwen and the Agent in **one GPU allocation**. It uses the provided fix's loopback endpoint `127.0.0.1:42865`; a separate CPU job on another node cannot reach that loopback address.
+
+```bash
+# Reuse your configured tcloud SDK (or export TCLOUD_BIN=/path/to/tcloud).
+python3 scripts/tacc.py submit --mode web --namespace hk-research --minutes 60
+python3 scripts/tacc.py status YOUR_JOB_ID
+# Wait for MODEL_READY, LIVE_SMOKE_PASSED, and Chat ready, then:
+python3 scripts/tacc.py bridge YOUR_JOB_ID
+```
+
+The last command prints the laptop browser URL. Model inference, stock calculations, conversation snapshots and request processing all run on the server. The local bridge uses the authenticated course SDK for file transfer; it does not need direct access to a compute-node HTTP port.
+
+```bash
+# Optional CPU-only runtime verification (no GPU/model request):
+python3 scripts/tacc.py submit --mode diagnostic --minutes 5
+# Save results and release your allocation when finished:
+python3 scripts/tacc.py download YOUR_JOB_ID
+python3 scripts/tacc.py stop YOUR_JOB_ID
+```
+
+See the [server deployment guide](docs/服务器部署指南.md) for configuration, persistent conversation namespaces, process cleanup and troubleshooting. Each submission uses a unique staged folder to avoid overwriting an active WORKDIR. The course's public environment and model files are never edited.
+
 ## Implementation update on the proposal-completion branch
 
 This branch adds deterministic evidence tables, historical price/SMA and rolling-volatility charts, validated numerical presentation, reusable ranking preferences, multiple browser conversations, private restart snapshots, worker progress events, a local browser server, independent offline references and a genuine **no-tool** baseline runner. It keeps the original fixed CSVs and the single-agent architecture.
@@ -29,7 +53,7 @@ python3 scripts/export_snapshot.py --check
 python3 evaluation/run.py --mode offline --output evaluation/runs/offline-001
 ```
 
-See the [Chinese implementation and connection guide](docs/实施说明与接入指南.md), [evaluation protocol](evaluation/README.md) and [validation record](docs/VALIDATION.md). Real Qwen/DeepSeek evaluation and TACC deployment have **not** been run for this branch; model endpoints will be supplied later. Do not interpret the offline scripted preview or calculation checks as live LLM performance.
+See the [Chinese implementation and connection guide](docs/实施说明与接入指南.md), [evaluation protocol](evaluation/README.md) and [validation record](docs/VALIDATION.md). Full Qwen/DeepSeek comparative evaluation remains pending. For the current server deployment and real-model smoke-test status, see the [server validation record](docs/服务器部署实测记录.md). Do not interpret the offline scripted preview or calculation checks as live LLM performance.
 
 The current scope is financial-condition screening within a fixed thirty-company technology universe. Verified sub-sector metadata is unavailable. The UI and prompt explicitly disclose this limitation; a sub-sector filter still requires sourced metadata. Historical analysis does not require a future-price forecasting model.
 
@@ -68,7 +92,7 @@ Reference: https://api-docs.deepseek.com/quick_start
 bash submit-web.sh
 ```
 
-The script stages the agent, CSVs and web page and runs one `tcloud submit` for a one-hour, CPU-only chat job. Use the returned **chat job ID** in both commands below. Wait for `Chat ready` in the log before launching the bridge.
+The script now defaults to one GPU allocation containing both Qwen and the Agent. It stages only the runtime files and invokes the same `scripts/tacc.py` workflow described above. Use `bash submit-web.sh --external-model` only for a separately deployed model whose non-loopback address is reachable from the CPU job. Use the returned **chat job ID** in both commands below. Wait for `Chat ready` in the log before launching the bridge.
 
 ```bash
 tcloud cat slurm_log/stock-chat-JOB_ID.log
@@ -79,9 +103,9 @@ Open the printed loopback URL (default `http://127.0.0.1:8765/`). Ask “Show al
 
 The job supplies the page and runs the agent and its tools. The laptop serves the page on loopback and uses the authenticated SDK to upload a question and poll for its reply. Transfers add a few seconds to each turn. Job-specific messages and audit logs are under `$TACC_USERDIR/stock-chat/JOB_ID/`. This setup uses the documented file-transfer interface. [TACC SDK](https://github.com/turingaicloud/tcloud-sdk) · [TACC SSH FAQ](https://github.com/turingaicloud/quickstart/blob/master/FAQ.md)
 
-Both allocations must be running. Check them with `tcloud ps -j JOB_ID` if a reply stalls. When finished, press Ctrl+C in the bridge terminal and cancel each active allocation with `tcloud cancel -j JOB_ID`.
+Keep the single allocation running. Check it with `tcloud ps -j JOB_ID` if a reply stalls. The legacy external-model mode requires both its CPU job and separate model service. When finished, press Ctrl+C in the bridge terminal and cancel each active allocation with `tcloud cancel -j JOB_ID`.
 
-### Single-question batch job
+### Legacy single-question batch job with an external model
 
 The included `tuxiv.conf`, `job.sh`, and copied `setup-sdk-account.sh` target the course's existing tcloud/proxy environment, following the local `qwen27b-student-release` package. These are not generic Texas TACC Slurm instructions. The batch launcher now runs the LLM chat agent; start the course model service first. The standalone `agent.py` still works without a model.
 

@@ -39,4 +39,4 @@ Score numerical values using the recorded absolute/relative tolerances; missing 
 
 Live timings here measure the command-line system, including model/tool calls, not the browser SDK transfer. Browser replies separately expose `end_to_end_ms`, including file transfers/polling, and `duration_ms` for the Agent. Report them separately. Different model providers compare the overall systems and cannot isolate the causal benefit of tool use.
 
-No real-model run is included in this branch. The saved offline summary and explicitly scripted browser demo must not be presented as live Qwen accuracy or API latency.
+No full real-model comparative evaluation is included in this branch. Server deployment smoke checks, when run, are documented separately in docs/服务器部署实测记录.md. The saved offline summary and explicitly scripted browser demo must not be presented as live Qwen accuracy or API latency.

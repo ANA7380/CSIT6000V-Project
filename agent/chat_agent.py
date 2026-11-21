@@ -131,7 +131,8 @@ class ChatAgent:
             if len(boundaries) < 2:
                 raise RuntimeError('Current request exceeds context budget; request fewer companies or a shorter analysis.')
             messages = [messages[0]] + messages[boundaries[1]:]
-        messages.insert(1, state_message)
+        # The course Qwen template allows system only at position zero.
+        messages[0] = {'role': 'system', 'content': messages[0]['content'] + '\n' + state_message['content']}
         return messages
 
     def _finish(self, answer, cited, current, start, fallback=False):
@@ -141,6 +142,8 @@ class ChatAgent:
         chinese = bool(re.search('[\u3400-\u9fff]', self._question))
         duration = (time.perf_counter() - start) * 1000
         # Resolve context and rendering before committing a successful turn.
+        if fallback and self.messages[-1]['role'] == 'assistant':
+            self.messages[-1]['content'] = json.dumps({'answer': answer}, ensure_ascii=False)
         context = self._context()
         text = answer + render_text(views, chinese)
         self.last_response = {'answer': answer, 'evidence': views, 'state': copy.deepcopy(self.state),
@@ -148,7 +151,8 @@ class ChatAgent:
         self.record({'event': 'turn_complete', 'duration_ms': duration, 'fallback': fallback,
                      'evidence_ids': [e['id'] for e in selected]})
         # Persist only bounded recent messages; facts and ranking handles live in state.
-        self.messages = [context[0]] + context[2:]
+        # Keep the static prompt in stored history; inject fresh state per call.
+        self.messages = [self.messages[0]] + context[1:]
         return text
 
     def ask(self, question):
@@ -161,6 +165,8 @@ class ChatAgent:
         self.last_response = None
         started = time.perf_counter()
         current = []
+        answer_repairs = 0
+        last_bad_answer = None
         self.messages.append({'role': 'user', 'content': question})
         self.record({'event': 'turn_start', 'content': question})
         try:
@@ -187,7 +193,16 @@ class ChatAgent:
                         refs = validate_answer(action['answer'], self.evidence, action.get('evidence_ids'),
                                                require_evidence=bool(current))
                     except GroundingError as exc:
-                        self.record({'event': 'answer_validation_error', 'error': str(exc)})
+                        answer_repairs += 1
+                        repeated = action['answer'] == last_bad_answer
+                        last_bad_answer = action['answer']
+                        self.record({'event': 'answer_validation_error', 'error': str(exc), 'attempt': answer_repairs, 'repeated': repeated})
+                        if answer_repairs >= 2 or repeated:
+                            if not current:
+                                raise RuntimeError('Model explanation failed validation without tool evidence; use an explicit supported ticker or task.')
+                            return self._finish('解释未通过校验，以下展示已验证的工具计算结果。' if re.search('[\u3400-\u9fff]', question)
+                                                else 'Explanation did not pass validation; verified tool results are shown below.',
+                                                [], current, started, fallback=True)
                         self.messages.append({'role': 'user', 'content': 'ANSWER_VALIDATION_ERROR\n' + str(exc)})
                         continue
                     return self._finish(action['answer'], refs, current, started)

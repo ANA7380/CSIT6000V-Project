@@ -15,7 +15,7 @@ from local_web import make_server
 
 def fixture(messages, *args, **kwargs):
     last=messages[-1]['content']
-    state=json.loads(next(m['content'].split('\n',1)[1] for m in messages if m['content'].startswith('SESSION_STATE\n')))
+    state=json.loads(messages[0]['content'].rsplit('\nSESSION_STATE\n',1)[1])
     if last.startswith('TOOL_RESULT\n'):
         item=json.loads(last.split('\n',1)[1])
         if item['tool']=='ticker_metrics' and 'result' in item:

@@ -34,7 +34,7 @@ class ProposalTests(unittest.TestCase):
             self.assertTrue(all(e['duration_ms']>=0 for e in events if 'duration_ms' in e))
 
     def test_unknown_citations_and_unverified_dates_are_rejected(self):
-        for answer in ['Revenue is 999999%.','Revenue is ９９９９９９%.','On 2026-01-01.', '[E999] profit', 'https://invented.example/data']:
+        for answer in ['Revenue is 999999%.','Revenue is ９９９９９９%.', 'Revenue is ²%.','On 2026-01-01.', '[E999] profit', 'https://invented.example/data']:
             with self.assertRaises(GroundingError):validate_answer(answer,[])
         self.assertEqual(validate_answer('SMA50 and SMA200 are moving averages.',[]),[])
 
@@ -94,12 +94,40 @@ class ProposalTests(unittest.TestCase):
         self.assertTrue(any(v is None for v in short['series']['sma_200']))
         self.assertTrue(all(len(v)==len(short['dates']) for v in short['series'].values()))
 
+    def test_grounded_crossover_label_and_bounded_repair(self):
+        result=AnalysisTools(TickerAgent()).price_analysis('0700.HK',window=60)
+        evidence=[{'id':'E1','tool':'price_analysis','arguments':{'ticker':'0700.HK'},'result':result}]
+        answer='The latest fifty/200 crossover is none. [E1]'
+        self.assertEqual(validate_answer(answer,evidence),['E1'])
+        with self.assertRaises(GroundingError):validate_answer(answer,[])
+        with self.assertRaises(GroundingError):validate_answer('Margin is 200% [E1]',evidence)
+        with tempfile.TemporaryDirectory() as p:
+            agent=self.make(p,[{'tool':'price_analysis','arguments':{'ticker':'0700.HK','window':60}},
+                               {'answer':'Invalid margin 999999% [E1]'},
+                               {'answer':'Invalid margin 999999% [E1]'}])
+            output=agent.ask('Show a chart')
+            self.assertTrue(agent.last_response['fallback'])
+            self.assertNotIn('999999',output)
+            events=[json.loads(l) for l in agent.log.read_text().splitlines()]
+            self.assertEqual(sum(e['event']=='model' for e in events),3)
+            self.assertNotIn('999999',agent.messages[-1]['content'])
+
     def test_context_budget_preserves_complete_turns_and_state(self):
         with tempfile.TemporaryDirectory() as p:
             agent=self.make(p,[{'answer':'A conceptual explanation.'}]*15)
             agent.max_context_chars=len(agent.messages[0]['content'])+1200
             for _ in range(15):agent.ask('Explain '+'historical analysis '*30)
             self.assertLess(sum(len(m['content']) for m in agent.messages),agent.max_context_chars)
+            self.assertEqual(agent.messages[1]['role'],'user')
+
+    def test_course_qwen_requires_single_leading_system_message(self):
+        with tempfile.TemporaryDirectory() as p:
+            agent=self.make(p,[{'answer':'A conceptual explanation.'}]*2)
+            agent.ask('Explain volatility');agent.ask('Explain margin')
+            context=agent._context()
+            self.assertEqual([i for i,m in enumerate(context) if m['role']=='system'],[0])
+            self.assertIn('SESSION_STATE\n',context[0]['content'])
+            self.assertNotIn('SESSION_STATE\n',agent.messages[0]['content'])
             self.assertEqual(agent.messages[1]['role'],'user')
 
     def test_direct_tool_arguments_rejected(self):

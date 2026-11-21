@@ -32,8 +32,15 @@ def validate_answer(answer, evidence, requested_ids=None, require_evidence=False
     for symbol in symbols:
         cleaned = cleaned.replace(symbol, '')
     cleaned = re.sub(r'\b(?:SMA(?:20|50|200)|RSI14|MACD(?:12/26/9)?)\b', '', cleaned, flags=re.I)
-    if any(ch.isdigit() for ch in cleaned):
-        raise GroundingError('No numbers or dates in explanation prose. The application renders exact tool values, units and dates. Use references and qualitative explanations.')
+    if any('latest_50_200_crossover' in item['result'].get('trend_comparison', {}) for item in evidence):
+        # This is an indicator label, not a numerical financial claim. Permit it
+        # only when that crossover was actually returned by a price tool.
+        cleaned = re.sub(r'\b(?:SMA)?(?:50|fifty)\s*/\s*(?:SMA)?(?:200|two hundred)\s+(?:moving-average\s+)?crossover\b', '', cleaned, flags=re.I)
+    offending = next((i for i, ch in enumerate(cleaned) if ch.isdigit()), None)
+    if offending is not None:
+        start, end = offending, offending + 1
+        snippet = cleaned[max(0, start-24):end+32]
+        raise GroundingError('Unverified numerical text near ' + repr(snippet) + '. Remove numbers/dates from explanation prose or use a catalog indicator label. The application renders exact tool values. Do not repeat the previous invalid sentence.')
     if re.search(r'https?://', cleaned):
         raise GroundingError('Source links are rendered from tools; do not invent links in prose.')
     return sorted(cited, key=lambda x: int(x[1:]))
