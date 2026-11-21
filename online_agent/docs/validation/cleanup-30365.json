@@ -1,0 +1,8 @@
+{
+  "state": "stopped",
+  "returncode": 143,
+  "base_url": "http://127.0.0.1:42866/v1",
+  "job_id": 30365,
+  "scheduler_job_absent": true,
+  "reason": "Stopped explicitly after successful model and browser validation"
+}

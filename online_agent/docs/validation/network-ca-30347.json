@@ -1,0 +1,64 @@
+{
+  "verify_paths": "DefaultVerifyPaths(cafile=None, capath='/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/etc/ssl/certs')",
+  "ca_file_exists": true,
+  "proxy_schemes": [],
+  "job_id": "30347",
+  "python": "3.12.14 (main, Aug 14 2026, 15:34:45) [Clang 22.1.3 ]",
+  "targets": [
+    {
+      "name": "official_page",
+      "url": "https://www.microsoft.com/en-us/Investor/",
+      "dns_addresses": 12,
+      "ok": true,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes_sampled": 12000,
+      "sample": "<!DOCTYPE html>\n\n<html lang=\"en-US\" dir=\"ltr\">\n  <head>\n    \n    \n\n    \n\n\n\n        \n            \n                    \n                            \n                        \n                \n        \n\n    \n<!-- Start of ADDITIONAL DEBUG INFO ** cv.html **\n\n    CVToken: CASMicrosoftCV141b43f3.0\n  End of ADDITIONAL DEBUG INFO -->\n\n\n\n    <meta name=\"content-page-ref\" content=\"QyejA8RNdXaoycf3MlFmXRQiVBUujc5sk6_Hj_vwJGNLCXs3uDOQPn1OiIc5fZ5ISOY5e2K1Qe9QgukirzlKhryxi3Ug6pkIGHfb3N78U0Q\"/>\n<link rel=\"dns-prefetch\" href=\"https://cdn-dynmedia-1.microsoft.com\"/>\n<link rel=\"preconnect\" href=\"https://cdn-dynmedia-1.microsoft.com\"/>\n<link rel=\"dns-prefetch\" href=\"https://web.vortex.data.microsoft.com\"/>\n<li",
+      "seconds": 0.2
+    },
+    {
+      "name": "search_bing_rss",
+      "url": "https://www.bing.com/search?format=rss&q=Microsoft+MSFT+investor+relations",
+      "dns_addresses": 27,
+      "ok": true,
+      "status": 200,
+      "content_type": "text/xml; charset=utf-8",
+      "bytes_sampled": 5771,
+      "sample": "<?xml version=\"1.0\" encoding=\"utf-8\" ?><rss version=\"2.0\"><channel><title>Bing: Microsoft MSFT investor relations</title><link>http://www.bing.com:80/search?q=Microsoft+MSFT+investor+relations</link><description>\u641c\u5c0b\u7d50\u679c</description><image><url>http://www.bing.com:80/s/a/rsslogo.gif</url><title>Microsoft MSFT investor relations</title><link>http://www.bing.com:80/search?q=Microsoft+MSFT+investor+relations</link></image><copyright>\u8457\u4f5c\u6b0a \u00a9 2026 Microsoft\u3002\u8457\u4f5c\u6b0a\u6240\u6709\uff0c\u4e26\u4fdd\u7559\u4e00\u5207\u6b0a\u5229\u3002\u9664\u4e86\u5728 RSS \u5f59\u7e3d\u5de5\u5177\u5167\u8f49\u8b6f\u7684 Bing \u7d50\u679c\u4f9b\u60a8\u500b\u4eba\u975e\u5546\u696d\u6027\u7684\u7528\u9014\uff0c\u9019\u4e9b XML \u7d50\u679c\u4e0d\u5f97\u4ee5\u4efb\u4f55\u65b9\u5f0f\u6216\u4f9b\u4efb\u4f55\u76ee\u7684\u4f7f\u7528\u3001\u91cd\u88fd\u6216\u50b3\u64ad\u3002\u5c0d\u9019\u4e9b\u7d50\u679c\u5176\u4ed6\u4efb\u4f55\u7684\u4f7f\u7528\uff0c\u9700\u5148\u7d93\u904e Microsoft Corporation \u660e\u78ba\u7684\u66f8\u9762\u8a31\u53ef\u3002\u4e00\u65e6\u4ee5\u4efb\u4f55\u65b9\u5f0f\u5b58\u53d6\u9019\u500b\u7db2\u9801\u6216\u4f7f\u7528\u9019\u4e9b\u7d50\u679c\uff0c\u5373\u8868\u793a\u60a8\u540c\u610f\u53d7\u5230\u524d\u8ff0\u7684\u9650\u5236\u3002</copyright><item><title>\u56e7\u6b21\u5143- \u6d77\u91cf\u65b0\u756a\u56fd\u6f2b\u65e5\u6f2b\u4e00\u7ad9\u8ffd\u66f4</title><link>https://www.jcydm.net.cn/ind",
+      "seconds": 0.23
+    },
+    {
+      "name": "search_duckduckgo",
+      "url": "https://html.duckduckgo.com/html/?q=Microsoft+MSFT+investor+relations",
+      "dns_addresses": 3,
+      "ok": true,
+      "status": 202,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes_sampled": 12000,
+      "sample": "<!-- <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\"> -->\n<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <link rel=\"canonical\" href=\"https://duckduckgo.com/\">\n    <meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=1\">\n    <meta name=\"referrer\" content=\"origin\">\n    <title>\n        DuckDuckGo\n    </title>\n    <link rel=\"preload\" href=\"/font/ProximaNova-Reg-webfont.woff2\" as=\"font\" type=\"font/woff2\" crossorigin=\"anonymous\">\n    <link rel=\"preload\" href=\"/font/ProximaNova-Sbold-webfont.woff2\" as=\"font\" type=\"font/woff2\" c",
+      "seconds": 0.4
+    },
+    {
+      "name": "market_yahoo",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=1mo&interval=1d",
+      "dns_addresses": 12,
+      "ok": true,
+      "status": 200,
+      "content_type": "application/json;charset=utf-8",
+      "bytes_sampled": 3659,
+      "sample": "{\"chart\":{\"result\":[{\"meta\":{\"currency\":\"USD\",\"symbol\":\"AAPL\",\"exchangeName\":\"NMS\",\"fullExchangeName\":\"NasdaqGS\",\"instrumentType\":\"EQUITY\",\"firstTradeDate\":345479400,\"regularMarketTime\":1795208402,\"hasPrePostMarketData\":true,\"gmtoffset\":-18000,\"timezone\":\"EST\",\"exchangeTimezoneName\":\"America/New_York\",\"regularMarketPrice\":342.56,\"regularMarketChangePercent\":-1.904,\"fulldayPrice\":342.56,\"fulldayChange\":-4.34,\"fulldayChangePercent\":-1.243,\"fiftyTwoWeekHigh\":360.83,\"fiftyTwoWeekLow\":243.42,\"regularMarketDayHigh\":354.3,\"regularMarketDayLow\":340.56,\"regularMarketVolume\":80692545,\"longName\":\"Apple Inc.\",\"shortName\":\"Apple Inc.\",\"chartPreviousClose\":339.5,\"priceHint\":2,\"currentTradingPeriod\":{\"pre\"",
+      "seconds": 0.13
+    },
+    {
+      "name": "public_github",
+      "url": "https://raw.githubusercontent.com/python/cpython/main/README.rst",
+      "dns_addresses": 24,
+      "ok": true,
+      "status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "bytes_sampled": 8920,
+      "sample": "This is Python version 3.16.0 alpha 2+dev\n=========================================\n\n.. image:: https://github.com/python/cpython/actions/workflows/build.yml/badge.svg?branch=main&event=push\n   :alt: CPython build status on GitHub Actions\n   :target: https://github.com/python/cpython/actions\n\n.. image:: https://dev.azure.com/python/cpython/_apis/build/status/Azure%20Pipelines%20CI?branchName=main\n   :alt: CPython build status on Azure DevOps\n   :target: https://dev.azure.com/python/cpython/_build/latest?definitionId=4&branchName=main\n\n.. image:: https://img.shields.io/badge/discourse-join_chat-brightgreen.svg\n   :alt: Python Discourse chat\n   :target: https://discuss.python.org/\n\n\nCopyright ",
+      "seconds": 0.32
+    }
+  ]
+}

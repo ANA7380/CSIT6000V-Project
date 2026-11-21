@@ -1,0 +1,33 @@
+{
+  "job_id": 30351,
+  "checks": [
+    {
+      "name": "primary_page",
+      "passed": true,
+      "seconds": 20.31486162194051,
+      "kind": "webpage",
+      "provider": null
+    },
+    {
+      "name": "external_market",
+      "passed": true,
+      "seconds": 0.4833852001465857,
+      "kind": "market_history",
+      "provider": null
+    },
+    {
+      "name": "symbol_search",
+      "passed": true,
+      "seconds": 0.14081941707991064,
+      "kind": "stock_lookup",
+      "provider": null
+    },
+    {
+      "name": "web_search",
+      "passed": true,
+      "seconds": 0.4814754829276353,
+      "kind": "web_search",
+      "provider": "google_news"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "job_id": 30359,
+  "symbol": "AAPL",
+  "chart_points": 61,
+  "checks": [
+    {
+      "metric": "sma_20",
+      "actual": 347.3065719604492,
+      "reference": 347.3065719604492,
+      "passed": true
+    },
+    {
+      "metric": "sma_50",
+      "actual": 341.5850439453125,
+      "reference": 341.5850439453125,
+      "passed": true
+    },
+    {
+      "metric": "maximum_drawdown",
+      "actual": -4.875186913486862,
+      "reference": -4.875186913486862,
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "source_commit": "4bb2784",
+  "algorithm_files_unchanged": [
+    "agent.py",
+    "analysis_tools.py"
+  ],
+  "retained_csvs": [
+    {
+      "file": "hk_tech30_financials.csv",
+      "sha256": "c5df50466781ef5676e2a6cbe70816b92bab962ef14c6c773efba3e78a81eb4a"
+    },
+    {
+      "file": "hk_tech30_daily_prices.csv",
+      "sha256": "0cbe21ab746097d11e97e37a2998db98032361245d5e0f8afab0fd62982b565f"
+    },
+    {
+      "file": "hk_tech30_snapshot.csv",
+      "sha256": "0b5c4184018ca21fe8beb27cbee272935345f79a6981ffc205e9d7260a12202a"
+    }
+  ]
+}

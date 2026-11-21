@@ -1,0 +1,46 @@
+{
+  "job_id": "30346",
+  "python": "3.12.14 (main, Aug 14 2026, 15:34:45) [Clang 22.1.3 ]",
+  "targets": [
+    {
+      "name": "official_page",
+      "url": "https://www.microsoft.com/en-us/Investor/",
+      "dns_addresses": 12,
+      "ok": false,
+      "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+      "seconds": 1.07
+    },
+    {
+      "name": "search_bing_rss",
+      "url": "https://www.bing.com/search?format=rss&q=Microsoft+MSFT+investor+relations",
+      "dns_addresses": 18,
+      "ok": false,
+      "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+      "seconds": 0.14
+    },
+    {
+      "name": "search_duckduckgo",
+      "url": "https://html.duckduckgo.com/html/?q=Microsoft+MSFT+investor+relations",
+      "dns_addresses": 3,
+      "ok": false,
+      "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1010)>",
+      "seconds": 0.38
+    },
+    {
+      "name": "market_yahoo",
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=1mo&interval=1d",
+      "dns_addresses": 12,
+      "ok": false,
+      "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+      "seconds": 0.06
+    },
+    {
+      "name": "public_github",
+      "url": "https://raw.githubusercontent.com/python/cpython/main/README.rst",
+      "dns_addresses": 24,
+      "ok": false,
+      "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+      "seconds": 0.06
+    }
+  ]
+}

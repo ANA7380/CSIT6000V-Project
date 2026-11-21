@@ -1,0 +1,5 @@
+var/
+agent/logs/
+__pycache__/
+*.py[cod]
+.env

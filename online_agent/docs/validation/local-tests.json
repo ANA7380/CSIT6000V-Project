@@ -1,0 +1,12 @@
+{
+  "tests": 18,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 0.512,
+  "python": "3.10",
+  "last_additions": [
+    "Exact tokenizer budget prunes complete old turns",
+    "Current tool content compacts without losing full evidence",
+    "Output reservation differs from final persistence"
+  ]
+}

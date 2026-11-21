@@ -1,0 +1,36 @@
+{
+  "job_id": 30359,
+  "turns": [
+    {
+      "request_id": "cd1bf5baf5a94f5487c12538be57fbd4",
+      "error": null,
+      "fallback": false,
+      "tools": [
+        "market_history"
+      ]
+    },
+    {
+      "request_id": "01230cdbc0e3459ca56b88e6aca473e5",
+      "error": null,
+      "fallback": false,
+      "tools": [
+        "market_history"
+      ]
+    },
+    {
+      "request_id": "0aa0fd6d37f44c45b78c49f3b6cf9bb6",
+      "error": null,
+      "fallback": false,
+      "tools": [
+        "read_webpage"
+      ]
+    },
+    {
+      "request_id": "6958de166ba941a9ad9a0e557bf249f6",
+      "error": "Qwen service returned HTTP 400. Check the current service log, /v1 address, request length and model name qwen3.8-27b.",
+      "fallback": null,
+      "tools": []
+    }
+  ],
+  "fix": "Exact tokenizer budgeting with output reserve; whole-turn history trimming and bounded tool-observation compaction"
+}

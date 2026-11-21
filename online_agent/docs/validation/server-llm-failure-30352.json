@@ -1,0 +1,47 @@
+{
+  "job_id": 30352,
+  "status": "failed_then_fixed",
+  "cause": "RSS month name and model ISO date had different numeric tokens; ordered-list markers could also trigger false positives",
+  "repairs": [
+    "Normalize provider pubDate into published_at ISO timestamps",
+    "Ignore ordered-list markers only, retaining checks on numeric claims",
+    "Add two regression cases"
+  ],
+  "validation_errors": [
+    {
+      "error": "Number 204,785 is absent from cited evidence. Remove or correct that claim; do not repeat the invalid answer.",
+      "attempt": 1
+    },
+    {
+      "error": "Number 10 is absent from cited evidence. Remove or correct that claim; do not repeat the invalid answer.",
+      "attempt": 1
+    },
+    {
+      "error": "Number 10 is absent from cited evidence. Remove or correct that claim; do not repeat the invalid answer.",
+      "attempt": 2
+    }
+  ],
+  "completed_turns": [
+    {
+      "duration_ms": 62772.381420014426,
+      "fallback": false
+    },
+    {
+      "duration_ms": 50860.515523003414,
+      "fallback": false
+    },
+    {
+      "duration_ms": 50372.51934991218,
+      "fallback": false
+    },
+    {
+      "duration_ms": 91016.5840499103,
+      "fallback": true
+    }
+  ],
+  "final_supervisor_status": {
+    "state": "failed",
+    "returncode": 1,
+    "base_url": "http://127.0.0.1:42866/v1"
+  }
+}

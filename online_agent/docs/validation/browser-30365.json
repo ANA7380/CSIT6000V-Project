@@ -1,0 +1,205 @@
+{
+  "job_id": 30365,
+  "passed": true,
+  "scripted": false,
+  "checks": [
+    "real server route",
+    "external AAPL history",
+    "contextual window change 60 to 120",
+    "primary page and source links",
+    "Anthropic listing claim checked online",
+    "desktop and mobile",
+    "no JS errors",
+    "no fallback"
+  ],
+  "turns": [
+    {
+      "fallback": false,
+      "duration_ms": 36263.31659103744,
+      "end_to_end_ms": 48326.62509800139,
+      "explanation": "Apple Inc. (AAPL, NasdaqGS) adjusted-close data through 2026-11-20 shows a 60-return maximum drawdown of -4.88% from the 2026-10-29 peak to the 2026-11-03 trough, with the latest adjusted close at $342.56. The price is 1.37% below the 20-day SMA ($347.31), 0.29% above the 50-day SMA ($341.59), and 13.14% above the 200-day SMA ($302.79), so the 50-day remains above the 200-day with no recent 50/200 crossover. RSI-14 is 46.59, MACD is $2.74 versus a $3.48 signal (negative histogram), and 20-day rolling annualized volatility is 27.98%. The latest volume is 1.69x the prior 20-session average. These are historical observations, not forecasts [E1].",
+      "tools": [
+        {
+          "tool": "market_history",
+          "arguments": {
+            "ticker": "AAPL",
+            "window": 60
+          },
+          "sources": [
+            {
+              "title": "Apple Inc. market history",
+              "url": "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=2y&interval=1d",
+              "retrieved_at": "2026-11-21T12:32:11.172372+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fallback": false,
+      "duration_ms": 39805.45025807805,
+      "end_to_end_ms": 53037.62839200135,
+      "explanation": "For Apple Inc. (AAPL, NasdaqGS), the 120-return adjusted-close window through 2026-11-20 shows a maximum drawdown of -12.71%, from the 2026-06-02 peak to the 2026-06-25 trough. The latest adjusted close is $342.56, 1.37% below the 20-day SMA ($347.31), 0.29% above the 50-day SMA ($341.59), and 13.14% above the 200-day SMA ($302.79). The 50-day SMA remains above the 200-day SMA with no recent crossover. RSI-14 is 46.59, MACD is $2.74 versus a $3.48 signal (negative histogram), and 20-day rolling annualized volatility is 27.98%. Latest volume is 1.69x the prior 20-session average. These are historical observations, not forecasts [E2].",
+      "tools": [
+        {
+          "tool": "market_history",
+          "arguments": {
+            "ticker": "AAPL",
+            "window": 120
+          },
+          "sources": [
+            {
+              "title": "Apple Inc. market history",
+              "url": "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=2y&interval=1d",
+              "retrieved_at": "2026-11-21T12:33:02.521578+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fallback": false,
+      "duration_ms": 56854.539066087455,
+      "end_to_end_ms": 71837.55794899844,
+      "explanation": "The retrieved page is Microsoft's official Investor Relations home page, retrieved on 2026-11-21. It provides navigation to key investor resources including Board of Directors, SEC Filings, Annual Reports, Dividends & Stock History, Annual Meeting, and ESG/Responsible AI reports. The page highlights recent announcements: Microsoft's FY27 Q1 Earnings on October 28, 2026, a quarterly dividend announcement on September 15, 2026, and FY2027 segment/metrics information from September 2, 2026. It also links to the 2026 Annual Report, 2026 Proxy Statement, and 2026 Responsible AI Transparency Report. Investor service tools include stock price lookup by date, a Direct Stock Purchase and Dividend Reinvestment Program, and an email alert subscription. The page also displays a news carousel featuring the 2026 Annual Report and various corporate reports [E3].",
+      "tools": [
+        {
+          "tool": "read_webpage",
+          "arguments": {
+            "url": "https://www.microsoft.com/en-us/Investor/",
+            "max_chars": 4000
+          },
+          "sources": [
+            {
+              "title": "Home page",
+              "url": "https://www.microsoft.com/en-us/investor/default",
+              "retrieved_at": "2026-11-21T12:34:11.749527+00:00",
+              "excerpt": "Home page\nThis is the Trace Id: 2c991e1e8685ab15e4e3a55277ff9426\nSkip to main content\nInvestor Relations\nPress Release & Webcast\nMetrics\nOverview\nOverview\nBoard of Directors\nBoard Committees\nPolicies and Guidelines\nEnvironment\nOverview\nResponsible AI\nPrivacy & Cybersecurity\nWorkplace & Culture\nDiversity & Inclusion\nHuman Rights\nResponsible Sourcing\nESG Reports Hub\nAwards & Recognition\nAnnual Reports\nSEC Filings\nInformation for Investors\nAnnual Meeting\nDividends & Stock History\nInvestment History\nAcquisition History\nFAQ\nAll Events\nPast Events\nUpcoming Events\nContacts\nMicrosoft 365\nAzure\nCopilot\nWindows\nSurface\nXBOX\nDeals\nSmall Business\nSupport\nWindows Apps\nOutlook\nOneDrive\nMicrosoft Teams\nOneNote\nMicrosoft Edge\nMoving from Skype to Teams\nComputers\nShop XBOX\nAccessories\nVR & mixed reality\nCe"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fallback": false,
+      "duration_ms": 142296.4953898918,
+      "end_to_end_ms": 154341.87505299997,
+      "explanation": "The claim that Anthropic has recently IPOed is supported by multiple current sources. Search results from November 20, 2026 report that Anthropic's stock (ticker: ANT) debuted on Nasdaq with a $1.8 trillion market cap, raised $93.5 billion total including greenshoe overallotment, and saw the stock drop after its first day of trading [E4]. The Guardian reported on Anthropic's second day of trading the same day [E4].\n\nThe official Anthropic website (anthropic.com), retrieved on 2026-11-21, displays the ticker symbol \"ANT\" prominently on its homepage and describes the company as a \"Public Benefit Corporation\" dedicated to responsible AI development [E6]. The site does not appear to have a dedicated investor relations page, but the presence of the ticker on the homepage is consistent with a public listing.\n\nWhat remains uncertain: I could not access a dedicated investor relations page or an exchange filing (e.g., Nasdaq listing confirmation or SEC registration) to independently verify the exact listing date, exchange, and share count. The evidence is based on news headlines and the company's own homepage ticker display. The exact IPO date appears to be November 19–20, 2026, based on the \"first day\" and \"second day\" reporting, but this is inferred from publication dates rather than a primary exchange notice [E4][E6].",
+      "tools": [
+        {
+          "tool": "web_search",
+          "arguments": {
+            "query": "Anthropic IPO listing status 2026",
+            "max_results": 6
+          },
+          "sources": [
+            {
+              "title": "Anthropic IPO: Amazon, Google And The Art Of The AI Cloud Deal - Forbes",
+              "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPUGFVS1hiSUJzbjY4b1VONUM3dmVWLW1QcEloM19BSElzbXZJYXl6WVlWMzQ0MERJY0pYQ2lTUkZJUHB0MVYyU1B4b2pfMnpCNElzX1p6c1Riek50SjJBQWZwaThhTWZxYmpselAyY200bHc4T0UyT0hsdGZxdkc3TFUwMWNJdHNmZlRwY3FuZWJRc1h1cE00a3paSlctRUxuZ3NGT2J4TWpUY3RzT213N0g2NWQ?oc=5",
+              "snippet": "Anthropic IPO: Amazon, Google And The Art Of The AI Cloud Deal Forbes",
+              "published": "Sat, 21 Nov 2026 11:08:30 GMT",
+              "published_at": "2026-11-21T11:08:30+00:00",
+              "retrieved_at": "2026-11-21T12:35:08.232093+00:00"
+            },
+            {
+              "title": "Anthropic IPO live: Anthropic stock drops after first day of trading - Yahoo Finance",
+              "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQdXV5MDNTQUNlQ2E0Y3ozc0RxalRiM2Vhelc3M2gyZnpmRWg3UWZYcHJqSVVpa1lsVjRYeldYNjVuZGxjMDZRcllvOHFmc24xcG1VY3RZdnFVT2Q4TGZ2Sk1zQTJBcm5BaTFqQjlDSGNLVUFfOERuLXo4M1VrTnFZcDFmSDdzejFmTy1PLXl6MHhsUkM0TjdrXzZScFl2TzJzdTJRc2FBNU9QdldNLXFMMkxrSUktVVFmRXFlbzhsaFd0Zw?oc=5",
+              "snippet": "Anthropic IPO live: Anthropic stock drops after first day of trading Yahoo Finance\nAnthropic says it will put humanity first. Will its IPO change that? NPR\nAnthropic IPO takeaways: ANT debuts with $1.8 trillion market cap in landmark moment for AI CNBC",
+              "published": "Fri, 20 Nov 2026 16:06:56 GMT",
+              "published_at": "2026-11-20T16:06:56+00:00",
+              "retrieved_at": "2026-11-21T12:35:08.232093+00:00"
+            },
+            {
+              "title": "Nasdaq wipes out gains for the year as Anthropic IPO fails to quell AI nerves - CNN",
+              "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9mdllsNUVFYnVqeDVsNWpGX1U5ckw2RURWWUc0ZDdaWksyYzF0c3JJUjAxaHRCbFR2a3F6R1RsLVhSRjBoTngtZWNSRHVybWd4cUN0STB2VWhQSDVtZTBIVG9jMFp0WHBrSGpydlhNTWI?oc=5",
+              "snippet": "Nasdaq wipes out gains for the year as Anthropic IPO fails to quell AI nerves CNN",
+              "published": "Fri, 20 Nov 2026 17:32:52 GMT",
+              "published_at": "2026-11-20T17:32:52+00:00",
+              "retrieved_at": "2026-11-21T12:35:08.232093+00:00"
+            },
+            {
+              "title": "Anthropic's IPO bank closed position meant to stabilize stock, removing source of support - Reuters",
+              "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQSVpRUnlwbWF4cmpjRkg1N1ZnRU9Dc1ZIRFFQU3pyMHNac0tJSXlINUg5YUdLRl9mMUEzQTRkZTdQWHJwRkhJbmYyWV9VYkt4dDVTSGRib3VzbVVENWd1WWllZkhzR2E5SGhrNm5xOUM1QzBfdFFqZlNvNmJDUHFNeU1IdnRMclVkRmdsNTRxTWVZY0hQYWJHN05EZ2xxZTFORDZ0V1g2eWZEWnBGRnVEVVNROURGMVFCTzkwbA?oc=5",
+              "snippet": "Anthropic's IPO bank closed position meant to stabilize stock, removing source of support Reuters",
+              "published": "Fri, 20 Nov 2026 17:10:35 GMT",
+              "published_at": "2026-11-20T17:10:35+00:00",
+              "retrieved_at": "2026-11-21T12:35:08.232093+00:00"
+            },
+            {
+              "title": "Nasdaq erases all 2026 gains as AI sell-off dampens Anthropic’s second day of trading - The Guardian",
+              "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOam9yUlhjeXdQYldnSlpuMlRsWjJsLXFYUGxaM3ZVc21qbTEyUG9Ja2x1aVpZRDU4amVMaTFsZVh0dWlYLXRWV1BJbGtoTkdfUjFkVlhvTnduWGFIY1VKcGNTRWRjTTNlQ1c5Z0FrazRudjFKOFVMYXVhMGNjYmVrMEpFSnpJa09jTHNDX0xrdG95NHl3ckRDc0RLZW9SQXNnSWdF?oc=5",
+              "snippet": "Nasdaq erases all 2026 gains as AI sell-off dampens Anthropic’s second day of trading The Guardian",
+              "published": "Fri, 20 Nov 2026 10:02:00 GMT",
+              "published_at": "2026-11-20T10:02:00+00:00",
+              "retrieved_at": "2026-11-21T12:35:08.232093+00:00"
+            },
+            {
+              "title": "Anthropic raises $93.5 billion total as underwriters scoop up ‘greenshoe’ overallotment - CNBC",
+              "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBFTVBJTG4td0xyYWJNdUpwM2hqSzNKMVdWZG5QMGxGN184UXU0SXdqY1pORWk1Q2J6YVdRM3dncVRneldLSXhzZ0p0azF2QmsxNGM0YzZxcFBSZ282UGh0MXVPX1dUckI4cWxWNtIBckFVX3lxTFAtcXZnZF9OcHBTcTNMVWVGN1lrVVRORHZCMVFDWFZyQk5PY1ppQVRJajByR0JMT1R4d2hlUURiNUdqZk9mb3EtUzVDSWM1SllIbFg4NmJTTEFUX3hocFMweWFKZW9odmNkaWptOUtabzl1dw?oc=5",
+              "snippet": "Anthropic raises $93.5 billion total as underwriters scoop up ‘greenshoe’ overallotment CNBC",
+              "published": "Fri, 20 Nov 2026 13:11:10 GMT",
+              "published_at": "2026-11-20T13:11:10+00:00",
+              "retrieved_at": "2026-11-21T12:35:08.232093+00:00"
+            }
+          ]
+        },
+        {
+          "tool": "web_search",
+          "arguments": {
+            "query": "Anthropic official website investor relations",
+            "max_results": 4
+          },
+          "sources": [
+            {
+              "title": "Anthropic is offering $600,000 to someone to shape its Wall Street story as it gears up for a blockbuster IPO - Yahoo Finance",
+              "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQOWlBdm1ib3VITmVRV3pFeUM5bDY3MmZUYnpJV21BZVQ4cVFSbWltRUF0eHJzYVFzQ3VTZ0t2V3lQUHY3dkxzSXpqZHUxMktycUxCN0lOQl9tWDFZMnEtd1FvMnBVWnkwdUdrRE44T2dINWp4OThqZFNYcm9qSHM3WFZPUGVnQ3g2cF9WRko0bkswanl1SGp0amcxcXJKUmc?oc=5",
+              "snippet": "Anthropic is offering $600,000 to someone to shape its Wall Street story as it gears up for a blockbuster IPO Yahoo Finance",
+              "published": "Sat, 18 Jul 2026 07:00:00 GMT",
+              "published_at": "2026-07-18T07:00:00+00:00",
+              "retrieved_at": "2026-11-21T12:35:28.823965+00:00"
+            },
+            {
+              "title": "Market Take | Anthropic Investor Day: Can New Revenue Numbers Revive the AI Trade? - Moomoo",
+              "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPOXZoVlgtWFJoVGRZRC1uOG45dFdraHZnMnRSYVZTZTkwSnk0blh0Z2pkLVptUzYxRThEU2tpcE1LMlpkby0zN1pxWlNqWHp4M18tMExRZG9FdEZxazBoeXFyVy1MOGJ2eVdZdkZpcGwwNnQ5R0Zzc0pad1BwVGVYcmU0T3hscENLN0pBY0F0YUt4ek8zekpEYWFBU3Y0V1RNS2dmYm5KNWEwX3VxNzlyT2NwTQ?oc=5",
+              "snippet": "Market Take | Anthropic Investor Day: Can New Revenue Numbers Revive the AI Trade? Moomoo",
+              "published": "Tue, 13 Oct 2026 07:00:00 GMT",
+              "published_at": "2026-10-13T07:00:00+00:00",
+              "retrieved_at": "2026-11-21T12:35:28.823965+00:00"
+            },
+            {
+              "title": "Anthropic reveals it will pay $600,000 for someone to shape its tricky IPO story - Business Insider",
+              "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQRDNhRm4tcXpZYXBXUjJISTJsal9Wb1hVaWhJU3ZLTXNmZ1ZyQ1JaMFlGZHE4WTV1anRQYk1MQlBqbGdQeTRqWldVRVp2ZnlxaFpkYUJpaGdtdmptdldLdTBIZjdNTkprUXZ1LUhocWJlTF9HbVNRTUJPT0tsRXVZalhhUEVjU3NtdzRZRzh2Wjk?oc=5",
+              "snippet": "Anthropic reveals it will pay $600,000 for someone to shape its tricky IPO story Business Insider",
+              "published": "Fri, 17 Jul 2026 07:00:00 GMT",
+              "published_at": "2026-07-17T07:00:00+00:00",
+              "retrieved_at": "2026-11-21T12:35:28.823965+00:00"
+            },
+            {
+              "title": "Anthropic raises $30B Series G at $380B valuation - Anthropic",
+              "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNaXY3cUsxbGhpVW9tUHAyc0MwNFlEOUJjRVFXYVBHNTBzZDNkakxyTW4yenQ0N3NUMGk0Zk1KbHVyVmprSWtJQzk3dGZjRUQ1QWhvbi00UnBjWlhsb0lPQnFYcDQxUW9BWFMteEVfekdvSG5acDRHU1pDQXB0M2M2WlhqclE1VGJfSUNXOXRZYmI2THlDYWp4MzlUcGdlWnB1enJpUXVUclBvZU5O?oc=5",
+              "snippet": "Anthropic raises $30B Series G at $380B valuation Anthropic",
+              "published": "Thu, 12 Feb 2026 08:00:00 GMT",
+              "published_at": "2026-02-12T08:00:00+00:00",
+              "retrieved_at": "2026-11-21T12:35:28.823965+00:00"
+            }
+          ]
+        },
+        {
+          "tool": "read_webpage",
+          "arguments": {
+            "url": "https://www.anthropic.com",
+            "max_chars": 4000
+          },
+          "sources": [
+            {
+              "title": "Home \\ Anthropic",
+              "url": "https://www.anthropic.com/",
+              "retrieved_at": "2026-11-21T12:35:58.030576+00:00",
+              "excerpt": "Home \\ Anthropic\nSkip to main content\nNews Research Policy Commitments\nCompany\nTry Claude\nAI research and products that put safety at the frontier. AI will have a vast impact on the world. Anthropic is a public benefit corporation dedicated to securing its benefits and mitigating its risks.\nANT\nAnnouncements Nov 9, 2026\nIntroducing Fable 5.2 and Mythos 5.2\nOur most capable models for daunting technical work. Claude Fable 5.2 sets a new bar in coding, finance, and the sciences.\nModel Details Fable\nMythos\nSystem Card View\nRead announcement\nAnnouncements Sep 22, 2026\nIntroducing Claude Opus 5.5\nClaude Opus 5.5 leads in agentic coding and knowledge work, and costs 40% less to run than Opus 5 on typical workloads.\nModel Details Opus\nSystem Card View\nRead announcement\nAnnouncements Sep 28, 2026\n"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
