@@ -45,7 +45,7 @@ of at most two tickers a case needs. It never includes computed metrics. Ranking
 no price data because 30 price histories do not fit the service's 32K context, so the raw
 baseline cannot compute volatility-based rankings.
 
-All runs use temperature 0 and max 1,800 output tokens. Model name, provider and context
+All runs use temperature 0. The no-tools baselines use max 1,800 output tokens; the agent uses its own limit (`MAX_TOKENS` in `agent/chat_agent.py`, 1,800 until the ranking fix described in `FAILURE_ANALYSIS.md`, 3,000 after). Model name, provider and context
 mode are stored in every result line.
 
 ## Run it

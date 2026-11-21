@@ -108,6 +108,27 @@ class ChatTests(unittest.TestCase):
             xml.dom.minidom.parse(result['chart_file'])
             self.assertNotIn('<svg', agent.log.read_text(encoding='utf-8'))
 
+    def test_truncated_answer_is_dropped_and_shorter_one_requested(self):
+        replies = iter([('{"answer":"a very long answer that was cut', 'length'), ('{"answer":"Short."}', 'stop')])
+        def fake(messages, base_url, **kwargs):
+            if messages[-1]['content'].startswith('MODEL_FORMAT_ERROR'):
+                self.assertIn('cut off', messages[-1]['content'])
+                self.assertFalse(any('very long answer' in m['content'] for m in messages))
+            content, reason = next(replies)
+            return {'choices': [{'message': {'content': content}, 'finish_reason': reason}]}
+        with tempfile.TemporaryDirectory() as folder:
+            agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl', fake)
+            self.assertEqual(agent.ask('Rank the top 10 stocks'), 'Short.')
+
+    def test_ranking_result_for_model_omits_source_urls(self):
+        with tempfile.TemporaryDirectory() as folder:
+            agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl')
+            shown = json.dumps(agent.dispatch('rank_stocks', {'top_k': 10}))
+            self.assertNotIn('source_url', shown)
+            self.assertLess(len(shown), 20000)
+            self.assertEqual(len(json.loads(shown)['results']), 10)
+            self.assertIn('source_url', agent.log.read_text(encoding='utf-8'))
+
 
 if __name__ == '__main__':
     unittest.main()

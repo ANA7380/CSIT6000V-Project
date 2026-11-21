@@ -192,7 +192,7 @@ Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysi
 | 12 | Create the evaluation set | Cover all three workflows, follow-ups, and invalid/incomplete inputs; verify reference calculations, filters, rankings, and tool outputs. | ✅ | horoling |
 | 13 | Implement the baseline | Use another provider's general-purpose LLM without custom tools; keep prompts and applicable company context identical; record model/API settings. | ✅ | horoling |
 | 14 | Run and compare evaluations | Report numerical accuracy, recommendation quality, trend grounding, explanation grounding, follow-up success, and response time. | ✅ | horoling |
-| 15 | Analyze failures and limitations | Document at least one observed failure, its cause, and mitigation; acknowledge that different models prevent isolating tool-use effects. | X | |
+| 15 | Analyze failures and limitations | Document at least one observed failure, its cause, and mitigation; acknowledge that different models prevent isolating tool-use effects. | ✅ | horoling |
 | 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | X | |
 
 ## Task 1
@@ -344,4 +344,6 @@ Scoring is automatic and heuristic; spot-check before quoting. Known issues from
 - `invalid-04`: asked for a 1-day window, the model silently used 2 days instead of rejecting the request.
 - `invalid-03` is a scorer false negative: the answer correctly says P/E is unavailable, in words the keyword list does not cover.
 - "Qwen, no tools + raw data" has 4 cases that the service rejected with HTTP 400 (prompt too long for the 32K context), so that column is incomplete.
+Task 15: observed failures, their causes and mitigations, scorer errors and limitations are written up in [evaluation/FAILURE_ANALYSIS.md](evaluation/FAILURE_ANALYSIS.md).
+
 - `results/old-agent-8-steps/` keeps the run made with the previous agent (6 tools, 8-step limit) for comparison.

@@ -11,6 +11,7 @@ from analysis_tools import AnalysisTools
 from tool_registry import TOOLS, validate
 
 MAX_STEPS = 12  # model calls allowed per question, including format retries
+MAX_TOKENS = 3000  # output limit per model call; a Top-10 ranking answer needs more than 1,800
 
 SYSTEM = '''You are a financial CSV assistant.
 Use the language of the user's latest message unless they explicitly request another
@@ -144,6 +145,13 @@ class ChatAgent:
             rolling['series_points_logged'] = len(rolling['series'])
             rolling['series'] = rolling['series'][-5:]
             rolling['series_note'] = 'Only latest 5 points shown; full requested series in local calculation log.'
+        if name == 'rank_stocks':
+            # Each stock repeats a long source URL per metric; ten stocks would fill the model context.
+            compact = json.loads(json.dumps(compact))
+            for row in compact['results']:
+                for detail in row.get('metric_details', {}).values():
+                    detail.pop('source_url', None)
+            compact['source_note'] = 'Source URLs omitted here; they are kept in the calculation log.'
         return compact
 
     def ask(self, question):
@@ -163,7 +171,7 @@ class ChatAgent:
             for _ in range(MAX_STEPS):
                 called = time.perf_counter()
                 try:
-                    response = self.call(self.messages, self.base_url, max_tokens=1800, temperature=0)
+                    response = self.call(self.messages, self.base_url, max_tokens=MAX_TOKENS, temperature=0)
                     content = response['choices'][0]['message']['content']
                 except Exception as exc:
                     # Service failures (unreachable, HTTP error, bad payload) belong in the audit log too.
@@ -184,6 +192,12 @@ class ChatAgent:
                 except (ValueError, TypeError, KeyError) as exc:
                     format_error = {'error': str(exc), 'tool_executed': False,
                                     'instruction': 'No tool was executed. Return ONE corrected JSON tool request; do not append an answer or footer. This is a model format/validation error, not a data lookup failure.'}
+                    if response['choices'][0].get('finish_reason') == 'length':
+                        # Repeating the same long answer would be cut off again, so drop it and ask for less.
+                        self.messages.pop()
+                        format_error = {'error': 'Your response was cut off at the output limit, so it was discarded.',
+                                        'tool_executed': False,
+                                        'instruction': 'Answer again, much shorter: one line or table row per stock, round values, and keep the final tools section brief. Return ONE complete JSON object.'}
                     self.record({'event': 'model_format_error', **format_error})
                     self.messages.append({'role': 'user', 'content': 'MODEL_FORMAT_ERROR\n' + json.dumps(format_error)})
                     continue
