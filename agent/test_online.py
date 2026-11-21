@@ -69,11 +69,11 @@ class OnlineTests(unittest.TestCase):
   self.assertEqual(r['provider'],'google');self.assertEqual(len(r['warnings']),1)
   self.assertFalse(relevant('Microsoft MSFT investor relations','cartoons investor relations'))
 
- def test_numeric_claim_needs_actual_cited_values(self):
+ def test_numeric_prose_allowed_with_structural_citation_checks(self):
   e=[{'id':'E1','tool':'read_webpage','result':{'text':'Reported revenue was 27.356495% in 2026.'}}]
   validate_answer('Reported 27.36% in 2026. [E1]',e,require_evidence=True)
-  with self.assertRaises(GroundingError):validate_answer('Revenue was 99%. [E1]',e)
-  with self.assertRaises(GroundingError):validate_answer('Revenue was 27.36%.',e)
+  validate_answer('Derived scenario: 99% in 2027. [E1]',e)
+  with self.assertRaises(GroundingError):validate_answer('Revenue was 27.36%.',e,require_evidence=True)
   with self.assertRaises(GroundingError):validate_answer('See https://invented.example [E1]',e)
 
  def test_rss_dates_are_normalized_for_grounded_answers(self):
@@ -89,7 +89,8 @@ class OnlineTests(unittest.TestCase):
  def test_list_markers_are_not_fact_values(self):
   e=[dict(id='E1',tool='read_webpage',result={'text':'Issuer primary source.'})]
   validate_answer('1. The issuer source is available. [E1]\n2) Read the disclosure. [E1]',e)
-  with self.assertRaises(GroundingError):validate_answer('1. Profit rose 99%. [E1]',e)
+  validate_answer('1. Scenario change: 99%. [E1]',e)
+  with self.assertRaises(GroundingError):validate_answer('Result [E999]',e)
 
  def test_external_agent_loop_and_snapshot(self):
   calls=[]

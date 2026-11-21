@@ -1,6 +1,7 @@
-"""Cited numeric tokens and exact tool evidence support online research output.
+"""Validate answer structure and evidence references, not numerical semantics.
 
-This is a conservative numerical guard, not a proof that qualitative prose is true.
+Numbers, dates, tickers and derived calculations are allowed in model prose.
+Tables and charts remain deterministic; prose accuracy requires evaluation/review.
 """
 import copy
 import json
@@ -20,31 +21,10 @@ def validate_answer(answer, evidence, requested_ids=None, require_evidence=False
         raise GroundingError('Unknown evidence IDs: ' + ', '.join(sorted(cited - known.keys())))
     if require_evidence and not cited:
         raise GroundingError('Cite available results as [E1], or call a tool before answering this data request.')
-    cleaned = re.sub(r'\[E\d+\]', '', answer)
-    # Ordered-list markers are formatting, not financial numeric claims.
-    cleaned = re.sub(r'(?m)^\s*\d+[.)]\s+', '', cleaned)
-    for item in evidence:
-        symbol=item['result'].get('symbol')
-        if symbol:cleaned=cleaned.replace(symbol,'')
-        for row in item['result'].get('results',[]):
-            if isinstance(row,dict) and row.get('symbol'):cleaned=cleaned.replace(row['symbol'],'')
-    cleaned=re.sub(r'\b(?:SMA(?:20|50|200)|RSI14|MACD(?:12/26/9)?)\b','',cleaned,flags=re.I)
-    if re.search(r'https?://',cleaned):
-        raise GroundingError('Do not write URLs in prose; source links are rendered from tool evidence.')
-    # A numeric-token guard is a plausibility check, not semantic fact verification.
-    pattern=r'\d+(?:,\d{3})*(?:\.\d+)?'
-    requested=re.findall(pattern,cleaned)
-    if requested:
-        if not cited:raise GroundingError('Numeric claims need cited tool evidence IDs.')
-        material=json.dumps([known[i]['result'] for i in cited],ensure_ascii=False)
-        supported=[]
-        for token in re.findall(pattern,material):
-            try:supported.append(float(token.replace(',','')))
-            except ValueError:pass
-        for token in requested:
-            value=float(token.replace(',',''))
-            if not any(abs(value-v)<=max(0.005,abs(v)*1e-6) for v in supported):
-                raise GroundingError('Number '+token+' is absent from cited evidence. Remove or correct that claim; do not repeat the invalid answer.')
+    # Numeric accuracy is evaluated against references, not inferred from digit
+    # presence: dates, rounding, derived values and scenario assumptions are valid.
+    if re.search(r'https?://', answer):
+        raise GroundingError('Source links are rendered from tools; do not invent links in prose.')
     return sorted(cited, key=lambda x: int(x[1:]))
 
 
