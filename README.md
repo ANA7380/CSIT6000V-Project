@@ -1,5 +1,11 @@
 # An Explainable AI Agent for Stock Screening and Analysis
 
+## 输出校验更新（2026-11-22）
+
+解释正文允许股票代码、数字、日期、列表序号、四舍五入和明确标注的情景计算。不再按数字字符或与证据数字逐项匹配来拒绝整段回答。硬校验仅检查非空回答、引用 ID 存在、本轮调用工具后提供证据引用，以及正文不直接写 URL（来源链接仍由证据卡片展示）。模型仍须按 prompt 引用依据、区分事实与假设；程序不再保证正文数字正确，数值准确率与语义依据需通过参考测评和人工审核确认。工具参数校验、确定性表格与图表计算保持原有行为。部署中的旧进程需要用新代码重新打包启动；恢复旧会话时，首条 system prompt 会替换为本版本 prompt。
+
+新增模拟多轮回归覆盖“先问 Anthropic，再问腾讯并输出股票代码、百分数、列表和情景推导值”，不代表真实 Qwen 对同一对话已复测。
+
 ## Deploy on the course server
 
 The recommended server deployment runs Qwen and the Agent in **one GPU allocation**. It uses the provided fix's loopback endpoint `127.0.0.1:42865`; a separate CPU job on another node cannot reach that loopback address.

@@ -20,9 +20,9 @@ class ProposalTests(unittest.TestCase):
     def make(self,folder,actions):
         return ChatAgent('http://localhost:8000/v1',Path(folder)/'audit.jsonl',call=scripted(actions))
 
-    def test_fabricated_numbers_are_rejected_then_repaired(self):
+    def test_unknown_references_are_rejected_then_repaired(self):
         with tempfile.TemporaryDirectory() as p:
-            agent=self.make(p,[{'answer':'Revenue growth is 999999%.'},
+            agent=self.make(p,[{'answer':'Revenue growth is 999999%. [E999]'},
                               {'tool':'ticker_metrics','arguments':{'ticker':'0700.HK'}},
                               {'answer':'The result is supported by the frozen dataset. [E1]'}])
             output=agent.ask('Show Tencent growth')
@@ -33,13 +33,17 @@ class ProposalTests(unittest.TestCase):
             self.assertTrue(all('timestamp' in e and 'turn_id' in e for e in events))
             self.assertTrue(all(e['duration_ms']>=0 for e in events if 'duration_ms' in e))
 
-    def test_unknown_citations_and_unverified_dates_are_rejected(self):
-        for answer in ['Revenue is 999999%.','Revenue is ９９９９９９%.', 'Revenue is ²%.','On 2026-01-01.', '[E999] profit', 'https://invented.example/data']:
-            with self.assertRaises(GroundingError):validate_answer(answer,[])
-        self.assertEqual(validate_answer('SMA50 and SMA200 are moving averages.',[]),[])
+    def test_numbers_dates_and_tickers_are_allowed_but_invalid_references_rejected(self):
+        for answer in ['Revenue is 999999%.', 'Revenue is ９９９９９９%.',
+                       'Revenue is ²%.', 'On 2026-01-01.', '0700.HK SMA50/SMA200']:
+            self.assertEqual(validate_answer(answer, []), [])
+        for answer in ['[E999] profit', 'https://invented.example/data', '   ']:
+            with self.assertRaises(GroundingError): validate_answer(answer, [])
+        with self.assertRaises(GroundingError):
+            validate_answer('Revenue is 27.36%.', [], require_evidence=True)
 
     def test_bounded_repair_falls_back_to_verified_results(self):
-        actions=[{'tool':'ticker_metrics','arguments':{'ticker':'0700.HK'}}]+[{'answer':'Margin is 999999% [E1]'}]*11
+        actions=[{'tool':'ticker_metrics','arguments':{'ticker':'0700.HK'}}]+[{'answer':'Margin is 999999% [E999]'}]*11
         with tempfile.TemporaryDirectory() as p:
             agent=self.make(p,actions)
             output=agent.ask('Show margin')
@@ -100,11 +104,11 @@ class ProposalTests(unittest.TestCase):
         answer='The latest fifty/200 crossover is none. [E1]'
         self.assertEqual(validate_answer(answer,evidence),['E1'])
         with self.assertRaises(GroundingError):validate_answer(answer,[])
-        with self.assertRaises(GroundingError):validate_answer('Margin is 200% [E1]',evidence)
+        self.assertEqual(validate_answer('Margin is 200% [E1]',evidence), ['E1'])
         with tempfile.TemporaryDirectory() as p:
             agent=self.make(p,[{'tool':'price_analysis','arguments':{'ticker':'0700.HK','window':60}},
-                               {'answer':'Invalid margin 999999% [E1]'},
-                               {'answer':'Invalid margin 999999% [E1]'}])
+                               {'answer':'Invalid reference 999999% [E999]'},
+                               {'answer':'Invalid reference 999999% [E999]'}])
             output=agent.ask('Show a chart')
             self.assertTrue(agent.last_response['fallback'])
             self.assertNotIn('999999',output)
