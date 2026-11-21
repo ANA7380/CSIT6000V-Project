@@ -67,6 +67,46 @@ class ChatTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     agent.dispatch(name, args)
 
+    def test_timings_and_turn_summary_logged(self):
+        responses = iter(['{"tool":"list_tickers","arguments":{}}', '{"answer":"Done"}'])
+        def fake(messages, base_url, **kwargs):
+            return {'choices': [{'message': {'content': next(responses)}}]}
+        with tempfile.TemporaryDirectory() as folder:
+            agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl', fake)
+            agent.ask('list tickers')
+            events = [json.loads(line) for line in agent.log.read_text(encoding='utf-8').splitlines()]
+            self.assertTrue(all('time' in e for e in events))
+            for kind in ('model', 'tool_result'):
+                self.assertTrue(all(e['seconds'] >= 0 for e in events if e['event'] == kind))
+            turn = events[-1]
+            self.assertEqual((turn['event'], turn['status'], turn['model_calls'], turn['tool_calls']), ('turn', 'ok', 2, 1))
+            self.assertGreaterEqual(turn['seconds'], turn['model_seconds'])
+
+    def test_service_error_logged_and_turn_rolled_back(self):
+        def broken(messages, base_url, **kwargs):
+            raise RuntimeError('Cannot reach the Qwen service or the request timed out.')
+        with tempfile.TemporaryDirectory() as folder:
+            agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl', broken)
+            with self.assertRaises(RuntimeError):
+                agent.ask('Show Tencent metrics')
+            self.assertEqual(len(agent.messages), 1)
+            events = [json.loads(line) for line in agent.log.read_text(encoding='utf-8').splitlines()]
+            error = next(e for e in events if e['event'] == 'model_error')
+            self.assertEqual(error['error_type'], 'RuntimeError')
+            self.assertIn('Cannot reach', error['error'])
+            self.assertEqual((events[-1]['event'], events[-1]['status'], events[-1]['model_calls']), ('turn', 'error', 1))
+
+    def test_price_chart_saved_and_markup_kept_out_of_context(self):
+        import xml.dom.minidom
+        with tempfile.TemporaryDirectory() as folder:
+            agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl')
+            result = agent.dispatch('price_chart', {'ticker': '700', 'window': 60})
+            self.assertNotIn('svg', result)
+            self.assertEqual((result['points'], result['status']), (61, 'ok'))
+            self.assertEqual(agent.charts, [result['chart_file']])
+            xml.dom.minidom.parse(result['chart_file'])
+            self.assertNotIn('<svg', agent.log.read_text(encoding='utf-8'))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -122,6 +122,7 @@ The chat client selects `deepseek_client.py` for local DeepSeek use or the cours
 | `ticker_metrics` | `ticker`, optional `window=252` | Original four metrics |
 | `financial_trends` | `ticker` | Annual profit-margin change, debt/equity growth, ROE |
 | `price_analysis` | `ticker`, optional `window=252`, `rolling_window=20` | Calendar 1/3/6/12-month returns, SMA20/50/200, RSI14, MACD12/26/9, maximum drawdown, rolling volatility, volume ratio, latest 50/200 crossover |
+| `price_chart` | `ticker`, optional `window=252` | Saves an SVG line chart of adjusted close with SMA20/50/200; returns the file path, date range, start/end price, change, high and low |
 | `stock_correlation` | `ticker`, `other_ticker`, optional `window=252` | Correlation of log returns over identical date intervals |
 | `rank_stocks` | Optional `top_k=5`, `weights`, `filters`, `window=252` | Filtered, weighted percentile ranking using the original four metrics |
 
@@ -131,6 +132,7 @@ New implementations are in `analysis_tools.py`. Examples to type into the existi
 - "Show 0700.HK's RSI, MACD, moving averages and 12-month return."
 - "What was Tencent's maximum drawdown over 60 trading sessions? Use 20-day rolling volatility."
 - "Compare the return correlation of 0700.HK and 9988.HK over 60 sessions."
+- "Draw a price chart for Tencent over the last 120 trading days."
 - "Rank the top 5 stocks with net margins at least 0% and debt-to-equity at most 1. Weight revenue growth twice as much as low volatility."
 
 For the last example, the tool arguments should use `weights={"revenue_growth":2,"historical_volatility":1}` and `filters={"net_profit_margin":{"min":0},"debt_to_equity":{"max":1}}`. Bounds are inclusive; say "at least" or "at most" for exact inclusive semantics. Ranking keys are `revenue_growth`, `net_profit_margin`, `debt_to_equity`, and `historical_volatility`. Percent values use whole percentages (10 = 10%); debt-to-equity uses multiples (1 = 1x).
@@ -146,6 +148,8 @@ Net profit margin uses profit attributable to the parent. Financial ratios use t
 Volatility uses the latest 253 observations by default, yielding 252 returns. A shorter available history is used and explicitly labeled `short_history`. The actual start/end dates and observation count are shown. Missing/nonpositive prices inside the selected window produce N/A, not an interpolated or skipped return. Missing financial inputs and nonpositive denominators produce N/A with reasons. Negative net income remains a valid loss margin.
 
 The data is a fixed 18 November 2026 snapshot, with completed prices through 17 November. It is not a live feed. Financial statement dates differ by company; vendor reporting labels and debt definitions retain the limitations in [the dataset notes](agent/data/README.md).
+
+The chat log (`logs/chat.jsonl`, or `--log PATH`) timestamps every event. Model calls and tool executions record their duration in seconds, model service failures are logged as `model_error`, and each turn ends with a `turn` event holding its status, total time, and model/tool call counts. Charts are saved as SVG files in a `charts/` folder next to the chat log and the path is printed after the answer; the web chat does not display them yet.
 
 Each successful request appends parameters, calculation time, formulas, inputs, dates, source URLs, underlying financial observations, values, and statuses to `logs/requests.jsonl` (or `--log PATH`). `--json` also prints the full result.
 
