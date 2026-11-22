@@ -1,4 +1,5 @@
 """One source of truth for model-facing tool definitions and argument validation."""
+MAX_BATCH_TOOLS = 6
 TOOLS = {
     'list_tickers': {
         'description': 'List supported ticker symbols and company names. Use to resolve company names before other tools.',
@@ -49,3 +50,16 @@ def validate(name, args):
             _, low, high = kind.split(':')
             if type(value) is not int or not int(low) <= value <= int(high):
                 raise ValueError(f'{key} must be an integer between {low} and {high}')
+
+
+def validate_batch(calls):
+    """Validate the entire batch before any tool runs; no nested actions."""
+    if not isinstance(calls, list) or not 1 <= len(calls) <= MAX_BATCH_TOOLS:
+        raise ValueError(f'tools must contain 1 to {MAX_BATCH_TOOLS} tool requests')
+    for call in calls:
+        if not isinstance(call, dict) or set(call) - {'tool', 'arguments'}:
+            raise ValueError('Each batch entry must contain only tool and arguments')
+        validate(call.get('tool'), call.get('arguments', {}))
+    # Ranking changes session preferences. Keep it separate from independent reads.
+    if len(calls) > 1 and any(call['tool'] == 'rank_stocks' for call in calls):
+        raise ValueError('Call rank_stocks separately; batch only independent read tools')

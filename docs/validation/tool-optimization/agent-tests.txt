@@ -1,0 +1,74 @@
+test_all_tickers_and_aliases (test_agent.AgentTests.test_all_tickers_and_aliases) ... ok
+test_known_calculations (test_agent.AgentTests.test_known_calculations) ... ok
+test_missing_and_invalid_inputs (test_agent.AgentTests.test_missing_and_invalid_inputs) ... ok
+test_short_history (test_agent.AgentTests.test_short_history) ... ok
+test_bad_inputs (test_analysis_tools.AnalysisTests.test_bad_inputs) ... ok
+test_correlation_matches_both_dates (test_analysis_tools.AnalysisTests.test_correlation_matches_both_dates) ... ok
+test_drawdown_rolling_and_volume (test_analysis_tools.AnalysisTests.test_drawdown_rolling_and_volume) ... ok
+test_entire_universe (test_analysis_tools.AnalysisTests.test_entire_universe) ... ok
+test_financial_years_and_currency (test_analysis_tools.AnalysisTests.test_financial_years_and_currency) ... ok
+test_ranking_ties_filters_and_missing (test_analysis_tools.AnalysisTests.test_ranking_ties_filters_and_missing) ... ok
+test_sma_rsi_macd_and_calendar_returns (test_analysis_tools.AnalysisTests.test_sma_rsi_macd_and_calendar_returns) ... ok
+test_each_catalog_tool_roundtrip (test_analysis_tools.ToolRoutingTests.test_each_catalog_tool_roundtrip) ... ok
+test_invalid_request_is_corrected (test_analysis_tools.ToolRoutingTests.test_invalid_request_is_corrected) ... ok
+test_ambiguous_answers_rejected (test_chat_agent.ChatTests.test_ambiguous_answers_rejected) ... ok
+test_format_error_is_not_tool_failure (test_chat_agent.ChatTests.test_format_error_is_not_tool_failure) ... ok
+test_invalid_tool_arguments (test_chat_agent.ChatTests.test_invalid_tool_arguments) ... ok
+test_ranking_result_for_model_omits_source_urls (test_chat_agent.ChatTests.test_ranking_result_for_model_omits_source_urls) ... ok
+test_service_error_logged_and_turn_rolled_back (test_chat_agent.ChatTests.test_service_error_logged_and_turn_rolled_back) ... ok
+test_timings_and_turn_summary_logged (test_chat_agent.ChatTests.test_timings_and_turn_summary_logged) ... ok
+test_tool_roundtrip (test_chat_agent.ChatTests.test_tool_roundtrip) ... ok
+test_truncated_answer_is_dropped_and_shorter_one_requested (test_chat_agent.ChatTests.test_truncated_answer_is_dropped_and_shorter_one_requested) ... ok
+test_two_objects_recover_lookup_before_answer (test_chat_agent.ChatTests.test_two_objects_recover_lookup_before_answer) ... ok
+test_auth_failure (test_deepseek_client.DeepSeekTests.test_auth_failure) ... ok
+test_missing_key (test_deepseek_client.DeepSeekTests.test_missing_key) ... ok
+test_reject_other_endpoint (test_deepseek_client.DeepSeekTests.test_reject_other_endpoint) ... ok
+test_request_and_answer (test_deepseek_client.DeepSeekTests.test_request_and_answer) ... ok
+test_local_protocol_status_and_restart_restore (test_local_web.LocalWebTests.test_local_protocol_status_and_restart_restore) ... 127.0.0.1 - - [22/Nov/2026 13:04:56] "POST /ask HTTP/1.1" 202 -
+127.0.0.1 - - [22/Nov/2026 13:04:56] "GET /reply/030a6c3226e142fc87636ec621a34966 HTTP/1.1" 202 -
+127.0.0.1 - - [22/Nov/2026 13:04:56] "GET /reply/030a6c3226e142fc87636ec621a34966 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Nov/2026 13:04:56] "POST /ask HTTP/1.1" 403 -
+ok
+test_outside_company_then_tencent_numeric_answer_is_displayed (test_output_policy.OutputPolicyTests.test_outside_company_then_tencent_numeric_answer_is_displayed) ... ok
+test_bounded_repair_falls_back_to_verified_results (test_proposal.ProposalTests.test_bounded_repair_falls_back_to_verified_results) ... ok
+test_chart_matches_prices_and_null_warmup (test_proposal.ProposalTests.test_chart_matches_prices_and_null_warmup) ... ok
+test_context_budget_preserves_complete_turns_and_state (test_proposal.ProposalTests.test_context_budget_preserves_complete_turns_and_state) ... ok
+test_course_qwen_requires_single_leading_system_message (test_proposal.ProposalTests.test_course_qwen_requires_single_leading_system_message) ... ok
+test_direct_tool_arguments_rejected (test_proposal.ProposalTests.test_direct_tool_arguments_rejected) ... ok
+test_failed_model_rolls_back_state_and_can_resume (test_proposal.ProposalTests.test_failed_model_rolls_back_state_and_can_resume) ... ok
+test_grounded_crossover_label_and_bounded_repair (test_proposal.ProposalTests.test_grounded_crossover_label_and_bounded_repair) ... ok
+test_numbers_dates_and_tickers_are_allowed_but_invalid_references_rejected (test_proposal.ProposalTests.test_numbers_dates_and_tickers_are_allowed_but_invalid_references_rejected) ... ok
+test_ranking_preferences_survive_concept_and_top_k_change (test_proposal.ProposalTests.test_ranking_preferences_survive_concept_and_top_k_change) ... ok
+test_unknown_references_are_rejected_then_repaired (test_proposal.ProposalTests.test_unknown_references_are_rejected_then_repaired) ... ok
+test_commit_marker_payload_and_duplicate (test_tacc_deploy.DeploymentTests.test_commit_marker_payload_and_duplicate) ... ok
+test_config_validation (test_tacc_deploy.DeploymentTests.test_config_validation) ... ok
+test_invalid_marker_does_not_read_outside_folder (test_tacc_deploy.DeploymentTests.test_invalid_marker_does_not_read_outside_folder) ... ok
+test_launcher_is_loopback_and_preserves_course_runtime (test_tacc_deploy.DeploymentTests.test_launcher_is_loopback_and_preserves_course_runtime) ... ok
+test_package_has_only_runtime_files_and_unique_workdir (test_tacc_deploy.DeploymentTests.test_package_has_only_runtime_files_and_unique_workdir) ... ok
+test_sdk_error_even_with_zero_exit_status (test_tacc_deploy.DeploymentTests.test_sdk_error_even_with_zero_exit_status) ... ok
+test_supervisor_readiness_runtime_and_cleanup (test_tacc_deploy.DeploymentTests.test_supervisor_readiness_runtime_and_cleanup) ... ok
+test_batch_limits_and_mixed_actions (test_tool_optimization.ToolOptimizationTests.test_batch_limits_and_mixed_actions) ... ok
+test_batch_results_rolled_back_after_transport_failure (test_tool_optimization.ToolOptimizationTests.test_batch_results_rolled_back_after_transport_failure) ... ok
+test_batch_validated_before_any_tool_runs (test_tool_optimization.ToolOptimizationTests.test_batch_validated_before_any_tool_runs) ... ok
+test_cache_does_not_cross_turns (test_tool_optimization.ToolOptimizationTests.test_cache_does_not_cross_turns) ... ok
+test_cached_ranking_does_not_duplicate_history (test_tool_optimization.ToolOptimizationTests.test_cached_ranking_does_not_duplicate_history) ... ok
+test_compact_ranking_keeps_values_and_periods_without_mutation (test_tool_optimization.ToolOptimizationTests.test_compact_ranking_keeps_values_and_periods_without_mutation) ... ok
+test_distinct_windows_are_not_deduplicated (test_tool_optimization.ToolOptimizationTests.test_distinct_windows_are_not_deduplicated) ... ok
+test_overview_batch_keeps_both_evidence_cards_and_chart (test_tool_optimization.ToolOptimizationTests.test_overview_batch_keeps_both_evidence_cards_and_chart) ... ok
+test_repeated_format_failures_keep_verified_results (test_tool_optimization.ToolOptimizationTests.test_repeated_format_failures_keep_verified_results) ... ok
+test_repeated_format_failures_stop_early (test_tool_optimization.ToolOptimizationTests.test_repeated_format_failures_stop_early) ... ok
+test_runtime_error_in_batch_preserves_other_results (test_tool_optimization.ToolOptimizationTests.test_runtime_error_in_batch_preserves_other_results) ... ok
+test_same_turn_alias_and_default_deduplication (test_tool_optimization.ToolOptimizationTests.test_same_turn_alias_and_default_deduplication) ... ok
+test_follow_up_through_bridge_and_worker (test_web_chat.WebChatTest.test_follow_up_through_bridge_and_worker) ... 127.0.0.1 - - [22/Nov/2026 13:05:01] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [22/Nov/2026 13:05:01] "POST /ask HTTP/1.1" 202 -
+127.0.0.1 - - [22/Nov/2026 13:05:01] "GET /reply/91bfaa6da04b4dcca6610fec141d737e HTTP/1.1" 202 -
+127.0.0.1 - - [22/Nov/2026 13:05:01] "GET /reply/91bfaa6da04b4dcca6610fec141d737e HTTP/1.1" 200 -
+127.0.0.1 - - [22/Nov/2026 13:05:01] "POST /ask HTTP/1.1" 202 -
+127.0.0.1 - - [22/Nov/2026 13:05:01] "GET /reply/1a281cfea512470f837d6dd97a437b3b HTTP/1.1" 202 -
+127.0.0.1 - - [22/Nov/2026 13:05:01] "GET /reply/1a281cfea512470f837d6dd97a437b3b HTTP/1.1" 200 -
+ok
+
+----------------------------------------------------------------------
+Ran 58 tests in 9.069s
+
+OK

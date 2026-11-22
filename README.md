@@ -1,895 +1,407 @@
-# An Explainable AI Agent for Stock Screening and Analysis
+# Explainable Stock Research Agent
 
-**Course:** CSIT6000V – Advanced AI Computing and Systems
+**Course:** CSIT6000V - Advanced AI Computing and Systems  
+**Repository:** [ANA7380/CSIT6000V-Project](https://github.com/ANA7380/CSIT6000V-Project)  
+**Team:** CHEN Zhaoyu Jensen, DUAN Zihang Raymond, Gan Hounan Edward, Zhu Yuhan Christo
 
-**Project:** Stock Research Agent
+A conversational research application for financial screening and historical analysis of 30 Hong Kong-listed technology companies. Deterministic Python tools calculate financial metrics, rankings and technical indicators; an LLM selects tools and explains the results with evidence references.
 
-**Team Members:** CHEN Zhaoyu Jensen, DUAN Zihang Raymond, Gan Hounan Edward, Zhu Yuhan Christo
+The application supports company analysis, configurable Top-K screening, historical charts, and contextual follow-up questions. It uses a fixed dataset collected on 18 November 2026, with daily prices through 17 November 2026.
 
----
+The documentation follows the two-part [NSDI '27 artifact README guidance](https://www.usenix.org/conference/nsdi27/call-for-artifacts#readme-instructions): a quick functionality check followed by complete evaluation instructions.
+
+**Evaluation status.** The latest runtime revision passes offline regression tests. The recorded 41/43 model results are from the earlier merged Agent; they are reported separately from the current offline validation. A new 43-case live benchmark and browser visual acceptance test remain pending. The SDK comparison measures operation counts, not a real-platform speedup.
 
 ## Getting Started Instructions
 
-### 1. Project Overview
+### G1. Prerequisites and access
 
-Stock research often requires investors to collect financial information, compare companies, and interpret historical market movements from different sources. This process can be time-consuming, especially for users without financial analysis experience. At the same time, general-purpose AI models may generate inaccurate financial figures or explanations that are not supported by reliable data.
+| Path | Requirements | What it checks |
+|---|---|---|
+| Offline quick start | Git, Python 3.9+, ordinary CPU machine; Linux/WSL recommended | Real CSV calculations, tests, and a scripted interface; no LLM |
+| TACC application | Configured course `tcloud` SDK and account, course project runtime/model access, allocation for two GPUs | Qwen, tools, worker, and browser bridge |
+| Local live alternative | Python 3.9+, internet access, `DEEPSEEK_API_KEY` | Live DeepSeek with local tools |
 
-This project develops an explainable Stock Research Agent that combines a large language model (LLM), structured financial data, and deterministic Python analysis tools. Users can interact with the system through a browser-based chat interface and receive financial analysis supported by numerical results, evidence, and visualizations.
+The application, offline tests, and evaluation runner use Python's standard library. Git and the course SDK are external tools. Playwright/Chrome are needed only for the optional browser acceptance scripts. Model weights and GPU libraries are supplied by the course TACC environment, not installed by this repository.
 
-The system supports three main tasks:
-
-1. **Individual Stock Analysis:** Retrieve a company's financial metrics, historical prices, technical indicators, and supporting evidence.
-2. **Stock Screening and Ranking:** Apply financial conditions and return a configurable Top-K ranking based on weighted financial metrics.
-3. **Historical Trend Analysis:** Analyze historical price movements, returns, and technical indicators to identify historical market signals without predicting future prices.
-
-The system also supports follow-up questions, allowing users to compare companies, understand indicators, and modify previous screening conditions.
-
-The current dataset covers 30 Hong Kong-listed technology companies.
-
-### 2. Main Features
-
-- Natural-language interaction with the stock research agent.
-- Financial analysis based on structured CSV datasets.
-- Deterministic calculation of financial metrics and technical indicators.
-- Filter-based stock screening and configurable weighted ranking.
-- Historical price charts, moving averages, and rolling-volatility visualizations.
-- Evidence-linked explanations and source information.
-- Contextual follow-up questions and reusable ranking preferences.
-- Multiple browser conversations with conversation history and restart recovery.
-- Qwen deployment on the course TACC environment and an alternative local DeepSeek API integration.
-
-### 3. Repository Structure
-
-The main project components are organized as follows:
-
-```text
-CSIT6000V-Project-main/
-│
-├── agent/
-│   ├── agent.py
-│   ├── analysis_tools.py
-│   ├── chat_agent.py
-│   ├── tool_registry.py
-│   ├── evidence.py
-│   ├── session_store.py
-│   ├── qwen_client.py
-│   ├── deepseek_client.py
-│   ├── local_web.py
-│   ├── web_worker.py
-│   ├── web_bridge.py
-│   ├── chat.html
-│   └── data/
-│       ├── hk_tech30_snapshot.csv
-│       ├── hk_tech30_daily_prices.csv
-│       ├── hk_tech30_financials.csv
-│       └── README.md
-│
-├── deploy/
-│   └── tacc/
-│       ├── job.sh
-│       ├── supervisor.py
-│       ├── server_entry.py
-│       └── tuxiv.conf
-│
-├── evaluation/
-│   ├── cases.py
-│   ├── cases.json
-│   ├── run_eval.py
-│   ├── score.py
-│   ├── test_eval.py
-│   ├── bundle.sh
-│   ├── job.sh
-│   ├── offline/
-│   └── results/
-│
-├── scripts/
-│   ├── tacc.py
-│   ├── export_snapshot.py
-│   └── prepare_hk_csv_data.py
-│
-├── docs/
-│   ├── VALIDATION.md
-│   └── ...
-│
-├── qwen27b-student-release/
-├── .env.example
-└── README.md
-```
-
-### 4. Prerequisites
-
-Choose one of the following execution paths.
-
-| Execution path | Requirements |
-|---|---|
-| Offline testing | Python 3.9 or later |
-| Local DeepSeek | Python 3.9 or later, internet access, and a DeepSeek API key |
-| TACC Qwen deployment | Active course TACC account, configured `tcloud` SDK, access to the course runtime, and the required GPU allocation |
-
-The deterministic tools, unit tests, and offline evaluation use Python's standard library. No additional Python packages are required for these checks.
-
-For TACC deployment, use the course-supported Linux/WSL environment and configure the `tcloud` SDK according to the course instructions.
-
-### 5. Obtain the Repository
-
-Clone the group repository:
+Keep API credentials and private keys in the local environment, outside the repository.
 
 ```bash
 git clone https://github.com/ANA7380/CSIT6000V-Project.git
 cd CSIT6000V-Project
+python3 --version
+git rev-parse HEAD
 ```
 
-The repository URL should be replaced with the actual group GitHub URL.
+Record the checkout hash with new experiments. These instructions apply to the runtime-review revision, including `docs/RUNTIME_REVIEW.md`, `scripts/reproduce_tacc_eval.py`, and the 77-test Agent suite.
 
-### 6. Quick Verification
+### G2. Quick verification without a model
 
-Before starting a model service, verify the deterministic components and evaluation scripts.
-
-**Step 1: Run the agent unit tests.**
-
-From the repository root:
+Run from the repository root:
 
 ```bash
 python3 -m unittest discover -s agent -v
-```
-
-Expected result:
-
-```text
-Ran 46 tests
-OK
-```
-
-**Step 2: Verify the committed data snapshot.**
-
-```bash
+python3 -m unittest discover -s evaluation -v
+python3 -m unittest discover -s scripts \
+  -p test_reproduce_tacc_eval.py -v
 python3 scripts/export_snapshot.py --check
-```
-
-Expected output includes the following dataset sizes:
-
-| Dataset | Expected rows |
-|---|---:|
-| `hk_tech30_snapshot.csv` | 30 |
-| `hk_tech30_daily_prices.csv` | 13,919 |
-| `hk_tech30_financials.csv` | 816 |
-
-The command also checks the committed CSV exports against their deterministic snapshot hashes.
-
-**Step 3: Run evaluation unit tests.**
-
-```bash
-cd evaluation
-python3 -m unittest -v
-cd ..
-```
-
-Expected result:
-
-```text
-Ran 10 tests
-OK
-```
-
-**Step 4: Run the independent offline evaluation.**
-
-```bash
 python3 evaluation/offline/run.py \
-  --mode offline \
-  --output evaluation/runs/offline-quickcheck
+  --mode offline --output evaluation/runs/offline-quickcheck
 ```
 
-For the current dataset and test configuration, the offline run should report:
+Expected results:
 
-- 42 evaluation turns.
-- 48/48 numerical checks passed.
-- 18/18 ranking checks passed.
-- 0 execution errors.
+| Check | Expected output |
+|---|---|
+| Agent tests | `Ran 77 tests`, then `OK` |
+| Evaluation tests | `Ran 10 tests`, then `OK` |
+| Co-located evaluation packaging tests | `Ran 3 tests`, then `OK`; these use mocked commands |
+| Snapshot check | 30 company rows, 13,919 price rows, 816 financial rows; hash check succeeds |
+| Independent offline evaluation | 42 turns, 0 errors, 48/48 numeric checks and 18/18 ranking checks |
 
-This is a deterministic calculation and regression check. It does not measure live LLM performance.
+Local offline checks completed in under two minutes; runtime varies by machine. They validate calculation and orchestration behavior, not live LLM quality or TACC latency. Evaluation outputs are saved under the supplied `--output` directory.
 
-### 7. End-to-End Example: TACC Qwen Deployment
+### G3. Quick-start example
 
-The recommended demonstration path runs Qwen and the Stock Research Agent within one course GPU allocation.
-
-**Step 1: Check the TACC configuration.**
+First run one real deterministic calculation:
 
 ```bash
+python3 agent/agent.py 0700.HK --window 60 --json \
+  --log var/quickstart-metrics.jsonl
+```
+
+Expected: a JSON result for `0700.HK` / Tencent, including `Revenue growth`, `Net profit margin`, `Debt-to-equity`, and `Historical volatility`, with values or explicit availability flags, reporting periods, formulas, and source inputs. The calculation audit is saved to the specified JSONL file.
+
+Then exercise the browser-to-backend-to-tool path without a model:
+
+```bash
+python3 agent/demo_web.py --port 8765
+```
+
+Open `http://127.0.0.1:8765/`. The page explicitly says **OFFLINE SCRIPTED DEMO / No LLM is connected**. Click **Tencent overview + chart**, then **Send**. Expected: core metric tables, evidence IDs, a price/moving-average chart, and a rolling-volatility chart. Start another conversation, use the ranking example, then ask `Keep the same criteria and show the top 10.` The deterministic ranking should update Top-K while retaining its filters.
+
+This fixture verifies the interface and orchestration with real frozen data, not autonomous model behavior. Press Ctrl+C to stop it before starting another local server on the same port. Browser visual acceptance of the latest UI remains pending; HTTP-level tests cover the request/result flow.
+
+### G4. TACC deployment
+
+Use the same Ubuntu/WSL terminal in which your course SDK works:
+
+```bash
+command -v tcloud
 python3 scripts/tacc.py preflight
-```
-
-Confirm that the configured SDK can list the available environments and query the scheduler.
-
-**Step 2: Submit the application.**
-
-```bash
 python3 scripts/tacc.py submit \
-  --mode web \
-  --namespace stock-demo \
-  --minutes 60
+  --mode web --namespace stock-demo --minutes 60
 ```
 
-The command packages the application and submits the job. Record the returned `JOB_ID`.
-
-**Step 3: Wait for application readiness.**
+Record the actual `JOB_ID` and replace it in subsequent commands:
 
 ```bash
 python3 scripts/tacc.py status JOB_ID
 ```
 
-Wait until the log reports:
-
-```text
-MODEL_READY=...
-LIVE_SMOKE_PASSED=...
-Chat ready
-```
-
-A running Slurm job alone does not mean the model and browser application are ready.
-
-**Step 4: Start the browser bridge.**
+Wait for `MODEL_READY`, `LIVE_SMOKE_PASSED`, and **Chat ready**. Slurm state `R` or `MODEL_READY` alone is insufficient. Queue time and model startup can take several minutes and depend on the platform; do not repeatedly submit while waiting.
 
 ```bash
-python3 scripts/tacc.py bridge JOB_ID
+python3 scripts/tacc.py bridge JOB_ID --local-ui
 ```
 
-Open the localhost URL printed by the command in your browser.
-
-**Step 5: Test the application.**
-
-Enter the following question:
+Open the printed localhost URL. `--local-ui` uses this checkout's page, including timing details. Ask:
 
 ```text
-Show all four metrics for 0700.HK
+Analyze 0700.HK's historical trend. Show moving averages and RSI.
+Do not predict future prices.
 ```
 
-Expected behavior:
+Expected: a `price_analysis` evidence card, historical charts, SMA and RSI values with dates, and a cited explanation restricted to historical observations. For the committed snapshot, RSI14 is approximately 35.98; SMA20, SMA50, and SMA200 are approximately HKD 396.07, 415.62, and 464.87. Wording can vary. These expected values are dataset checks, not current market quotes.
 
-- The agent identifies 0700.HK as Tencent.
-- It invokes the relevant financial and price-analysis tools.
-- The browser displays the four core metrics with units and reporting periods.
-- Evidence cards provide the calculation details and data context.
-- Historical price and technical-indicator visualizations are displayed.
-
-Then ask a follow-up:
+For a follow-up test, ask:
 
 ```text
-Now use 60 trading days for volatility.
+Rank the top 3 by net profit margin only, with margin at least 10%.
 ```
 
-The agent should retain the company context and apply the requested volatility window.
+Then ask `Keep the same filters and weights, but return the top 5.` Expected: the stored margin filter and single-metric weights remain, while Top-K changes. Inspect the evidence arguments, not only the prose.
 
-Another example is:
-
-```text
-Rank the top 5 stocks with net profit margin at least 10% and debt-to-equity at most 0.5.
-```
-
-The system should return eligible companies, their financial values, and the ranking results with supporting evidence.
-
-**Step 6: Stop the deployment.**
-
-After testing, release the allocation:
+Save results and release the allocation:
 
 ```bash
 python3 scripts/tacc.py download JOB_ID
 python3 scripts/tacc.py stop JOB_ID
 ```
 
-### 8. Alternative: Local DeepSeek Chat
+Ctrl+C stops the local bridge only. It does not cancel the GPU job. The application and Qwen share one allocation; `127.0.0.1:42865` is internal to that node. Do not use that loopback address from a separate evaluation job or laptop.
 
-The application can also run locally using the DeepSeek API.
+### G5. Local DeepSeek deployment
 
-Set the API key in the terminal:
+Configure the key in the terminal environment, then run (replace the example value):
 
 ```bash
 export DEEPSEEK_API_KEY='YOUR_DEEPSEEK_API_KEY'
+python3 agent/local_web.py --provider deepseek --port 8765
 ```
 
-Start the browser application from the repository root:
-
-```bash
-python3 agent/local_web.py --provider deepseek
-```
-
-Open the local URL printed by the application, normally:
-
-```text
-http://127.0.0.1:8765/
-```
-
-The local agent executes the Python tools on the user's machine and sends model requests to DeepSeek.
-
-The default model is `deepseek-flash`. The model can be changed through the `DEEPSEEK_MODEL` environment variable.
-
-API usage may incur charges. Never commit API keys or other credentials to GitHub.
-
----
+The default configured model is `deepseek-flash`; `DEEPSEEK_MODEL` overrides it. Requests are sent to DeepSeek and may incur API charges. The same Python tools and fixed data run locally. No GPU is needed for local tool execution.
 
 ## Detailed Instructions
 
-### 1. System Architecture
+### D1. Architecture and repository layout
 
-The system follows an application-managed tool-calling architecture.
+| Location | Purpose |
+|---|---|
+| `agent/` | Calculations, six tools, JSON action protocol, evidence, state, transports, web UI/bridge/worker, tests |
+| `agent/data/` | The three application CSVs and dataset documentation |
+| `data/snapshot_2026-11-18/` | Frozen source snapshot used by independent offline references |
+| `deploy/tacc/` | Co-located model/worker startup and supervision |
+| `evaluation/cases.json`, `cases.py` | Frozen 43-case model test set and reference construction |
+| `evaluation/offline/` | Independent references and deterministic evaluation |
+| `evaluation/results/` | Archived per-case model outputs, summaries, and failed checks |
+| `evaluation/bridge-baseline/` | Frozen pre-review bridge source for the SDK-operation comparison |
+| `scripts/` | Packaging, snapshot checks, scoring/reproduction helpers, local comparison scripts |
+| `docs/` | Architecture, deployment, failure/validation records, and runtime review |
 
-The LLM is responsible for understanding user requests, selecting tools, extracting parameters, and generating explanations. Financial calculations are performed by deterministic Python functions rather than relying on the model to calculate numerical results directly.
-
-The overall workflow is:
-
-```text
-User
- |
- v
-Browser Chat Interface
- |
- v
-Python Backend / Chat Agent
- |
- v
-Qwen on TACC or DeepSeek API
- |
- v
-Structured JSON Tool Request
- |
- v
-Tool Registry and Argument Validation
- |
- v
-Python Financial Analysis Tools
- |
- v
-CSV Dataset and Deterministic Calculations
- |
- v
-Evidence and Tool Results
- |
- v
-LLM Explanation
- |
- v
-Browser Tables, Charts and Final Response
-```
-
-The application uses a JSON-based action protocol rather than depending on provider-native function-calling APIs.
-
-Each model call returns either a tool request or a final answer. Tool requests are validated against the registered tool definitions before execution.
-
-The Agent maintains conversation context and relevant ranking preferences. A bounded execution loop handles tool interactions and response validation. Failed turns are rolled back instead of committing incomplete conversation state.
-
-The browser renders financial tables and charts directly from deterministic tool results. The model provides the accompanying explanation and evidence references.
-
-### 2. Available Tools
-
-The current implementation provides six main tools.
+The browser sends a request to a Python backend. The LLM returns an allowlisted tool request, a batch of independent read-tool requests, or an answer. The application validates arguments, executes Python tools, and supplies evidence to the model. Tables and charts are generated directly from tool results. The backend keeps conversation context and ranking preferences, and rolls back failed turns.
 
 | Tool | Function |
 |---|---|
-| `list_tickers` | Lists all supported stock symbols and company names. |
-| `ticker_metrics` | Calculates revenue growth, net profit margin, debt-to-equity, and historical volatility. |
-| `financial_trends` | Calculates annual profit-margin changes, debt growth, equity growth, and ROE. |
-| `price_analysis` | Calculates historical returns, moving averages, RSI, MACD, drawdown, volatility, and volume indicators. |
-| `stock_correlation` | Calculates Pearson correlation between two stocks using matched historical log returns. |
-| `rank_stocks` | Applies financial filters and returns a configurable Top-K weighted ranking. |
+| `list_tickers` | Supported company/symbol lookup |
+| `ticker_metrics` | Four core financial/volatility metrics |
+| `financial_trends` | Comparable annual margin change, debt/equity growth, ROE |
+| `price_analysis` | Returns, SMAs, Wilder RSI14, MACD, drawdown, rolling volatility, volume ratio |
+| `stock_correlation` | Pearson correlation of matched adjusted-close log-return intervals |
+| `rank_stocks` | Mandatory financial filters followed by weighted percentile ranking |
 
-All tools are registered in `agent/tool_registry.py`, which defines their parameters, required arguments, and validation rules.
+The latest protocol allows at most six independent reads in a batch. Rankings run separately because they update preferences. Successful identical requests are reused within one user turn; changed parameters and later turns are recalculated. The total model-call budget is 12. Consecutive format/truncation failures and repeated answer-validation failures have separate bounded repair paths. See `agent/chat_agent.py` and `tool_registry.py` for the executable rules.
 
-#### Example Tool Usage
+### D2. Data and calculation configuration
 
-Individual stock analysis:
+The snapshot contains 30 companies, 13,919 daily price observations, and 816 financial observations. Coverage and financial reporting dates vary by company. Inputs and provenance are documented in [the dataset notes](agent/data/README.md).
 
-```text
-Show Tencent's ROE, debt growth and change in profit margin.
-```
-
-Technical analysis:
-
-```text
-Show 0700.HK's RSI, MACD, moving averages and 12-month return.
-```
-
-Stock correlation:
-
-```text
-Compare the return correlation of 0700.HK and 9988.HK over 60 sessions.
-```
-
-Custom ranking:
-
-```text
-Rank the top 5 stocks with net margins at least 10%
-and debt-to-equity at most 0.5.
-```
-
-The ranking tool supports:
-
-- Mandatory minimum and maximum filters.
-- Configurable Top-K.
-- Custom metric weights.
-- Reuse of previous ranking parameters through `reuse_previous=true`.
-- Explicit removal of previous filters when `filters={}` is supplied.
-
-For example, if a user changes the requested Top-K after an earlier ranking, the Agent can retain the existing screening conditions instead of requiring the user to repeat them.
-
-### 3. Dataset and Data Processing
-
-The project uses a fixed dataset covering 30 Hong Kong-listed technology companies.
-
-The dataset was collected on **18 November 2026**, with daily prices complete through **17 November 2026**.
-
-Three CSV files provide the main financial inputs.
-
-| File | Description |
-|---|---|
-| `hk_tech30_snapshot.csv` | One row per company, containing the latest collected financial inputs, selected quote information, reporting dates, and source information. |
-| `hk_tech30_daily_prices.csv` | Historical daily OHLCV data, including adjusted closing prices and trading volume. |
-| `hk_tech30_financials.csv` | Historical financial observations across different reporting periods. |
-
-The data contains:
-
-- 30 company snapshot records.
-- 13,919 daily price observations.
-- 816 financial observations.
-
-The data is stored locally and is not refreshed automatically during user conversations.
-
-Financial reporting dates, currencies, and available historical periods can differ between companies. The implementation preserves this information instead of treating all observations as directly comparable.
-
-See [`agent/data/README.md`](agent/data/README.md) for the detailed dataset documentation, source information, and data-quality notes.
-
-**Missing-data handling:**
-
-- Missing financial inputs return `N/A` with an explanation.
-- Negative net income is retained as a valid loss margin.
-- Missing or invalid prices are not silently interpolated.
-- Short historical price records are explicitly identified.
-- Stocks missing required metrics are excluded from ranking.
-
-### 4. Financial Metrics and Calculation Methods
-
-The four core financial metrics are calculated as follows.
-
-| Metric | Formula | Preferred direction in ranking |
+| Core metric | Definition | Favorable ranking direction |
 |---|---|---|
-| Revenue Growth | `(Current Revenue / Prior-year Revenue - 1) × 100` | Higher |
-| Net Profit Margin | `(Net Income / Revenue) × 100` | Higher |
-| Debt-to-Equity | `Total Debt / Stockholders' Equity` | Lower |
-| Historical Volatility | `Sample Standard Deviation of Daily Log Returns × √252 × 100` | Lower |
+| Revenue growth | `(revenue / matching prior-year revenue - 1) * 100` | Higher |
+| Net profit margin | `net income / revenue * 100` | Higher |
+| Debt-to-equity | `total debt / stockholders equity` | Lower |
+| Historical volatility | Sample standard deviation of daily adjusted-close log returns, multiplied by `sqrt(252) * 100` | Lower |
 
-Percentage outputs use whole percentage values. For example, `10` represents 10%.
+Percent values use whole percentages: `10` means 10%. Debt/equity is a multiple. Default volatility lookback is 252 returns. Default ranking is Top-5 with equal weights across the four core metrics. Filters are applied before percentile scoring; weights are normalized, ties use midranks, and symbol order breaks equal final scores. Only metrics required by positive weights or filters determine missing-data exclusions.
 
-Historical volatility uses adjusted closing prices and is annualized using 252 trading days.
+Negative net income remains a valid loss margin. Nonpositive denominators and invalid prices produce unavailable results or errors, not invented values. Required short volatility histories are excluded from rankings. Historical analysis preserves unavailable/short-history flags and reporting periods. There is no price-forecasting model or backtest.
 
-#### Stock Ranking
+### D3. Cases, baselines, metrics, and configuration
 
-The ranking process consists of the following steps:
+The model suite has **43 cases, 85 checks, and 49 executed turns**. A multi-turn case is counted once; follow-up checks assess the specified turn. The independent offline suite has 30 scenarios and 42 turns and is a separate evaluation.
 
-1. Apply mandatory financial filters to the supported stock universe.
-2. Exclude companies with missing required metrics.
-3. Calculate percentile scores for the selected metrics.
-4. Reverse the score direction for debt-to-equity and historical volatility, since lower values are preferred.
-5. Normalize the user-specified weights.
-6. Calculate the final weighted score and sort eligible stocks.
-
-The default configuration assigns equal weights to the four core metrics:
-
-- Revenue Growth: 25%
-- Net Profit Margin: 25%
-- Debt-to-Equity: 25%
-- Historical Volatility: 25%
-
-The user can change the weights and request a different Top-K.
-
-The ranking represents a descriptive screening result based on the selected criteria, not a prediction of future stock performance.
-
-#### Historical Technical Indicators
-
-The `price_analysis` tool supports:
-
-| Indicator | Description |
-|---|---|
-| Historical Returns | 1-, 3-, 6-, and 12-month returns. |
-| SMA20 / SMA50 / SMA200 | Simple moving averages over different trading windows. |
-| RSI14 | Relative Strength Index using Wilder smoothing. |
-| MACD | MACD line, signal line, and histogram. |
-| Maximum Drawdown | Largest historical decline from a running price peak within the selected window. |
-| Rolling Volatility | Annualized volatility over a configurable rolling window. |
-| Volume Ratio | Latest trading volume relative to the previous 20-session average. |
-| SMA Crossover | Identifies the latest SMA50/SMA200 upward or downward crossover. |
-
-The project focuses on historical analysis. It does not implement a validated future-price forecasting model or a backtesting system.
-
-### 5. Evaluation Methodology
-
-The main model-based evaluation contains **43 test cases and 85 individual checks**.
-
-The cases are divided into five categories.
-
-| Category | Number of cases | Evaluation focus |
+| Model-case category | Cases | Coverage |
 |---|---:|---|
-| Individual Analysis | 11 | Core metrics, ticker resolution, financial trends, missing data, and historical volatility. |
-| Ranking | 9 | Financial filters, custom weights, ranking order, and configurable Top-K. |
-| Historical Trend | 10 | Returns, moving averages, RSI, MACD, drawdown, and historical signals. |
-| Follow-up | 6 | Context retention and modification of previous conditions. |
-| Invalid Inputs | 7 | Unknown tickers, missing company information, unsupported metrics, and invalid parameters. |
-| **Total** | **43** | **85 checks** |
+| Individual | 11 | Metrics, name resolution, windows, financial trends, missing/short data |
+| Ranking | 9 | Filters, weights, order, empty results, Top-K |
+| Historical trend | 10 | Indicators, returns, historical labels, no prediction |
+| Follow-up | 6 | Retaining and updating conversation conditions |
+| Invalid/incomplete input | 7 | Missing company, unknown ticker, unsupported data, invalid arguments |
 
-Reference answers are generated from the deterministic Python tools in `agent/`, rather than manually entering expected numerical values.
+The runner supports `agent` and `notools`, providers `qwen` and `deepseek`, and no-tool contexts `none` or `raw`. The `raw` baseline receives selected raw inputs, not computed metrics. It contains full histories for at most two required tickers; ranking cases lack all-company price histories because of context constraints. Baselines therefore have documented information/context limits.
 
-The evaluation compares the proposed tool-augmented Agent against no-tool LLM baselines.
+The current configuration uses temperature 0 and max 1,800 output tokens per call. Qwen requests use the configured `qwen3.8-27b` service with thinking disabled. DeepSeek uses the configured model name and JSON output mode. Preserve model, provider, context, usage, and deployment settings with each run. A provider alias or serving implementation may change independently of this repository.
 
-The tested systems include:
+Metrics are: numeric agreement with references; Top-K precision, constraint compliance and exact order; trend-value/label checks; support for numerical claims in explanations; follow-up checks; and runner response time. The heuristic numerical scorer accepts reference rounding within its documented tolerance and ignores sign in some matches. It does not establish that a number belongs to the correct metric or that all prose is semantically supported. Follow-up and invalid-input checks also use keyword/label heuristics. Inspect failed cases and sample passing transcripts.
 
-- Qwen Agent with financial tools.
-- Qwen without custom tools.
-- Qwen without tools but with raw financial data.
-- DeepSeek without custom tools.
-- DeepSeek without tools but with raw financial data.
-- DeepSeek running the merged tool-augmented Agent.
+### D4. Main results and their evidence
 
-The no-tool baseline receives the same user questions but must answer without invoking the project's custom financial tools.
-
-The raw-data baseline additionally receives selected original financial inputs and historical prices, but not the precomputed financial metrics.
-
-### 6. Evaluation Metrics
-
-The project evaluates six main metrics, following the proposal.
-
-| Metric | Measurement |
-|---|---|
-| Numerical Accuracy | Agreement between the model's numerical answers and deterministic reference values. |
-| Recommendation Quality | Top-K precision, financial constraint compliance, and exact ranking order. |
-| Trend Analysis Grounding | Whether historical indicator values and directional labels agree with the reference calculations. |
-| Explanation Grounding | Whether numerical claims in the explanation are supported by the available tool evidence. |
-| Follow-up Success | Whether the Agent preserves and correctly updates previous conversation context. |
-| Response Time | Mean, median, and p90 end-to-end execution time per turn. |
-
-Additional measurements include:
-
-- Invalid-input handling.
-- Model calls per turn.
-- Tokens per turn.
-- Failed turns and transport errors.
-
-The evaluation uses an automatic heuristic scorer. Numerical checks and keyword-based behavior checks cannot fully assess qualitative reasoning. Failure reports and raw transcripts should therefore be reviewed alongside aggregate scores.
-
-### 7. Recorded Evaluation Results
-
-The following results were recorded for the merged Agent on 22 November 2026.
-
-#### 7.1 Merged Agent: Qwen vs DeepSeek
+**Table 1. Recorded merged Agent results (22 November 2026, historical code).**
 
 | Metric | Qwen Agent | DeepSeek Agent |
 |---|---:|---:|
 | Model | `qwen3.8-27b` | `deepseek-flash` |
-| Cases fully passed | 95.3% (41/43) | 95.3% (41/43) |
-| Numerical accuracy | 100% (55/55) | 100% (55/55) |
+| Cases fully passed | 41/43 (95.3%) | 41/43 (95.3%) |
+| Numerical checks | 55/55 | 55/55 |
 | Top-K precision | 98.1% | 100% |
 | Constraint compliance | 100% | 100% |
-| Exact ranking order | 92.3% (12/13) | 100% (13/13) |
-| Trend analysis grounding | 100% (17/17) | 100% (17/17) |
-| Explanation grounding | 97.5% (230/236) | 98.0% (478/488) |
-| Follow-up success | 100% (6/6) | 100% (6/6) |
-| Invalid-input handling | 100% (7/7) | 85.7% (6/7) |
-| Mean response time | 6.6 s | 3.1 s |
-| Median response time | 5.9 s | 2.9 s |
-| p90 response time | 11.0 s | 4.2 s |
-| Model calls per turn | 2.06 | 2.02 |
-| Tokens per turn | 6,164 | 5,703 |
-| Failed turns | 0 of 49 | 0 of 49 |
+| Exact ranking order | 12/13 | 13/13 |
+| Trend checks | 17/17 | 17/17 |
+| Numerical-claim grounding | 230/236 (97.5%) | 478/488 (98.0%) |
+| Follow-up cases | 6/6 | 6/6 |
+| Invalid-input cases | 7/7 | 6/7 |
+| Mean / median / p90 runner time | 6.6 / 5.9 / 11.0 s | 3.1 / 2.9 / 4.2 s |
+| Model calls / tokens per turn | 2.06 / 6,164 | 2.02 / 5,703 |
+| Failed turns | 0/49 | 0/49 |
 
-Detailed outputs are available in:
+Raw sources are `evaluation/results/merged-agent-qwen/agent-qwen.jsonl` and `evaluation/results/merged-agent-deepseek/agent-deepseek.jsonl`; each directory contains its summary and failed checks. Re-scoring these raw files reproduces the table's metrics. It does not rerun inference. The archived rows do not fully identify historical source and hardware state. Fresh runs should record the checkout and deployment configuration; their generation conditions may differ.
 
-- [`evaluation/results/merged-agent-qwen/summary.md`](evaluation/results/merged-agent-qwen/summary.md)
-- [`evaluation/results/merged-agent-deepseek/summary.md`](evaluation/results/merged-agent-deepseek/summary.md)
+**Table 2. Earlier five-system comparison and current re-scoring (same raw outputs).**
 
-#### 7.2 Baseline Comparison
+| System | Archived 21 November summary | Current bundled scorer |
+|---|---:|---:|
+| Qwen Agent | 40/43 (93.0%) | 40/43 (93.0%) |
+| Qwen no tools | 5/43 (11.6%) | 5/43 (11.6%) |
+| Qwen no tools + raw inputs | 8/43 (18.6%), incomplete | 8/43 (18.6%), incomplete |
+| DeepSeek no tools | 3/43 (7.0%) | 3/43 (7.0%) |
+| DeepSeek no tools + raw inputs | 13/43 (30.2%) | 14/43 (32.6%) |
 
-The earlier five-system comparison was conducted on 21 November 2026, before the final merge.
+The DeepSeek raw-input discrepancy is one behavior check, `trend-09`: the current reference/scorer accepts the existing answer's `I can't forecast` wording; the archived per-check CSV marks that check failed. The raw answer is unchanged. This is a scoring-artifact discrepancy, not a new inference result or model improvement. The current scorer therefore reproduces 14/43 for these raw outputs. The archived summary remains unchanged. The two records are available under `evaluation/results/` and `docs/validation/readme-reproduction/`, respectively.
 
-| System | Cases fully passed |
-|---|---:|
-| Qwen Agent with tools | 93.0% (40/43) |
-| Qwen without tools | 11.6% (5/43) |
-| Qwen without tools + raw data | 18.6% (8/43) |
-| DeepSeek without tools | 7.0% (3/43) |
-| DeepSeek without tools + raw data | 30.2% (13/43) |
+The Qwen raw-input run includes six transport-error turns associated with context limits. Treat it as incomplete; it cannot establish a reliable completed-run accuracy. Raw files and the aggregate table are under `evaluation/results/`. Do not combine Tables 1 and 2 into a single same-version experiment. Comparisons across providers reflect whole systems and hardware, not an isolated causal effect of tools.
 
-The Qwen raw-data baseline experienced six transport-error turns due to context-length limitations. Its result is therefore incomplete.
+**Table 3. Current runtime-review evidence (23 November 2026, offline).**
 
-The earlier baseline results and merged Agent results were recorded on different dates and code versions. They should not be treated as a single simultaneous experiment.
+| Check | Observed result |
+|---|---|
+| Agent / evaluation unit tests | 77 / 10 passed |
+| Deterministic outputs and model projections | 156 / 156 match the input runtime-review baseline |
+| Independent offline evaluation | 48/48 numeric checks, 18/18 rankings, 0 errors across 42 turns |
+| SDK calls with 3 pending polls | 9 baseline -> 6 updated |
+| SDK calls with 8 pending polls | 19 baseline -> 12 updated |
+| Completed-result recheck | 1 extra SDK call -> 0 with a cached reply |
 
-The comparison between different model providers evaluates complete systems rather than isolating the causal effect of tool use. The same-provider Qwen no-tool baseline provides a more direct comparison of tool-augmented and non-tool behavior.
+The SDK comparison uses real local HTTP handlers and file-copy fixtures instead of TACC transfers. It demonstrates fewer operations, not a measured platform speedup. Evidence is in `docs/validation/runtime-review/`; [the runtime review](docs/RUNTIME_REVIEW.md) defines each test and timing scope. The reproduction helper also has three offline packaging tests, reported separately from the original runtime-review suite.
 
-#### 7.3 Failure Analysis
+**Timing scope.** Tables 1 and 2 report wall time around the evaluation runner's system call, including model/tool processing. They exclude the browser SDK bridge, allocation wait and model startup. In the UI, Agent and End to end are different scopes. Model API time includes service waiting. Polling can overlap inference, so phase times must not be added. A long browser wait is not automatically slow model inference.
 
-The merged Qwen evaluation had two automatically failed checks. Their details are recorded in:
+### D5. Reproduce the results
 
-[`evaluation/results/merged-agent-qwen/failures.md`](evaluation/results/merged-agent-qwen/failures.md)
+Run all commands from the repository root unless noted. Use new output directories for new inference runs: the runner skips completed cases already present and retries designated transport failures. Keep archived JSONL files unchanged.
 
-The merged DeepSeek evaluation also had two failed checks:
-
-- `invalid-02`: The Agent answered a request for unspecified company metrics using Tencent instead of asking the user which company they meant.
-- `ind-07`: The automatic scorer did not recognize the expected short-history label.
-
-See:
-
-[`evaluation/results/merged-agent-deepseek/failures.md`](evaluation/results/merged-agent-deepseek/failures.md)
-
-The scorer may produce false negatives for company-name aliases or wording variations. Raw model responses should be inspected before interpreting every failed check as an actual calculation error.
-
-### 8. Reproducing the Evaluation
-
-All commands below should be executed from the appropriate repository directory.
-
-#### 8.1 Run Agent and Evaluation Unit Tests
-
-From the repository root:
+#### D5.1 Re-score the archived model tables, without a model
 
 ```bash
-python3 -m unittest discover -s agent -v
+python3 evaluation/score.py \
+  evaluation/results/merged-agent-qwen/agent-qwen.jsonl \
+  evaluation/results/merged-agent-deepseek/agent-deepseek.jsonl \
+  --out-dir evaluation/reproduced/recorded-merged
+
+python3 evaluation/score.py \
+  evaluation/results/agent-qwen.jsonl \
+  evaluation/results/notools-qwen.jsonl \
+  evaluation/results/notools-qwen-raw.jsonl \
+  evaluation/results/notools-deepseek.jsonl \
+  evaluation/results/notools-deepseek-raw.jsonl \
+  --out-dir evaluation/reproduced/recorded-baselines
 ```
 
-Then:
+Each output directory contains `summary.md`, `per_check.csv`, and `failures.md`. Expected: Table 1's metrics and Table 2's **current bundled scorer** column, including 14/43 for DeepSeek raw inputs and the raw-Qwen incomplete-run warning. Scoring does not contact a model provider.
 
-```bash
-cd evaluation
-python3 -m unittest -v
-```
-
-These tests validate deterministic calculations, data handling, tool invocation, request validation, and evaluation logic without requiring a live LLM.
-
-#### 8.2 Run the Independent Offline Evaluation
-
-From the repository root:
+#### D5.2 Repeat independent offline checks and the bridge comparison
 
 ```bash
 python3 evaluation/offline/run.py \
-  --mode offline \
-  --output evaluation/runs/offline-reproduction
+  --mode offline --output evaluation/runs/offline-reproduction
+
+python3 scripts/benchmark_bridge_optimization.py \
+  --baseline evaluation/bridge-baseline \
+  --output evaluation/runs/bridge-comparison.json
 ```
 
-This evaluation contains 30 scenarios and 42 turns.
+Expected: the offline numeric/ranking counts and the SDK-operation counts in Table 3. The frozen bridge baseline is included in the repository. Model-projection differential tests require both complete source versions; their archived JSON includes source hashes, but re-running them is optional and is not a substitute for fresh model evaluation.
 
-It uses an independent reference implementation to check:
+#### D5.3 Run a fresh Qwen comparison in one TACC allocation
 
-- 48 numerical values.
-- 18 ranking results.
-- Invalid-argument handling.
-- Data and calculation consistency.
+The reproduction helper packages the model and evaluation in one GPU job, so the runner can reach the allocation-local model. It copies code into a unique package and replaces only the generated package's worker entry point. It does not change the repository's web entry point or public course files.
 
-Expected output includes:
-
-```text
-"turns": 42,
-"errors": 0,
-"numeric_checks": 48,
-"numeric_passes": 48,
-"ranking_checks": 18,
-"ranking_passes": 18
-```
-
-The offline evaluation does not involve a live LLM. It must not be presented as evidence of live model accuracy or response time.
-
-#### 8.3 Re-run the 43-case Qwen Evaluation on TACC
-
-First, ensure a Qwen model-serving endpoint is running and reachable from the evaluation job.
-
-From the `evaluation/` directory:
+Inspect a package without submitting, or submit a full run:
 
 ```bash
-cd evaluation
-
-bash bundle.sh
+python3 scripts/reproduce_tacc_eval.py package --minutes 60
+python3 scripts/reproduce_tacc_eval.py submit --minutes 60
 ```
 
-Configure the actual reachable Qwen service endpoint:
+The default systems are Agent, no-tool Qwen, and no-tool Qwen with raw inputs, using the same service. For a smaller live acceptance run of the Agent suite only:
 
 ```bash
-printf '%s\n' \
-  'http://ACTUAL_SERVICE_HOST:8000/v1' > server-url.txt
+python3 scripts/reproduce_tacc_eval.py submit \
+  --systems agent --minutes 60
 ```
 
-Submit the evaluation job:
+Record the new `JOB_ID`:
 
 ```bash
-tcloud submit
+python3 scripts/tacc.py status JOB_ID
 ```
 
-Check its status and log:
+This is an evaluation job, not a web job. Expect `MODEL_READY`, `EVAL_START=...`, and eventually `EVALUATION_COMPLETE=...`; it does not emit Chat ready or start a browser bridge. On success, the job exits and releases its allocation. If it times out or fails, retain partial files and the job/model logs; do not report an incomplete run as a completed benchmark. Package construction and command wiring pass offline tests; a live TACC validation run remains pending.
 
 ```bash
-tcloud ps
-tcloud cat slurm_log/eval-JOB_ID.log
+python3 scripts/tacc.py download JOB_ID
 ```
 
-The job executes the systems defined in `systems.txt`:
+Outputs appear under `var/tacc-results/JOB_ID/evaluation/`: selected system JSONL files, `audit/`, and `scored/summary.md`, `per_check.csv`, and `failures.md`. Raw outputs are isolated by job ID. Downloaded summaries should use the current checkout label and should not overwrite the historical tables. The helper uses the current conservative serving configuration; see `deployment.json` and the downloaded model log before comparing latency with old runs.
 
-```text
-agent none
-notools none
-notools raw
-```
+The older `evaluation/job.sh` remains an alternative only when a separately deployed service has a real endpoint reachable from that job. Its `server-url.txt` cannot point to another allocation's `127.0.0.1`.
 
-Results are saved to:
+#### D5.4 Run fresh DeepSeek comparisons locally
 
-```text
-$TACC_USERDIR/stock-eval-results/
-```
-
-The evaluation endpoint must be reachable from the evaluation job. A loopback address such as `127.0.0.1` belonging to another allocation cannot be used as its remote service address.
-
-After the job completes, download the result files:
+Set `DEEPSEEK_API_KEY` in the environment. Optionally set `DEEPSEEK_MODEL` and record the value. Use a new run label, for example:
 
 ```bash
-mkdir -p results
+python3 evaluation/run_eval.py --system agent --provider deepseek \
+  --out-dir evaluation/runs/current-deepseek
+python3 evaluation/run_eval.py --system notools --provider deepseek \
+  --out-dir evaluation/runs/current-deepseek
+python3 evaluation/run_eval.py --system notools --provider deepseek \
+  --context raw --out-dir evaluation/runs/current-deepseek
 
-for f in agent-qwen notools-qwen notools-qwen-raw; do
-    tcloud download \
-      "stock-eval-results/$f.jsonl" \
-      "./results/$f.jsonl"
-done
+python3 evaluation/score.py \
+  evaluation/runs/current-deepseek/agent-deepseek.jsonl \
+  evaluation/runs/current-deepseek/notools-deepseek.jsonl \
+  evaluation/runs/current-deepseek/notools-deepseek-raw.jsonl \
+  --out-dir evaluation/runs/current-deepseek/scored
 ```
 
-Generate the evaluation summary:
+Each case starts an independent conversation; follow-up turns share that case's state. Results record model/provider/context, prompts, answers, tool traces, usage and timings. These runs use an external API and incur usage charges.
 
-```bash
-python score.py
-```
+### D6. Report cross-references
 
-The scoring script generates:
+The following captions connect the reproducible evidence to the project report. Historical model experiments and current offline validation use separate labels.
 
-- `results/summary.md`
-- `results/per_check.csv`
-- `results/failures.md`
-
-#### 8.4 Re-run the DeepSeek Agent Evaluation
-
-Set the API key in the current terminal:
-
-```bash
-export DEEPSEEK_API_KEY='YOUR_DEEPSEEK_API_KEY'
-```
-
-From the `evaluation/` directory, run the merged Agent:
-
-```bash
-python run_eval.py \
-  --system agent \
-  --provider deepseek \
-  --out-dir results/merged-agent-deepseek
-```
-
-Generate the corresponding evaluation reports:
-
-```bash
-python score.py \
-  results/merged-agent-deepseek/agent-deepseek.jsonl \
-  --out-dir results/merged-agent-deepseek
-```
-
-To run the no-tool DeepSeek baselines:
-
-```bash
-python run_eval.py \
-  --system notools \
-  --provider deepseek
-
-python run_eval.py \
-  --system notools \
-  --provider deepseek \
-  --context raw
-```
-
-Then generate their reports:
-
-```bash
-python score.py
-```
-
-The evaluation runner records model information, raw responses, tool calls, evidence, timing, and token usage. Completed cases are skipped when resuming a run; cases with transport failures can be retried.
-
-#### 8.5 Evaluation Output Files
-
-The main output files are:
-
-| File | Purpose |
-|---|---|
-| `cases.json` | Frozen 43-case test set and reference checks. |
-| `agent-qwen.jsonl` | Raw Qwen Agent evaluation results. |
-| `notools-qwen.jsonl` | Qwen no-tool baseline. |
-| `notools-deepseek.jsonl` | DeepSeek no-tool baseline. |
-| `merged-agent-qwen/` | Merged Qwen Agent results and reports. |
-| `merged-agent-deepseek/` | Merged DeepSeek Agent results and reports. |
-| `summary.md` | Aggregate evaluation results. |
-| `per_check.csv` | Individual check results. |
-| `failures.md` | Failed checks and response excerpts. |
-
-The raw JSONL results and audit logs should be retained together with the summary files so that the teaching team can inspect how the reported results were obtained.
-
-### 9. Known Limitations
-
-The project has the following limitations.
-
-1. **Fixed Dataset:** The system uses a fixed data snapshot collected on 18 November 2026. It does not automatically retrieve current market prices or newly published financial statements.
-
-2. **Limited Stock Universe:** The system covers 30 selected Hong Kong-listed technology companies. It does not represent the entire Hong Kong market.
-
-3. **No Verified Sub-sector Classification:** The dataset does not provide sufficiently verified sub-sector metadata for reliable sub-sector screening.
-
-4. **No Future-price Prediction:** The system analyzes historical indicators and signals. It does not provide a validated price-forecasting model or backtesting results.
-
-5. **Financial Data Differences:** Reporting periods, currencies, financial definitions, and historical coverage differ between companies. Comparisons should consider the reporting-period details displayed by the application.
-
-6. **LLM Explanation Reliability:** Financial tables and charts are generated from deterministic Python tools, but explanatory text is generated by an LLM. Output validation checks response structure and evidence references but cannot guarantee that every qualitative statement is correct.
-
-7. **Heuristic Evaluation:** Automatic evaluation may misclassify company aliases, wording variations, or certain natural-language responses. Failure analysis and human review remain important.
-
-8. **Model Variability:** Model responses, token usage, tool selection, and latency may vary between runs. The reported model results are single recorded runs rather than repeated-run statistical averages.
-
-9. **TACC Availability:** Model startup, GPU allocation, and job scheduling depend on the course computing environment.
-
-10. **Browser Bridge Overhead:** TACC browser communication uses authenticated file transfers and polling. Browser end-to-end latency therefore includes additional transfer time beyond the model and Agent execution time.
-
-11. **API Usage:** The local DeepSeek mode sends submitted messages and selected tool results to the external API provider. API usage may incur charges.
-
-### 10. Troubleshooting and Logs
-
-| Problem | Possible cause | Suggested action |
+| README evidence | Corresponding report content | Reproduction path |
 |---|---|---|
-| TACC job is running but chat is unavailable | Qwen is still loading or the Agent has not completed its startup checks. | Check the job log and wait for `Chat ready`. |
-| Browser bridge cannot connect | Incorrect job ID, stopped allocation, or SDK transfer problem. | Check `tcloud ps` and confirm the correct job is running. |
-| DeepSeek returns HTTP 401 | Missing or invalid API key. | Check `DEEPSEEK_API_KEY`. |
-| DeepSeek returns HTTP 402 | Insufficient API balance. | Check the API account balance. |
-| DeepSeek returns HTTP 429 | Rate limiting. | Wait before retrying. |
-| Model response is slow | Model inference, tool-loop retries, long context, or browser transfer overhead. | Inspect the audit logs and recorded timings. |
-| A metric returns `N/A` | Missing data, invalid inputs, or insufficient historical observations. | Check the evidence card and dataset notes. |
+| D1-D2 | System Architecture; Dataset and Data Processing; Financial Metrics | G2-G4; dataset/source files |
+| D3 | Evaluation Methodology; Evaluation Metrics | Frozen cases, runner configuration and scorer |
+| Table 1 | Recorded Evaluation Results: Merged Agent, Qwen vs DeepSeek | D5.1 merged raw-file scoring |
+| Table 2 | Recorded Evaluation Results: Baseline Comparison, including the historical/re-scored discrepancy | D5.1 baseline raw-file scoring |
+| Table 3 | Runtime/tool optimization validation, labeled offline | G2; D5.2; runtime-review records |
+| D7 | Failure Analysis and Known Limitations | Failed checks, raw transcripts and audit logs |
 
-Useful logs and records include:
+New model experiments should be reported separately with their checkout hash and configuration. Offline validation establishes calculation and protocol behavior, not new live-model accuracy or latency.
 
-- `logs/chat.jsonl`: model requests, responses, tool calls, errors, and timings.
-- `logs/requests.jsonl`: calculation inputs, formulas, source information, and results.
-- `agent/logs/web/`: local browser conversation and audit records.
-- TACC job logs and downloaded deployment results.
-- `evaluation/results/`: raw evaluation outputs and reports.
+### D7. Observed failure, limitations, and expected variation
 
-Additional documentation:
+**Concrete observed failure.** In the merged DeepSeek run, `invalid-02` asked `Show the metrics.` without identifying a company. The expected behavior was a clarification question; the model instead selected Tencent and returned its metrics. This is a task-resolution failure, not a demonstrated arithmetic error. The likely cause was an unsupported default-company assumption. The current prompt requires clarification when no company is established, and traces preserve the selected arguments. That mitigation still needs a fresh live regression; a prompt rule alone does not guarantee the behavior is fixed.
 
-- [Evaluation Protocol](evaluation/README.md)
-- [Failure Analysis](evaluation/FAILURE_ANALYSIS.md)
-- [Dataset Documentation](agent/data/README.md)
-- [Technical Architecture](docs/项目技术架构报告.md)
-- [Implementation and Connection Guide](docs/实施说明与接入指南.md)
-- [Validation Record](docs/VALIDATION.md)
+Both archived merged runs also failed the short-history label check in `ind-07`. The scorer expected a particular SHORT label; inspect the full response before deciding whether this was omitted information or a wording/scoring mismatch. Qwen's `rank-02` also failed the ranking check. The corresponding `failures.md` and JSONL files distinguish observed behavior from possible scorer mismatches.
 
-### 11. Team Contributions
+Known limits and variation:
 
-**CHEN Zhaoyu Jensen (21341500)**
+1. This is a fixed, limited stock universe. No live refresh, verified sub-sector screening, or future-price forecasting is implemented. Reporting periods, currencies and financial definitions vary across companies.
+2. The code validates tool arguments, answer structure and evidence IDs. It does not verify every prose number or qualitative statement. Independent data/semantic review remains necessary.
+3. The model suite's references derive from the tools. Independent offline references validate selected calculations, not every upstream source disclosure or all natural-language claims.
+4. Model outputs and provider aliases can vary even at temperature 0. Single recorded runs are not repeated-run statistical estimates. Exactly matching historical token counts or latency is not expected.
+5. TACC scheduling, startup, hardware, serving settings and SDK traffic affect latency. The new UI exposes phase statistics; it does not prove that transport changes already improved real-platform time.
+6. Context limits constrain raw-input baselines. The historical raw-Qwen run is incomplete. Information available to raw/no-context baselines differs and is documented above.
+7. The current runtime revision has no new full live benchmark or browser visual acceptance result. Existing historical browser/model checks should not be presented as acceptance of every latest change.
 
-Contributed to the evaluation pipeline, including designing the 43-case test suite, implementing baseline comparisons, running Qwen and DeepSeek experiments, and analyzing evaluation results. Also worked on failure analysis and improving response validation and error handling.
+### D8. Troubleshooting and logs
 
-**DUAN Zihang Raymond (20910081)**
-
-Contributed to the core system development, including defining the project scope, preparing the financial dataset, implementing financial metric calculations and stock screening and ranking tools, and integrating the TACC model service. Also developed the initial Agent/backend components and web chat.
-
-**Gan Hounan Edward (21347097)**
-
-Focused on Agent execution optimization and tool integration. Optimized the Agent interaction loop to reduce unnecessary model–tool round trips and response waiting time. Refined tool definitions, invocation logic, and parameter handling, particularly for stock ranking and contextual follow-up requests. Also contributed to end-to-end debugging and integration testing.
-
-**Zhu Yuhan Christo (21315173)**
-
-Contributed to the Agent architecture and frontend development, including the evidence-based Agent workflow, browser chat interface, multi-conversation management, and conversation snapshots. Also implemented the co-located TACC deployment workflow and prepared system architecture documentation.
-
-### 12. Project Report Cross-References
-
-The README's main implementation and evaluation materials correspond to the following parts of the project report:
-
-| README Section | Corresponding Project Report Content |
+| Symptom | Action |
 |---|---|
-| System Architecture | System architecture and Agent/tool workflow diagram. |
-| Dataset and Data Processing | Dataset description, data sources, and metric definitions. |
-| Evaluation Methodology | Evaluation setup, test categories, and baseline configurations. |
-| Recorded Evaluation Results | Qwen and DeepSeek comparison tables and performance metrics. |
-| Failure Analysis | Observed failures, limitations, and mitigation discussion. |
+| TACC state R but bridge fails | Check status; wait for all web readiness markers, especially Chat ready |
+| Only MODEL_READY appears | Smoke checks or worker startup may still be running or may have failed; inspect the latest job log |
+| Port 8765 is occupied | Stop your old local server, or use bridge `--port 8766` |
+| New local code has no effect remotely | Re-submit for worker/Agent changes; only local bridge/UI changes can use an existing job with `--local-ui` |
+| A namespace is busy | Stop your previous worker or choose a new namespace; do not run two workers on it |
+| DeepSeek 401 / 402 / 429 | Check key / API balance / rate limiting; inspect the actual error |
+| Slow answer | Compare model requests, SDK upload/download, and session timing; their scopes can overlap |
+| N/A metric or short history | Inspect the evidence's reason and reporting/window flags |
+| Runner skips cases | Use a new output directory for a new inference experiment |
 
-The exact figure numbers, table numbers, and page references should match the final submitted project report.
+Web conversation logs/snapshots are under `stock-chat/NAMESPACE/` in TACC USERDIR; evaluation audits are under the run's `audit/` directory. `scripts/tacc.py download` downloads the job's `stock-research/JOB_ID/` results, not the separate namespace conversation directory. Use the SDK to download that directory separately when investigating interactive turns.
 
+Additional documentation: [evaluation protocol](evaluation/README.md), [failure analysis](evaluation/FAILURE_ANALYSIS.md), [dataset notes](agent/data/README.md), [runtime review](docs/RUNTIME_REVIEW.md), [initial validation record](docs/VALIDATION.md), [technical architecture](docs/项目技术架构报告.md), and [deployment guide](docs/服务器部署指南.md). Validation records identify the revision and scope of each check.
+
+### D9. Group contributions
+
+**CHEN Zhaoyu Jensen (21341500).** Contributed to the evaluation pipeline: the 43-case suite, baseline comparisons, recorded Qwen/DeepSeek experiments, result analysis and failure analysis. Also worked on malformed-response handling and evaluation-related reliability improvements.
+
+**DUAN Zihang Raymond (20910081).** Contributed to project scoping, financial data preparation, core metric calculations, screening/ranking tools and the initial Agent/backend. Integrated the course model service and developed the initial web chat implementation.
+
+**Gan Hounan Edward (21347097).** Contributed to Agent execution and tool integration, including model-tool round-trip reduction, tool arguments and ranking follow-ups. Worked on SDK polling, phase timing, debugging and regression checks to support execution profiling and reliability.
+
+**Zhu Yuhan Christo (21315173).** Contributed the evidence-based Agent workflow, browser interface, multiple conversations and restart snapshots. Implemented the co-located TACC deployment and prepared architecture/deployment documentation, with integration work across frontend and backend components.

@@ -1,0 +1,15 @@
+test_claims_and_support (test_eval.HelperTests.test_claims_and_support) ... ok
+test_number_extraction_ignores_dates_and_tickers (test_eval.HelperTests.test_number_extraction_ignores_dates_and_tickers) ... ok
+test_rounding_tolerance (test_eval.HelperTests.test_rounding_tolerance) ... ok
+test_ticker_order_and_name_overlap (test_eval.HelperTests.test_ticker_order_and_name_overlap) ... ok
+test_case_ids_unique_and_categories_covered (test_eval.PipelineTests.test_case_ids_unique_and_categories_covered) ... ok
+test_committed_references_match_tools (test_eval.PipelineTests.test_committed_references_match_tools) ... ok
+test_fabricating_baseline_scores_poorly (test_eval.PipelineTests.test_fabricating_baseline_scores_poorly) ... ok
+test_oracle_agent_scores_perfectly (test_eval.PipelineTests.test_oracle_agent_scores_perfectly) ... ok
+test_raw_context_has_inputs_but_no_computed_metrics (test_eval.PipelineTests.test_raw_context_has_inputs_but_no_computed_metrics) ... ok
+test_transport_errors_resume_and_stop (test_eval.PipelineTests.test_transport_errors_resume_and_stop) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 4.861s
+
+OK

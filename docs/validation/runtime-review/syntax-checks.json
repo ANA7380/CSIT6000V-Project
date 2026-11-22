@@ -1,0 +1,13 @@
+{
+  "python_syntax_files": 44,
+  "shell_syntax_files": 9,
+  "html_javascript_syntax": "passed",
+  "cjs_syntax_files": 2,
+  "browser_visual_check": "not completed: local Chromium socket startup denied; cloud browser could not access executor localhost",
+  "final_python_syntax": "passed",
+  "package_modes_checked": [
+    "web",
+    "diagnostic"
+  ],
+  "package_manifest_hashes": "passed"
+}

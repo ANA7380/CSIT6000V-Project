@@ -1,5 +1,7 @@
 # Validation record
 
+For the latest 23 November runtime/bridge review, see [RUNTIME_REVIEW.md](RUNTIME_REVIEW.md) and [its raw checks](validation/runtime-review/). The counts and browser results below describe the original implementation, not the latest revision.
+
 This record covers the initial offline implementation commit `3b8edac`. Later server-specific tests and actual job results are documented in [the server validation record](服务器部署实测记录.md).
 
 Base: `origin/main` at `7a4540a559f9e17fac462844dac15dbd89fe042e`. Validation date: 21 November 2026, Asia/Shanghai. Python 3.10 on Linux; browser smoke checks used headless local Chrome through Playwright. Tests use temporary files and loopback servers, with no real LLM requests.

@@ -1,0 +1,118 @@
+{
+  "created_at": "2026-11-22T21:04:49.749456+00:00",
+  "mode": "offline-scripted-no-llm",
+  "notice": "Scripted actions do not measure model adoption, answer quality, tokens or live latency. Character counts are not token counts. Timestamps excluded from deterministic hashes.",
+  "deterministic_outputs_equal": true,
+  "baseline": {
+    "deterministic_outputs": 156,
+    "deterministic_sha256": "077a6bb692b908f65de1f68e9e2c5787cc2401828f71638a40a1657900b20852",
+    "scripted_scenarios": [
+      {
+        "companies": 1,
+        "model_calls": 3,
+        "tool_calculations": 2,
+        "model_input_chars": 27817,
+        "evidence_sha256": "496823a692a133946dbc3bf6ec32bd3a0f060457765a4047117e421f6edcec39",
+        "charts": 1
+      },
+      {
+        "companies": 2,
+        "model_calls": 5,
+        "tool_calculations": 4,
+        "model_input_chars": 63264,
+        "evidence_sha256": "a142c01908e6e98900f5ccefec02be80c23de352f23e3b91276a73a31f469137",
+        "charts": 2
+      },
+      {
+        "companies": 3,
+        "model_calls": 7,
+        "tool_calculations": 6,
+        "model_input_chars": 112348,
+        "evidence_sha256": "ed11ba4ce9d9aa4f3507303d9795c1bc719e6012b371410df703fbc81499b2eb",
+        "charts": 3
+      }
+    ],
+    "duplicate_request": {
+      "tool_calculations": 2,
+      "evidence_cards": 2
+    },
+    "ranking_payloads": [
+      {
+        "top_k": 5,
+        "model_result_chars": 9257,
+        "full_evidence_chars": 17239
+      },
+      {
+        "top_k": 10,
+        "model_result_chars": 17014,
+        "full_evidence_chars": 31827
+      },
+      {
+        "top_k": 30,
+        "model_result_chars": 38742,
+        "full_evidence_chars": 73264
+      }
+    ],
+    "source_sha256": {
+      "chat_agent.py": "cfa5c6c7226724e9ce5dc792a706b4d37228c54076096e3ba38cd2bf5c96ee2b",
+      "evidence.py": "bacaebc1d99a87804d2b87a81e0af4dd19fe3b11fd372be7aae9275c92872897",
+      "tool_registry.py": "d1976c6606448a30670bf296350c5f7ac2819b9e6d5f9dfaa18f1a4bcc82336a"
+    }
+  },
+  "optimized": {
+    "deterministic_outputs": 156,
+    "deterministic_sha256": "077a6bb692b908f65de1f68e9e2c5787cc2401828f71638a40a1657900b20852",
+    "scripted_scenarios": [
+      {
+        "companies": 1,
+        "model_calls": 2,
+        "tool_calculations": 2,
+        "model_input_chars": 20421,
+        "evidence_sha256": "496823a692a133946dbc3bf6ec32bd3a0f060457765a4047117e421f6edcec39",
+        "charts": 1
+      },
+      {
+        "companies": 2,
+        "model_calls": 2,
+        "tool_calculations": 4,
+        "model_input_chars": 27224,
+        "evidence_sha256": "a142c01908e6e98900f5ccefec02be80c23de352f23e3b91276a73a31f469137",
+        "charts": 2
+      },
+      {
+        "companies": 3,
+        "model_calls": 2,
+        "tool_calculations": 6,
+        "model_input_chars": 34032,
+        "evidence_sha256": "ed11ba4ce9d9aa4f3507303d9795c1bc719e6012b371410df703fbc81499b2eb",
+        "charts": 3
+      }
+    ],
+    "duplicate_request": {
+      "tool_calculations": 1,
+      "evidence_cards": 1
+    },
+    "ranking_payloads": [
+      {
+        "top_k": 5,
+        "model_result_chars": 7510,
+        "full_evidence_chars": 17239
+      },
+      {
+        "top_k": 10,
+        "model_result_chars": 13528,
+        "full_evidence_chars": 31827
+      },
+      {
+        "top_k": 30,
+        "model_result_chars": 30376,
+        "full_evidence_chars": 73264
+      }
+    ],
+    "source_sha256": {
+      "chat_agent.py": "97a1cc9889f9c8286d5e6c01e39b0ce0c1fa030bd4eaf685440c9a0315cf6158",
+      "evidence.py": "aa94827b21ad3f4631729a9b6c0208e89e2d0220cbf7dde993090d9880dc1a20",
+      "tool_registry.py": "398f4772dd3984470b4f4cd89bb081b266566b4b70e81c6e00cd57ec0652a8c0"
+    }
+  }
+}

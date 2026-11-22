@@ -37,8 +37,8 @@ def chat(messages, base_url=BASE_URL, max_tokens=1800, temperature=0):
         raise RuntimeError('DeepSeek returned invalid JSON.') from None
     try:
         choice = result['choices'][0]
-        if choice.get('finish_reason') == 'length':
-            raise RuntimeError('DeepSeek response was truncated. Try a simpler question.')
+        # Preserve finish_reason, as the Qwen client does. ChatAgent owns the
+        # bounded truncation repair/fallback policy and must see this response.
         if not isinstance(choice['message']['content'], str):
             raise TypeError()
     except (KeyError, IndexError, TypeError):

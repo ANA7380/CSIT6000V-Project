@@ -1,0 +1,123 @@
+{
+  "created_at": "2026-11-22T22:00:29.757809+00:00",
+  "mode": "offline-scripted-no-llm",
+  "notice": "Scripted actions do not measure model adoption, answer quality, tokens or live latency. Character counts are not token counts. Timestamps excluded from deterministic hashes.",
+  "deterministic_outputs_equal": true,
+  "model_projections_equal": true,
+  "baseline": {
+    "deterministic_outputs": 156,
+    "deterministic_sha256": "077a6bb692b908f65de1f68e9e2c5787cc2401828f71638a40a1657900b20852",
+    "model_projection_sha256": "5354898358b8e1b789848e9817f4bb7776e92fdf8ce7b8ec2a8c20177a573842",
+    "model_projection_median_ms": 0.5606229999557399,
+    "scripted_scenarios": [
+      {
+        "companies": 1,
+        "model_calls": 3,
+        "tool_calculations": 2,
+        "model_input_chars": 30343,
+        "evidence_sha256": "496823a692a133946dbc3bf6ec32bd3a0f060457765a4047117e421f6edcec39",
+        "charts": 1
+      },
+      {
+        "companies": 2,
+        "model_calls": 5,
+        "tool_calculations": 4,
+        "model_input_chars": 67474,
+        "evidence_sha256": "a142c01908e6e98900f5ccefec02be80c23de352f23e3b91276a73a31f469137",
+        "charts": 2
+      },
+      {
+        "companies": 3,
+        "model_calls": 7,
+        "tool_calculations": 6,
+        "model_input_chars": 118242,
+        "evidence_sha256": "ed11ba4ce9d9aa4f3507303d9795c1bc719e6012b371410df703fbc81499b2eb",
+        "charts": 3
+      }
+    ],
+    "duplicate_request": {
+      "tool_calculations": 1,
+      "evidence_cards": 1
+    },
+    "ranking_payloads": [
+      {
+        "top_k": 5,
+        "model_result_chars": 7510,
+        "full_evidence_chars": 17239
+      },
+      {
+        "top_k": 10,
+        "model_result_chars": 13528,
+        "full_evidence_chars": 31827
+      },
+      {
+        "top_k": 30,
+        "model_result_chars": 30376,
+        "full_evidence_chars": 73264
+      }
+    ],
+    "source_sha256": {
+      "chat_agent.py": "97a1cc9889f9c8286d5e6c01e39b0ce0c1fa030bd4eaf685440c9a0315cf6158",
+      "evidence.py": "aa94827b21ad3f4631729a9b6c0208e89e2d0220cbf7dde993090d9880dc1a20",
+      "tool_registry.py": "398f4772dd3984470b4f4cd89bb081b266566b4b70e81c6e00cd57ec0652a8c0"
+    }
+  },
+  "optimized": {
+    "deterministic_outputs": 156,
+    "deterministic_sha256": "077a6bb692b908f65de1f68e9e2c5787cc2401828f71638a40a1657900b20852",
+    "model_projection_sha256": "5354898358b8e1b789848e9817f4bb7776e92fdf8ce7b8ec2a8c20177a573842",
+    "model_projection_median_ms": 0.04581449979923491,
+    "scripted_scenarios": [
+      {
+        "companies": 1,
+        "model_calls": 2,
+        "tool_calculations": 2,
+        "model_input_chars": 20745,
+        "evidence_sha256": "496823a692a133946dbc3bf6ec32bd3a0f060457765a4047117e421f6edcec39",
+        "charts": 1
+      },
+      {
+        "companies": 2,
+        "model_calls": 2,
+        "tool_calculations": 4,
+        "model_input_chars": 27548,
+        "evidence_sha256": "a142c01908e6e98900f5ccefec02be80c23de352f23e3b91276a73a31f469137",
+        "charts": 2
+      },
+      {
+        "companies": 3,
+        "model_calls": 2,
+        "tool_calculations": 6,
+        "model_input_chars": 34356,
+        "evidence_sha256": "ed11ba4ce9d9aa4f3507303d9795c1bc719e6012b371410df703fbc81499b2eb",
+        "charts": 3
+      }
+    ],
+    "duplicate_request": {
+      "tool_calculations": 1,
+      "evidence_cards": 1
+    },
+    "ranking_payloads": [
+      {
+        "top_k": 5,
+        "model_result_chars": 7510,
+        "full_evidence_chars": 17239
+      },
+      {
+        "top_k": 10,
+        "model_result_chars": 13528,
+        "full_evidence_chars": 31827
+      },
+      {
+        "top_k": 30,
+        "model_result_chars": 30376,
+        "full_evidence_chars": 73264
+      }
+    ],
+    "source_sha256": {
+      "chat_agent.py": "c81d1b6b0ca0b7a82c6cc8c91d424fef1f7c5187653292d151ebbdd04724ea3b",
+      "evidence.py": "c9e4083bda24f013ca0fe1216f343300d82328e74318f84d4c7c44af741d9855",
+      "tool_registry.py": "398f4772dd3984470b4f4cd89bb081b266566b4b70e81c6e00cd57ec0652a8c0"
+    }
+  }
+}

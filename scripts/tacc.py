@@ -102,7 +102,9 @@ def main():
     for name in ('status','download','bridge','stop'):
         p=sub.add_parser(name);p.add_argument('job',type=int)
         if name=='download':p.add_argument('--output',type=Path,default=ROOT/'var'/'tacc-results')
-        if name=='bridge':p.add_argument('--port',type=int,default=8765)
+        if name=='bridge':
+            p.add_argument('--port',type=int,default=8765)
+            p.add_argument('--local-ui',action='store_true',help='Use the local chat page with timing details')
     args=parser.parse_args()
     if hasattr(args,'job') and args.job <= 0:
         parser.error('Job ID must be a positive integer.')
@@ -144,7 +146,9 @@ def main():
     elif args.command=='bridge':
         # Reuse the browser bridge. Its authenticated SDK traffic stays local.
         env=dict(os.environ,TCLOUD_BIN=sdk,PATH=str(Path(sdk).resolve().parent)+os.pathsep+os.environ.get('PATH',''))
-        raise SystemExit(subprocess.call([sys.executable,str(ROOT/'agent'/'web_bridge.py'),str(args.job),'--port',str(args.port)],env=env))
+        command=[sys.executable,str(ROOT/'agent'/'web_bridge.py'),str(args.job),'--port',str(args.port)]
+        if args.local_ui:command.append('--local-ui')
+        raise SystemExit(subprocess.call(command,env=env))
     elif args.command=='stop':
         print(sdk_call(sdk,['cancel','-j',args.job]))
 

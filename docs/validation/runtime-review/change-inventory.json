@@ -1,0 +1,191 @@
+{
+  "input_name": "CSIT6000V-Project-main(2) (2).zip",
+  "input_sha256": "da20f22167a64fa97f21691f525d3240985251bfadb92756123eaa0891f56c56",
+  "agent_tests": 77,
+  "evaluation_tests": 10,
+  "deterministic_outputs": 156,
+  "deterministic_outputs_equal": true,
+  "model_projections_equal": true,
+  "changes": [
+    {
+      "path": "README.md",
+      "change": "modified",
+      "before_sha256": "236b48b9635ca7f939d4bf10efb4a89fe44fb6351f9c2938f0b7ca1f9a7c4816",
+      "after_sha256": "6081cde6747bf03906997698eb035dce89cdb6c1b947d411af47577b10778702"
+    },
+    {
+      "path": "scripts/benchmark_bridge_optimization.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "39faf4402f7a61d4625dd3739b5cbead25d4127d30afb50de8ce5f5cbd39177c"
+    },
+    {
+      "path": "scripts/tacc.py",
+      "change": "modified",
+      "before_sha256": "fcc83331c27472852c3e6f9dd17be5ac0561eeaaf8c6e69eb1c4326a0e3f75cd",
+      "after_sha256": "22dff76f6a2305eb69f44331dc5dc2e8ae7b05dd1d4713cae72a2319d4f5e1fa"
+    },
+    {
+      "path": "scripts/benchmark_tool_optimization.py",
+      "change": "modified",
+      "before_sha256": "2dd3f17a471d89a8676a497ea971aceae3aaabb815bd786a3c6d6bde772470bc",
+      "after_sha256": "bc0067308ad02ffe176cbc866dd3667dc64e115ab8a48086a419151d1dc58fff"
+    },
+    {
+      "path": "scripts/browser_smoke.cjs",
+      "change": "modified",
+      "before_sha256": "a446520fe1a70ed7ead27a5efa6d1bac26caedde8e2ee36b67eb4a184e7d3c71",
+      "after_sha256": "bc49db6bca273489cc8da4e6f474e3d8444178b8580bf744f3d23f9f918c118c"
+    },
+    {
+      "path": "docs/服务器部署指南.md",
+      "change": "modified",
+      "before_sha256": "5ffa257bb164170f0dbbc592bce449447ff4c0be257aef123f329add1188cb92",
+      "after_sha256": "83f7c6118a259f3867cc2bdd19c1e6b64cca17ed3ae94754bf4aafaa12d3b3fc"
+    },
+    {
+      "path": "docs/RUNTIME_REVIEW.md",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "3e9fe9c76fe76992ee6dfd4abdc47e189945609009a29d0d6977c3f3c3176543"
+    },
+    {
+      "path": "docs/VALIDATION.md",
+      "change": "modified",
+      "before_sha256": "66c5635070860b3dacab59a21bf0e59dab1b2fbb511d1cf2edf0a4e05699bd7b",
+      "after_sha256": "d91cc4bd7f6cad2acfdd4ea1102394380dfdb9a9bb69fdc56861fecb24092b56"
+    },
+    {
+      "path": "agent/chat.html",
+      "change": "modified",
+      "before_sha256": "4de18c56f6bdc465839f3021eaa975b0ad67aba889ee9085e01fb35a361b3c3d",
+      "after_sha256": "9089cfda207e932c7682602b29c32b896b1eb071b97ff8471530df4935cfc650"
+    },
+    {
+      "path": "agent/web_bridge.py",
+      "change": "modified",
+      "before_sha256": "f1bfc53ce049e510f8e9609019ae56c199547836d618dfdf92fdc110f2976fdb",
+      "after_sha256": "5764512b13a505be9a579b2b5efbdd5bac46dbb30e42c04f78cdbd32a73298f0"
+    },
+    {
+      "path": "agent/test_tacc_deploy.py",
+      "change": "modified",
+      "before_sha256": "74ade423bffd2121b346df3056de59a5de9b7f28e1cccff5e96f69df3c39b4de",
+      "after_sha256": "cdb7938bb623fe8b5b44e64774944448c5613067e68dafdf487c24ad6e4a7079"
+    },
+    {
+      "path": "agent/test_deepseek_client.py",
+      "change": "modified",
+      "before_sha256": "c6599a326874b2862f0cfb13f8d9fa79d468c171c869f5bb6b0b3f201bf5b3f0",
+      "after_sha256": "7134be6bb346a844163dd1f54855630883453feb53dde163c207ce03289acd64"
+    },
+    {
+      "path": "agent/evidence.py",
+      "change": "modified",
+      "before_sha256": "aa94827b21ad3f4631729a9b6c0208e89e2d0220cbf7dde993090d9880dc1a20",
+      "after_sha256": "c9e4083bda24f013ca0fe1216f343300d82328e74318f84d4c7c44af741d9855"
+    },
+    {
+      "path": "agent/test_runtime_review.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "03d43c6f6057dd3dd6521ffd61af171aeaf33878e25119284274208ad55bd2e1"
+    },
+    {
+      "path": "agent/chat_agent.py",
+      "change": "modified",
+      "before_sha256": "97a1cc9889f9c8286d5e6c01e39b0ce0c1fa030bd4eaf685440c9a0315cf6158",
+      "after_sha256": "c81d1b6b0ca0b7a82c6cc8c91d424fef1f7c5187653292d151ebbdd04724ea3b"
+    },
+    {
+      "path": "agent/deepseek_client.py",
+      "change": "modified",
+      "before_sha256": "ba0ab32f6363749534a315064d18bbddbe7bb92ab1d397005ef7ed00dfc5d231",
+      "after_sha256": "a75a30074398cd6ba96b9f639bcf4ac09b31a70bc701b4a34179086e1f7c0b7d"
+    },
+    {
+      "path": "agent/test_bridge_optimization.py",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "6f7bc5ea53a1b11b9979f9e23e226708fa3298abd34aacf1cc305fb211ce4431"
+    },
+    {
+      "path": "agent/web_worker.py",
+      "change": "modified",
+      "before_sha256": "0d0993b0da12a7c8d94c23661115b66a3970c7c86d3b893eba95d603ecb1a3b3",
+      "after_sha256": "f0c5004d8464c3490b71f4c9b6c0caa2bb5030910fbec566e519de724a2adfb6"
+    },
+    {
+      "path": "docs/validation/runtime-review/offline-manual_review.csv",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "c9bc89a7ca2a36f7aa13a305546c077674b0da4d559f0e897701639950d8b065"
+    },
+    {
+      "path": "docs/validation/runtime-review/offline-manifest.json",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "763a27879fe6843322ad0de5e1edb8e5495a2cebe56d3fa7283cca17a9fc5783"
+    },
+    {
+      "path": "docs/validation/runtime-review/offline-results.json",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "a53de26023ac372e1e5f02e87e0605a59fb886afc463730b421f655af362dac1"
+    },
+    {
+      "path": "docs/validation/runtime-review/snapshot-check.json",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "09e5665ff120b0aefab61e6f23706be45c6291fa7d908011f3447416a27c569a"
+    },
+    {
+      "path": "docs/validation/runtime-review/evaluation-tests.txt",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "3e9ebf87781e057641f3beeccd067d9f4bfb0330585d3559422d0afd70feb668"
+    },
+    {
+      "path": "docs/validation/runtime-review/tool-equivalence.json",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "244de00136cb049f6b1b40b96ff7b0308f65f562060345a660b61fbfdbbc88f9"
+    },
+    {
+      "path": "docs/validation/runtime-review/input-agent-tests.txt",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "469e719c72bfef6195a22d315d814981cc9df3e3184c342ad00c5047b242a681"
+    },
+    {
+      "path": "docs/validation/runtime-review/bridge-benchmark.json",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "9566848db7b7290abc1b91dd89f9a03265a327f8924fa170d6334e8e33de126f"
+    },
+    {
+      "path": "docs/validation/runtime-review/agent-tests.txt",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "27e17968b9a86c965f0d21a6bd8c5861839ad7a9990f7744c2164dc4fe629b0a"
+    },
+    {
+      "path": "docs/validation/runtime-review/bridge-phase-check.txt",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "23be482b343d017c57765e782c88a29ad79e5264523edef9e8ed7bee2294acb6"
+    },
+    {
+      "path": "docs/validation/runtime-review/offline-summary.json",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "a716583cc9336edf6494773292530945c5432e8c1f3a1e8f91cf920c5c6e5f77"
+    },
+    {
+      "path": "docs/validation/runtime-review/syntax-checks.json",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "832e12fb553751cb04d3a64cca99b454df769891061b0463d82a3a84b8bd6704"
+    }
+  ]
+}

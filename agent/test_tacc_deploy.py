@@ -4,6 +4,7 @@ import os
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from session_store import atomic_json
@@ -23,6 +24,17 @@ tacc=module('stock_tacc_cli',ROOT/'scripts'/'tacc.py')
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_bridge_passes_local_ui_without_submitting_a_job(self):
+        with patch.object(tacc, 'sdk_binary', return_value='/tmp/tcloud'), \
+             patch.object(tacc.subprocess, 'call', return_value=0) as call, \
+             patch('sys.argv', ['tacc.py', 'bridge', '30934', '--local-ui']):
+            with self.assertRaises(SystemExit) as exit_result:
+                tacc.main()
+        self.assertEqual(exit_result.exception.code, 0)
+        self.assertIn('--local-ui', call.call_args.args[0])
+        self.assertIn('30934', call.call_args.args[0])
+        self.assertEqual(call.call_args.kwargs['env']['TCLOUD_BIN'], '/tmp/tcloud')
+
     def test_launcher_is_loopback_and_preserves_course_runtime(self):
         source='''#!/usr/bin/env bash
 export CUDA_VISIBLE_DEVICES=0,1

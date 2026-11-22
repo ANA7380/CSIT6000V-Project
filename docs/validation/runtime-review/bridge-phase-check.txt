@@ -1,0 +1,18 @@
+test_completed_envelope_uses_one_download_and_reply_cache (test_bridge_optimization.BridgeOptimizationTests.test_completed_envelope_uses_one_download_and_reply_cache) ... ok
+test_failed_payload_upload_does_not_publish_marker (test_bridge_optimization.BridgeOptimizationTests.test_failed_payload_upload_does_not_publish_marker) ... ok
+test_legacy_error_reply_is_returned_as_completed_turn (test_bridge_optimization.BridgeOptimizationTests.test_legacy_error_reply_is_returned_as_completed_turn) ... ok
+test_local_ui_switch_skips_remote_html_download (test_bridge_optimization.BridgeOptimizationTests.test_local_ui_switch_skips_remote_html_download) ... Open http://127.0.0.1:<MagicMock name='mock.server_port' id='140326728356384'>/ in your browser. Press Ctrl+C to stop.
+ok
+test_old_worker_completion_fetches_legacy_reply (test_bridge_optimization.BridgeOptimizationTests.test_old_worker_completion_fetches_legacy_reply) ... ok
+test_optional_missing_file_does_not_mask_access_error (test_bridge_optimization.BridgeOptimizationTests.test_optional_missing_file_does_not_mask_access_error) ... ok
+test_optional_missing_file_remains_normal_polling (test_bridge_optimization.BridgeOptimizationTests.test_optional_missing_file_remains_normal_polling) ... ok
+test_pending_poll_downloads_only_status (test_bridge_optimization.BridgeOptimizationTests.test_pending_poll_downloads_only_status) ... ok
+test_reply_without_any_status_is_recovered (test_bridge_optimization.BridgeOptimizationTests.test_reply_without_any_status_is_recovered) ... ok
+test_stale_running_status_periodically_probes_reply (test_bridge_optimization.BridgeOptimizationTests.test_stale_running_status_periodically_probes_reply) ... ok
+test_transfer_failure_does_not_cache_a_completed_reply (test_bridge_optimization.BridgeOptimizationTests.test_transfer_failure_does_not_cache_a_completed_reply) ... ok
+test_two_phase_upload_keeps_payload_before_marker (test_bridge_optimization.BridgeOptimizationTests.test_two_phase_upload_keeps_payload_before_marker) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 4.534s
+
+OK

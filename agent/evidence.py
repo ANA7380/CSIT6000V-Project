@@ -29,18 +29,26 @@ def validate_answer(answer, evidence, requested_ids=None, require_evidence=False
 
 
 def model_result(result):
-    out = copy.deepcopy(result)
-    out.pop('financial_observations', None)
-    out.pop('chart', None)
+    # Trim large audit-only series before copying. The final deepcopy keeps the
+    # model projection independent without copying arrays that we immediately drop.
+    out = {k: v for k, v in result.items() if k not in {'financial_observations', 'chart'}}
     if 'metrics' in out and 'rolling_volatility' in out['metrics']:
-        rolling = out['metrics']['rolling_volatility']
+        out['metrics'] = dict(out['metrics'])
+        rolling = dict(out['metrics']['rolling_volatility'])
         rolling['series_points_logged'] = len(rolling.get('series', []))
         rolling['series'] = rolling.get('series', [])[-5:]
-    for row in out.get('results', []):
-        for m in row.get('metric_details', {}).values():
-            for key in ('inputs', 'source_url'):
-                m.pop(key, None)
-    return out
+        out['metrics']['rolling_volatility'] = rolling
+    if 'results' in out:
+        rows = []
+        for row in out['results']:
+            projected = dict(row)
+            if 'metric_details' in row:
+                projected['metric_details'] = {name: {k: v for k, v in metric.items()
+                    if k not in {'inputs', 'source_url', 'value', 'formula'}}
+                    for name, metric in row['metric_details'].items()}
+            rows.append(projected)
+        out['results'] = rows
+    return copy.deepcopy(out)
 
 
 def metric_rows(result):

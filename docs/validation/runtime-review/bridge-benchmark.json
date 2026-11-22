@@ -1,0 +1,45 @@
+{
+  "created_at": "2026-11-22T22:00:21.446190+00:00",
+  "mode": "offline-http-sdk-fixture",
+  "notice": "SDK calls are local file-copy fixtures. No claim about TACC latency, bandwidth or live model behavior.",
+  "baseline": [
+    {
+      "pending_polls": 3,
+      "sdk_calls_to_first_result": 9,
+      "sdk_calls_for_completed_recheck": 1,
+      "uploads": 2,
+      "status_downloads": 3,
+      "reply_downloads": 5,
+      "same_answer_and_evidence": true
+    },
+    {
+      "pending_polls": 8,
+      "sdk_calls_to_first_result": 19,
+      "sdk_calls_for_completed_recheck": 1,
+      "uploads": 2,
+      "status_downloads": 8,
+      "reply_downloads": 10,
+      "same_answer_and_evidence": true
+    }
+  ],
+  "optimized": [
+    {
+      "pending_polls": 3,
+      "sdk_calls_to_first_result": 6,
+      "sdk_calls_for_completed_recheck": 0,
+      "uploads": 2,
+      "status_downloads": 4,
+      "reply_downloads": 0,
+      "same_answer_and_evidence": true
+    },
+    {
+      "pending_polls": 8,
+      "sdk_calls_to_first_result": 12,
+      "sdk_calls_for_completed_recheck": 0,
+      "uploads": 2,
+      "status_downloads": 9,
+      "reply_downloads": 1,
+      "same_answer_and_evidence": true
+    }
+  ]
+}
