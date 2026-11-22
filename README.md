@@ -115,8 +115,8 @@ For TACC deployment, use the course-supported Linux/WSL environment and configur
 Clone the group repository:
 
 ```bash
-git clone <GROUP_GITHUB_REPOSITORY_URL>
-cd CSIT6000V-Project-main
+git clone https://github.com/ANA7380/CSIT6000V-Project.git
+cd CSIT6000V-Project
 ```
 
 The repository URL should be replaced with the actual group GitHub URL.
