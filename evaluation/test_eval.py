@@ -38,13 +38,16 @@ def oracle(case):
 
     def call(messages, base_url, **kwargs):
         last = messages[-1]['content']
+        if last.startswith('TOOL_RESULT'):
+            state['cite'] = ' [%s]' % json.loads(last.split('\n', 1)[1]).get('id', 'E1')
         if not last.startswith(('TOOL_RESULT', 'MODEL_FORMAT_ERROR')):
+            state['cite'] = ''
             state['turn'] += 1
             state['pending'] = list(case['turns'][state['turn']]['reference_calls'])
         if state['pending']:
             ref = state['pending'].pop(0)
             return reply(json.dumps({'tool': ref['tool'], 'arguments': ref['arguments']}))
-        return reply(json.dumps({'answer': perfect_answer(case['turns'][state['turn']])}))
+        return reply(json.dumps({'answer': perfect_answer(case['turns'][state['turn']]) + state['cite']}))
     return call
 
 

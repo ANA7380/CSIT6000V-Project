@@ -21,8 +21,8 @@ UNAVAILABLE_WORDS = ['n/a', 'unavailable', 'not available', 'missing', 'insuffic
 
 
 def model_view(result):
-    """Trim a tool result the way ChatAgent.dispatch does before showing it to the model."""
-    view = {k: v for k, v in result.items() if k != 'financial_observations'}
+    """Trim a tool result the way evidence.model_result does before showing it to the model."""
+    view = {k: v for k, v in result.items() if k not in ('financial_observations', 'chart')}
     rolling = view.get('metrics', {}).get('rolling_volatility') if isinstance(view.get('metrics'), dict) else None
     if isinstance(rolling, dict) and 'series' in rolling:
         view = json.loads(json.dumps(view))
@@ -30,9 +30,17 @@ def model_view(result):
     return view
 
 
-def check_turn(check, answer, names):
-    """Return (passed, detail dict) for one check against one answer."""
+def check_turn(check, answer, names, prose=None):
+    """Return (passed, detail dict) for one check.
+
+    `answer` is everything the user sees: the model's explanation plus the tables the
+    application renders from tool results. `prose` is the model's explanation alone.
+    Numbers and N/A flags may appear in either; wording, labels and ranking order are
+    judged on the explanation only, so a rendered table cannot pass them by itself.
+    """
     kind = check['type']
+    if prose is not None and kind in ('behavior', 'label', 'ranking'):
+        answer = prose
     # Models often write typographic apostrophes (can’t); keyword lists use plain ones.
     low = answer.lower().replace('\u2019', "'").replace('\u2018', "'")
     if kind == 'number':
@@ -80,13 +88,14 @@ def score_system(records, data, reference):
         evidence, prompts, all_ok, last_ok = [], '', True, True
         for index, (spec, turn) in enumerate(zip(case['turns'], record['turns'])):
             answer = turn['answer'] or ''
+            prose = turn.get('explanation') or answer
             prompts += ' ' + spec['prompt']
             for call in spec['reference_calls']:
                 flatten_numbers(model_view(reference.call(call['tool'], call['arguments'])), evidence)
             evidence += turn.get('evidence', [])
             turn_ok = True
             for check in spec['checks']:
-                passed, detail = (False, {}) if turn['error'] else check_turn(check, answer, names)
+                passed, detail = (False, {}) if turn['error'] else check_turn(check, answer, names, prose)
                 if check['type'] == 'ranking' and turn['error']:
                     detail = {'precision': 0.0, 'compliance': 0.0, 'exact_order': False, 'got': []}
                 turn_ok = turn_ok and passed
@@ -94,7 +103,7 @@ def score_system(records, data, reference):
                                'type': check['type'], 'label': check.get('label', ''),
                                'expected': check.get('expected', ''), 'passed': passed, **detail,
                                'error': turn['error'] or '', 'answer': answer, 'prompt': spec['prompt']})
-            claims = numeric_claims(answer, prompts)
+            claims = numeric_claims(prose, prompts)
             if claims:
                 answers_with_claims += 1
                 claims_total += len(claims)

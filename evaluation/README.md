@@ -116,3 +116,11 @@ Invalid-input handling is reported as an extra row.
 - The agent and the proposal baseline use different models, so that comparison measures
   whole systems. `notools-qwen` is the like-for-like comparison for the effect of tools.
 - Response times of different providers are not comparable hardware-for-hardware.
+
+## After the merge with `complete_raw`
+
+- The agent's answer is now the model's explanation followed by tables the application renders from tool results. `run_eval.py` saves both (`answer` and `explanation`). `score.py` accepts a number or N/A flag anywhere in the answer, but judges refusal wording, labels, ranking order and explanation grounding on the explanation alone.
+- `bundle.sh` also copies `evidence.py` and `session_store.py`.
+- Three refusal wordings were added to the keyword lists in `cases.py` ("can't forecast", "not in this", "no verified ...") after reading answers that were correct but failed.
+- `offline/` holds the second evaluation written on the `complete_raw` branch: 30 scenarios checked against reference calculations that do not import the agent code. Run it from the repository root with `python3 evaluation/offline/run.py --mode offline --output evaluation/runs/offline-001`.
+- `results/merged-agent-deepseek/` is the merged agent with DeepSeek as the model. The Qwen results in `results/` predate the merge.

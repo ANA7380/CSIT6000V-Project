@@ -19,24 +19,6 @@ class AnalysisTests(unittest.TestCase):
         return [dict(symbol=symbol, date=(date(2024, 1, 1)+timedelta(days=i)).isoformat(),
                      adjusted_close=str(v), volume=str(volumes[i] if volumes else 100)) for i, v in enumerate(values)]
 
-    def test_price_chart_summary_and_short_history(self):
-        self.engine.prices = self.prices([100, 120, 90, 108])
-        chart = self.tools.price_chart('700', window=2)
-        self.assertEqual((chart['points'], chart['status'], chart['start_date']), (3, 'ok', '2024-01-02'))
-        self.assertEqual(chart['summary']['high'], {'value': 120.0, 'date': '2024-01-02'})
-        self.assertEqual(chart['summary']['low'], {'value': 90.0, 'date': '2024-01-03'})
-        self.assertAlmostEqual(chart['summary']['change_pct'], -10)
-        self.assertEqual(chart['series_plotted'], ['Adjusted close'])
-        self.assertEqual(chart['svg'].count('<polyline'), 1)
-        chart = self.tools.price_chart('700', window=252)
-        self.assertEqual((chart['points'], chart['status']), (4, 'short_history'))
-        self.engine.prices = self.prices(list(range(1, 61)))
-        chart = self.tools.price_chart('700', window=10)
-        self.assertEqual(chart['series_plotted'], ['Adjusted close', 'SMA20', 'SMA50'])
-        self.assertAlmostEqual(chart['summary']['latest_sma']['SMA20'], 50.5)
-        with self.assertRaises(ValueError):
-            self.tools.price_chart('AAPL')
-
     def test_drawdown_rolling_and_volume(self):
         self.engine.prices = self.prices([100, 120, 90, 108])
         metrics = self.tools.price_analysis('700', window=3, rolling_window=2)['metrics']
@@ -144,7 +126,7 @@ class ToolRoutingTests(unittest.TestCase):
     def test_each_catalog_tool_roundtrip(self):
         for name, spec in TOOLS.items():
             with self.subTest(tool=name), tempfile.TemporaryDirectory() as folder:
-                calls = iter([{'tool': name, 'arguments': spec['example']}, {'answer': 'Computed from tool result.'}])
+                calls = iter([{'tool': name, 'arguments': spec['example']}, {'answer': 'Computed from tool result. [E1]'}])
                 def fake(messages, base_url, **kwargs):
                     if messages[-1]['content'].startswith('TOOL_RESULT'):
                         data = json.loads(messages[-1]['content'].split('\n', 1)[1])
@@ -153,16 +135,16 @@ class ToolRoutingTests(unittest.TestCase):
                     return {'choices': [{'message': {'content': json.dumps(next(calls))}}]}
                 agent = ChatAgent('https://api.deepseek.com/v1', Path(folder)/'test.jsonl', call=fake)
                 self.assertIn(name, SYSTEM)
-                self.assertEqual(agent.ask('Test request'), 'Computed from tool result.')
+                self.assertTrue(agent.ask('Test request').startswith('Computed from tool result. [E1]'))
 
     def test_invalid_request_is_corrected(self):
         actions = iter([{'tool': 'price_analysis', 'arguments': {'ticker': '700', 'window': -1}},
-                        {'tool': 'price_analysis', 'arguments': {'ticker': '700'}}, {'answer': 'Done.'}])
+                        {'tool': 'price_analysis', 'arguments': {'ticker': '700'}}, {'answer': 'Done. [E1]'}])
         def fake(*args, **kwargs):
             return {'choices': [{'message': {'content': json.dumps(next(actions))}}]}
         with tempfile.TemporaryDirectory() as folder:
             agent = ChatAgent('https://api.deepseek.com/v1', Path(folder)/'test.jsonl', call=fake)
-            self.assertEqual(agent.ask('Show RSI'), 'Done.')
+            self.assertTrue(agent.ask('Show RSI').startswith('Done. [E1]'))
             self.assertIn('error', agent.log.read_text(encoding='utf-8'))
 
 

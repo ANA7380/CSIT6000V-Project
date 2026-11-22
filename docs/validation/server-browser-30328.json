@@ -1,0 +1,65 @@
+{
+  "job_id": 30328,
+  "passed": true,
+  "scripted": false,
+  "checks": [
+    "real server route",
+    "live metrics",
+    "contextual window change",
+    "historical chart",
+    "desktop and mobile",
+    "no JS errors"
+  ],
+  "turns": [
+    {
+      "fallback": false,
+      "duration_ms": 15033.552061067894,
+      "end_to_end_ms": 25775.4435450006,
+      "tools": [
+        {
+          "tool": "ticker_metrics",
+          "arguments": {
+            "ticker": "0700.HK",
+            "window": 60
+          }
+        }
+      ]
+    },
+    {
+      "fallback": false,
+      "duration_ms": 22061.725387116894,
+      "end_to_end_ms": 32928.42323500008,
+      "tools": [
+        {
+          "tool": "ticker_metrics",
+          "arguments": {
+            "ticker": "0700.HK",
+            "window": 60
+          }
+        },
+        {
+          "tool": "ticker_metrics",
+          "arguments": {
+            "ticker": "0700.HK",
+            "window": 120
+          }
+        }
+      ]
+    },
+    {
+      "fallback": true,
+      "duration_ms": 195618.99595311843,
+      "end_to_end_ms": 206261.84151100097,
+      "tools": [
+        {
+          "tool": "price_analysis",
+          "arguments": {
+            "ticker": "0700.HK",
+            "window": 60
+          }
+        }
+      ]
+    }
+  ],
+  "limitation": "Historical-chart prose hit the numerical-label false positive; tool chart and values still returned, using the clearly labeled fallback. Fixed in the next deployment."
+}

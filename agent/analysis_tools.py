@@ -47,78 +47,9 @@ class AnalysisTools:
         return dict(symbol=symbol, company=row['company_name'], snapshot_cutoff=row['snapshot_cutoff'],
                     data_notice='Fixed snapshot, not live data. Historical indicators do not predict future prices.')
 
-    def price_chart(self, ticker, window=252):
-        """Adjusted-close line chart with SMA20/50/200 as a standalone SVG; history only."""
-        symbol, rows = self.prices(ticker)
-        prices = positive_prices(rows)
-        out = self.context(symbol)
-        currency = self.engine.snapshot[symbol]['price_currency']
-        count = min(window + 1, len(prices))
-        first = len(prices) - count
-        shown, dates = prices[first:], [r['date'] for r in rows[first:]]
-        colors = {'Adjusted close': '#1f4e79', 'SMA20': '#d9822b', 'SMA50': '#2e8b57', 'SMA200': '#8e44ad'}
-        series = {'Adjusted close': shown}
-        for n in (20, 50, 200):
-            # Averages use the full history so the lines are complete inside the plotted window.
-            line = [statistics.mean(prices[i - n + 1:i + 1]) if i >= n - 1 else None for i in range(first, len(prices))]
-            if any(v is not None for v in line):
-                series[f'SMA{n}'] = line
-        values = [v for line in series.values() for v in line if v is not None]
-        low, high = min(values), max(values)
-        pad = (high - low) * 0.06 or max(high * 0.01, 0.01)
-        low, high = low - pad, high + pad
-        width, height, left, right, top, bottom = 760, 380, 64, 20, 46, 44
-        plot_w, plot_h = width - left - right, height - top - bottom
-
-        def x(i):
-            return left + (plot_w * i / (count - 1) if count > 1 else plot_w / 2)
-
-        def y(v):
-            return top + plot_h * (high - v) / (high - low)
-
-        parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
-                 f'font-family="Arial, sans-serif" font-size="12" role="img">',
-                 f'<title>{symbol} adjusted close, {dates[0]} to {dates[-1]}</title>',
-                 f'<rect width="{width}" height="{height}" fill="#ffffff"/>',
-                 f'<text x="{left}" y="20" font-size="14" fill="#1a1a1a">{symbol} {escape(out["company"])} '
-                 f'adjusted close ({currency}), {dates[0]} to {dates[-1]}</text>']
-        for k in range(5):
-            value = low + (high - low) * k / 4
-            parts.append(f'<line x1="{left}" y1="{y(value):.1f}" x2="{width - right}" y2="{y(value):.1f}" stroke="#e3e3e3"/>')
-            parts.append(f'<text x="{left - 8}" y="{y(value) + 4:.1f}" text-anchor="end" fill="#555555">{value:.2f}</text>')
-        ticks = sorted({0, (count - 1) // 3, 2 * (count - 1) // 3, count - 1})
-        for i in ticks:
-            anchor = 'start' if i == 0 else ('end' if i == count - 1 else 'middle')
-            parts.append(f'<line x1="{x(i):.1f}" y1="{top + plot_h}" x2="{x(i):.1f}" y2="{top + plot_h + 5}" stroke="#555555"/>')
-            parts.append(f'<text x="{x(i):.1f}" y="{top + plot_h + 20}" text-anchor="{anchor}" fill="#555555">{dates[i]}</text>')
-        parts.append(f'<rect x="{left}" y="{top}" width="{plot_w}" height="{plot_h}" fill="none" stroke="#555555"/>')
-        for offset, (name, line) in enumerate(series.items()):
-            points = ' '.join(f'{x(i):.1f},{y(v):.1f}' for i, v in enumerate(line) if v is not None)
-            if count == 1:
-                parts.append(f'<circle cx="{x(0):.1f}" cy="{y(line[0]):.1f}" r="3" fill="{colors[name]}"/>')
-            else:
-                parts.append(f'<polyline points="{points}" fill="none" stroke="{colors[name]}" '
-                             f'stroke-width="{2 if name == "Adjusted close" else 1.2}"/>')
-            lx = left + offset * 130
-            parts.append(f'<line x1="{lx}" y1="34" x2="{lx + 22}" y2="34" stroke="{colors[name]}" stroke-width="2"/>')
-            parts.append(f'<text x="{lx + 28}" y="38" fill="#1a1a1a">{name}</text>')
-        parts.append(f'<text x="{width - right}" y="{height - 6}" text-anchor="end" font-size="11" fill="#777777">'
-                     'Fixed snapshot; historical prices only, not a forecast.</text></svg>')
-        top_i, bottom_i = shown.index(max(shown)), shown.index(min(shown))
-        out.update(points=count, requested_returns=window, start_date=dates[0], end_date=dates[-1],
-                   status='ok' if count == window + 1 else 'short_history',
-                   price_basis='adjusted_close', price_currency=currency,
-                   source_url=self.engine.snapshot[symbol]['price_source_url'],
-                   series_plotted=list(series),
-                   summary={'start_price': shown[0], 'end_price': shown[-1],
-                            'change_pct': (shown[-1] / shown[0] - 1) * 100 if count > 1 else None,
-                            'high': {'value': shown[top_i], 'date': dates[top_i]},
-                            'low': {'value': shown[bottom_i], 'date': dates[bottom_i]},
-                            'latest_sma': {name: line[-1] for name, line in series.items() if name != 'Adjusted close'}},
-                   svg='\n'.join(parts))
-        return out
-
     def price_analysis(self, ticker, window=252, rolling_window=20):
+        if type(window) is not int or not 2 <= window <= 5000 or type(rolling_window) is not int or not 2 <= rolling_window <= 5000:
+            raise ValueError('Price windows must be integers between 2 and 5000.')
         symbol, rows = self.prices(ticker)
         prices = positive_prices(rows)
         out = self.context(symbol)
@@ -202,6 +133,15 @@ class AnalysisTools:
         metrics['volume_ratio_20'] = metric(volume / baseline if volume is not None and volume >= 0 and baseline and baseline > 0 else None,
                                             unit='x', formula='latest volume / mean volume of previous 20 sessions',
                                             inputs={'latest_volume': volume, 'prior_average_volume': baseline})
+        count = min(len(rows), window + 1)
+        series = {'adjusted_close': prices}
+        for n in (20, 50, 200):
+            series[f'sma_{n}'] = [statistics.mean(prices[i-n+1:i+1]) if i >= n-1 else None for i in range(len(prices))]
+        out['chart'] = dict(symbol=symbol, currency=out['price_currency'], price_basis='adjusted_close',
+                            source_url=out['source_url'], snapshot_cutoff=out['snapshot_cutoff'],
+                            dates=[r['date'] for r in rows[-count:]],
+                            series={k: v[-count:] for k, v in series.items()},
+                            rolling_volatility=rolling[-window:])
         out['metrics'] = metrics
         out['trend_comparison'] = {
             'price_above_sma_50': prices[-1] > averages[50] if averages[50] is not None else None,
@@ -215,6 +155,8 @@ class AnalysisTools:
         return out
 
     def stock_correlation(self, ticker, other_ticker, window=252):
+        if type(window) is not int or not 2 <= window <= 5000:
+            raise ValueError('Correlation window must be an integer between 2 and 5000.')
         symbol, left = self.prices(ticker)
         other, right = self.prices(other_ticker)
         def returns(rows):
@@ -298,6 +240,8 @@ class AnalysisTools:
                     basis='Latest available comparable annual vendor observations per metric; may be older than the curated snapshot income period. No quarterly annualization or issuer/vendor mixing.')
 
     def rank_stocks(self, top_k=5, weights=None, filters=None, window=252):
+        if type(top_k) is not int or not 1 <= top_k <= 30 or type(window) is not int or not 2 <= window <= 5000:
+            raise ValueError('top_k must be 1..30; window must be 2..5000.')
         names = {'revenue_growth': 'Revenue growth', 'net_profit_margin': 'Net profit margin',
                  'debt_to_equity': 'Debt-to-equity', 'historical_volatility': 'Historical volatility'}
         weights = weights if weights is not None else {k: 1 for k in names}
@@ -338,7 +282,8 @@ class AnalysisTools:
                 score = rank / (len(vals)-1) * 100 if len(vals) > 1 else 50
                 percentiles[key] = 100-score if key in {'debt_to_equity', 'historical_volatility'} else score
             row['percentile_scores'] = percentiles
-            row['score'] = sum(weights[k] * percentiles[k] for k in weights)
+            row['contributions'] = {k: weights[k] * percentiles[k] for k in weights}
+            row['score'] = sum(row['contributions'].values())
         eligible.sort(key=lambda r: (-r['score'], r['symbol']))
         for i, row in enumerate(eligible, 1):
             row['rank'] = i

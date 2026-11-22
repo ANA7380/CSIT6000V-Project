@@ -16,17 +16,13 @@ TOOLS = {
         'description': 'Calendar 1/3/6/12-month returns, SMA20/50/200 and latest crossover, Wilder RSI14, MACD12/26/9, maximum drawdown, rolling annualized volatility and latest volume divided by previous 20-session average. window controls drawdown lookback and number of rolling points; rolling_window controls volatility estimation. Defaults 252 and 20. All use adjusted close except volume.',
         'parameters': {'ticker': 'string', 'window': 'integer:2:5000', 'rolling_window': 'integer:2:5000'}, 'required': ['ticker'],
         'example': {'ticker': '0700.HK', 'window': 252, 'rolling_window': 20}},
-    'price_chart': {
-        'description': 'Save a line chart (SVG image) of adjusted close with SMA20/50/200 for one ticker. Use only when the user asks for a chart, plot or graph. window is the number of daily returns shown, default 252. Returns the file path, date range, start/end price, change, high and low with dates, and latest SMA values. History only.',
-        'parameters': {'ticker': 'string', 'window': 'integer:2:5000'}, 'required': ['ticker'],
-        'example': {'ticker': '0700.HK', 'window': 120}},
     'stock_correlation': {
         'description': 'Pearson correlation between two stocks using matched adjusted-close log-return intervals. window defaults to 252 returns. Not market beta.',
         'parameters': {'ticker': 'string', 'other_ticker': 'string', 'window': 'integer:2:5000'}, 'required': ['ticker', 'other_ticker'],
         'example': {'ticker': '0700.HK', 'other_ticker': '9988.HK', 'window': 60}},
     'rank_stocks': {
-        'description': 'Screen all supported stocks, then return Top-K weighted percentile ranks. top_k defaults 5. weights defaults equal across revenue_growth, net_profit_margin, debt_to_equity, historical_volatility. Supply nonnegative weights for any subset. Higher growth/margin and lower debt/volatility score better. filters maps those same keys to min/max numeric bounds. Growth, margin and volatility are percent values (10 means 10%); debt is a multiple (0.5 means 0.5x). window defaults 252 for volatility. Missing required data excluded. No sector filters available.',
-        'parameters': {'top_k': 'integer:1:30', 'weights': 'object', 'filters': 'object', 'window': 'integer:2:5000'}, 'required': [],
+        'description': 'Set reuse_previous=true to keep last ranking parameters, overriding only supplied fields. Explicit filters={} clears filters. Screen all supported stocks, then return Top-K weighted percentile ranks. top_k defaults 5. weights defaults equal across revenue_growth, net_profit_margin, debt_to_equity, historical_volatility. Supply nonnegative weights for any subset. Higher growth/margin and lower debt/volatility score better. filters maps those same keys to min/max numeric bounds. Growth, margin and volatility are percent values (10 means 10%); debt is a multiple (0.5 means 0.5x). window defaults 252 for volatility. Missing required data excluded. No sector filters available.',
+        'parameters': {'reuse_previous': 'boolean', 'top_k': 'integer:1:30', 'weights': 'object', 'filters': 'object', 'window': 'integer:2:5000'}, 'required': [],
         'example': {'top_k': 5, 'weights': {'revenue_growth': 2, 'historical_volatility': 1}, 'filters': {'net_profit_margin': {'min': 0}, 'debt_to_equity': {'max': 1}}}},
 }
 
@@ -45,6 +41,8 @@ def validate(name, args):
         kind = spec['parameters'][key]
         if kind == 'string' and (not isinstance(value, str) or not value.strip()):
             raise ValueError(key + ' must be a nonempty string')
+        if kind == 'boolean' and type(value) is not bool:
+            raise ValueError(key + ' must be a boolean')
         if kind == 'object' and not isinstance(value, dict):
             raise ValueError(key + ' must be an object')
         if kind.startswith('integer:'):

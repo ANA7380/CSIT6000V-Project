@@ -31,7 +31,7 @@ The dataset is the latest obtained from the queried feeds plus five newer primar
 
 The CSVs contain collected prices, financial inputs, dates, and provenance. Revenue growth, net profit margin, debt-to-equity, and historical volatility are not precomputed or stored here. Their derived window/status fields have also been removed. Preparation scripts do not calculate these four metrics.
 
-During chat, the planned Python tools will select comparable financial periods or a requested price window, validate inputs, calculate the requested metric, and return the value, formula, input references, dates, and missing-data status. Tool execution and parameters must be logged. These runtime tools are still an implementation task; this dataset update does not implement them.
+During chat, the planned Python tools will select comparable financial periods or a requested price window, validate inputs, calculate the requested metric, and return the value, formula, input references, dates, and missing-data status. Tool execution and parameters must be logged. These runtime tools are now implemented in agent/agent.py and agent/analysis_tools.py; derived metrics remain separate from the frozen input CSVs.
 
 Keep matching financial periods and currencies when calculating growth and margins. `net_income` follows vendor `NetIncome` or issuer profit attributable to parent shareholders, not adjusted profit. Debt definitions need harmonization: SMIC's supplemented debt includes leases; Hua Hong's includes bank borrowings and leases but excludes other long-term payables. Equity inputs exclude non-controlling interests. Vendor quarterly labels are not independent confirmation of reporting frequency for semiannual reporters.
 

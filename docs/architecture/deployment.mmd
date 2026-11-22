@@ -1,0 +1,15 @@
+flowchart LR
+  subgraph PC[用户电脑]
+    Browser[chat.html 浏览器] -->|HTTP 8765| Bridge[web_bridge.py]
+    Bridge --> SDK[tcloud SDK]
+  end
+  subgraph TACC[同一个 GPU 作业]
+    Supervisor[supervisor.py] -.监督.-> Model[Qwen vLLM 42865]
+    Supervisor -.监督.-> Worker[web_worker.py]
+    Worker --> Agent[ChatAgent]
+    Agent <-->|节点内 HTTP| Model
+    Agent --> Tools[六个确定性工具]
+    Tools --> CSV[三份冻结 CSV]
+  end
+  SDK <-->|认证文件传输| Store[USERDIR 请求 回复 会话]
+  Worker <--> Store

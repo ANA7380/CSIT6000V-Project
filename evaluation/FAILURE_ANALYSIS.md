@@ -131,3 +131,15 @@ manual review before any number is quoted.
   depend on the model following instructions; failure 2 shows it does not always do so.
 - **Charts are not visible to the model.** It can only describe the summary numbers returned
   with a chart.
+
+## Addendum, 22 November 2026: after merging `complete_raw`
+
+The sections above describe the agent before the merge. What changed for each failure:
+
+- **Failure 1 (top-10 ranking).** No longer depends on a long answer: the application renders the ranking table and the model writes a short cited explanation. The cut-off handling is kept. Top-10 passed with DeepSeek (2 model calls).
+- **Failure 2 (answer without a tool call).** Partly mitigated: an answer that follows a tool call must cite an evidence ID, and unknown IDs are rejected. An answer given with no tool call in the turn is still accepted, so a reused number remains possible.
+- **Failure 3 (`invalid-04`).** Unchanged.
+- **Failure 4 (multi-stock questions).** The sector question now gets a refusal that asks for financial conditions; before the merge the DeepSeek run used all 12 steps on it.
+- **New observed failure (`invalid-02`).** "Show the metrics." with no company: the model shows Tencent instead of asking, in both versions with DeepSeek. An instruction not to pick a default company did not change this; the tool examples in the prompt all use 0700.HK, which is the likely cause. Not fixed.
+- **Scorer.** Reading ranking order from the full answer picked up tickers from the rendered "Excluded" list; wording and order are now judged on the explanation only. `ind-07` is still a false negative.
+- **Not yet run:** the merged agent with Qwen on TACC. All merged-agent figures are from DeepSeek.

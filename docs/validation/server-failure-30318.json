@@ -1,0 +1,12 @@
+{
+  "job_id": 30318,
+  "status": "failed_then_fixed",
+  "cause": "Course Qwen chat template rejects a second system message.",
+  "observed_error": "System message must be at the beginning.",
+  "fix": "Merge SESSION_STATE into the single leading system message; preserve static stored prompt.",
+  "regression_test": "test_course_qwen_requires_single_leading_system_message",
+  "evidence": [
+    "(APIServer pid=24749) ERROR 11-21 09:49:53 [hf.py:786] jinja2.exceptions.TemplateError: System message must be at the beginning.",
+    "(APIServer pid=24749) INFO:     127.0.0.1:54156 - \"POST /v1/chat/completions HTTP/1.1\" 400 Bad Request"
+  ]
+}
