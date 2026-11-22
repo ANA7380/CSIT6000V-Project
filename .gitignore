@@ -4,3 +4,15 @@ agent/logs/
 var/
 evaluation/runs/
 .env
+
+# Local runtime files
+/var/
+/agent/logs/
+/slurm_log/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+.env.local
+*Zone.Identifier
