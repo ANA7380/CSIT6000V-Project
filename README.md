@@ -409,13 +409,20 @@ The agent column is the third Qwen run, made after the ranking fix. Scoring is a
 - "Qwen, no tools + raw data" has 4 cases that the service rejected with HTTP 400 (prompt too long for the 32K context), so that column is incomplete.
 - Earlier agent runs are kept for comparison: `results/old-agent-8-steps/` (6 tools, 8-step limit, 38/43) and `results/old-agent-before-ranking-fix/` (12-step limit, 38/43).
 
-**After merging the `complete_raw` branch (22 November 2026).** The table above was measured on the earlier agent, in which the model wrote every figure into its answer. The merged agent renders figures in evidence tables and the model writes a shorter cited explanation, so those Qwen numbers describe the previous version and the Qwen run has to be repeated on TACC. The merged agent was run on the same 43 cases with DeepSeek (`deepseek-flash`) as the model; results are in [evaluation/results/merged-agent-deepseek/](evaluation/results/merged-agent-deepseek/summary.md):
+**After merging the `complete_raw` branch (22 November 2026).** The table above was measured on the earlier agent, in which the model wrote every figure into its answer. The merged agent renders figures in evidence tables and the model writes a shorter cited explanation, so those Qwen numbers describe the previous version. The merged agent was rerun with Qwen on TACC on 22 November (job 30578); see the table below and [evaluation/results/merged-agent-qwen/](evaluation/results/merged-agent-qwen/summary.md). The merged agent was run on the same 43 cases with DeepSeek (`deepseek-flash`) as the model; results are in [evaluation/results/merged-agent-deepseek/](evaluation/results/merged-agent-deepseek/summary.md):
 
 | Agent version, DeepSeek as the model | Cases passed | Numerical accuracy | Exact ranking order | Mean time per turn | Tokens per turn |
 |---|---|---|---|---|---|
 | `main` before the merge | 93.0% (40/43) | 100% (55/55) | 100% (13/13) | 5.5 s | 13,261 |
 | `complete_raw` as pushed | 86.0% (37/43) | 100% (55/55) | 92.3% (12/13) | 2.8 s | 5,673 |
 | Merged | 95.3% (41/43) | 100% (55/55) | 100% (13/13) | 3.1 s | 5,703 |
+
+| Agent version, Qwen (`qwen3.8-27b`) on TACC | Cases passed | Numerical accuracy | Exact ranking order | Invalid-input handling | Mean time per turn | Tokens per turn |
+|---|---|---|---|---|---|---|
+| `main` before the merge (21 November) | 93.0% (40/43) | 100% (55/55) | 100% (13/13) | 71.4% (5/7) | 13.2 s | 8,504 |
+| Merged (22 November) | 95.3% (41/43) | 100% (55/55) | 92.3% (12/13) | 100% (7/7) | 6.6 s | 6,164 |
+
+Both failures of the merged Qwen run are scorer false negatives: in `rank-02` the explanation lists the four eligible companies in the correct order but writes "Tencent Music", which the scorer does not map to 1698.HK; `ind-07` is the known `SHORT` label case. `invalid-04` (1-day window) and `invalid-02` (no company named) both passed with Qwen. No turn failed and no answer fell back to tool results only.
 
 One run each, so differences of one or two cases are within run-to-run variation. Four of the six `complete_raw` failures were scoring errors (the scorer read ticker order from the rendered evidence text and missed three refusal wordings); the scorer now judges wording and ranking order on the model's explanation only. The remaining merged failures are `invalid-02` (asked "Show the metrics." with no company, the model shows Tencent instead of asking) and `ind-07` (scorer false negative).
 
