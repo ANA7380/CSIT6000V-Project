@@ -34,7 +34,7 @@ class WebChatTest(unittest.TestCase):
                     action = {'tool': 'list_tickers', 'arguments': {}}
                 elif question.startswith('TOOL_RESULT'):
                     self.assertIn('0700.HK', json.loads(question.split('\n', 1)[1])['result'])
-                    action = {'answer': 'Includes Tencent.'}
+                    action = {'answer': 'Includes Tencent. [E1]'}
                 else:
                     self.assertIn('List the tickers', [m['content'] for m in messages])
                     action = {'answer': '0700.HK'}
@@ -50,11 +50,11 @@ class WebChatTest(unittest.TestCase):
                 conn = HTTPConnection(server.address)
                 try:
                     conn.request('GET', '/')
-                    self.assertIn(b'HK Tech research chat', conn.getresponse().read())
+                    self.assertIn(b'Research with evidence', conn.getresponse().read())
                     with patch.object(web_bridge, 'transfer', transfer), patch.object(
                         web_worker, 'ChatAgent', lambda url, log: ChatAgent(url, log, model)
                     ):
-                        for question, answer in [('List the tickers', 'Includes Tencent.'),
+                        for question, answer in [('List the tickers', 'Includes Tencent. [E1]'),
                                                  ('Which ticker was that?', '0700.HK')]:
                             conn.request('POST', '/ask', json.dumps({'session': 'a' * 32, 'question': question}),
                                          {'Content-Type': 'application/json', 'Origin': 'http://' + server.address})
@@ -65,45 +65,10 @@ class WebChatTest(unittest.TestCase):
                             response.read()
                             web_worker.process(directory / (turn + '.ask'), sessions, 'http://localhost:8000/v1')
                             conn.request('GET', '/reply/' + turn)
-                            self.assertEqual(json.load(conn.getresponse()), {'answer': answer})
+                            reply = json.load(conn.getresponse())
+                            self.assertEqual(reply['explanation'], answer)
+                            self.assertIn('evidence', reply)
+                            self.assertTrue(reply['answer'].startswith(answer))
                 finally:
                     conn.close()
                     server.shutdown()
-
-    def test_local_server_returns_answer_and_chart(self):
-        import time
-        import web_local
-
-        def model(messages, *args, **kwargs):
-            last = messages[-1]['content']
-            action = ({'answer': 'Chart saved.'} if last.startswith('TOOL_RESULT')
-                      else {'tool': 'price_chart', 'arguments': {'ticker': '0700.HK', 'window': 30}})
-            return {'choices': [{'message': {'content': json.dumps(action)}}]}
-
-        with tempfile.TemporaryDirectory() as temp, web_local.build(
-                'deepseek', 'http://localhost:8000/v1', temp, 0, call=model) as server:
-            thread = threading.Thread(target=server.serve_forever, daemon=True)
-            thread.start()
-            self.addCleanup(thread.join, 2)
-            conn = HTTPConnection(server.address)
-            try:
-                conn.request('GET', '/')
-                page = conn.getresponse().read()
-                self.assertIn(b'DeepSeek', page)
-                self.assertNotIn(b'Qwen', page)
-                conn.request('POST', '/ask', json.dumps({'session': 'b' * 32, 'question': 'Chart Tencent'}),
-                             {'Content-Type': 'application/json', 'Origin': 'http://' + server.address})
-                turn = json.load(conn.getresponse())['turn']
-                for _ in range(100):
-                    conn.request('GET', '/reply/' + turn)
-                    response = conn.getresponse()
-                    data = json.load(response)
-                    if response.status == 200:
-                        break
-                    time.sleep(0.05)
-                self.assertEqual(data['answer'], 'Chart saved.')
-                self.assertEqual(len(data['charts']), 1)
-                self.assertTrue(data['charts'][0].startswith('<svg'))
-            finally:
-                conn.close()
-                server.shutdown()

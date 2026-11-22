@@ -1,5 +1,71 @@
 # An Explainable AI Agent for Stock Screening and Analysis
 
+## 输出校验更新（2026-11-22）
+
+解释正文允许股票代码、数字、日期、列表序号、四舍五入和明确标注的情景计算。不再按数字字符或与证据数字逐项匹配来拒绝整段回答。硬校验仅检查非空回答、引用 ID 存在、本轮调用工具后提供证据引用，以及正文不直接写 URL（来源链接仍由证据卡片展示）。模型仍须按 prompt 引用依据、区分事实与假设；程序不再保证正文数字正确，数值准确率与语义依据需通过参考测评和人工审核确认。工具参数校验、确定性表格与图表计算保持原有行为。部署中的旧进程需要用新代码重新打包启动；恢复旧会话时，首条 system prompt 会替换为本版本 prompt。
+
+新增模拟多轮回归覆盖“先问 Anthropic，再问腾讯并输出股票代码、百分数、列表和情景推导值”，不代表真实 Qwen 对同一对话已复测。
+
+## Deploy on the course server
+
+The recommended server deployment runs Qwen and the Agent in **one GPU allocation**. It uses the provided fix's loopback endpoint `127.0.0.1:42865`; a separate CPU job on another node cannot reach that loopback address.
+
+```bash
+# Reuse your configured tcloud SDK (or export TCLOUD_BIN=/path/to/tcloud).
+python3 scripts/tacc.py submit --mode web --namespace hk-research --minutes 60
+python3 scripts/tacc.py status YOUR_JOB_ID
+# Wait for MODEL_READY, LIVE_SMOKE_PASSED, and Chat ready, then:
+python3 scripts/tacc.py bridge YOUR_JOB_ID
+```
+
+The last command prints the laptop browser URL. Model inference, stock calculations, conversation snapshots and request processing all run on the server. The local bridge uses the authenticated course SDK for file transfer; it does not need direct access to a compute-node HTTP port.
+
+```bash
+# Optional CPU-only runtime verification (no GPU/model request):
+python3 scripts/tacc.py submit --mode diagnostic --minutes 5
+# Save results and release your allocation when finished:
+python3 scripts/tacc.py download YOUR_JOB_ID
+python3 scripts/tacc.py stop YOUR_JOB_ID
+```
+
+See the [server deployment guide](docs/服务器部署指南.md) for configuration, persistent conversation namespaces, process cleanup and troubleshooting. Each submission uses a unique staged folder to avoid overwriting an active WORKDIR. The course's public environment and model files are never edited.
+
+The [Chinese technical architecture report](docs/项目技术架构报告.md) explains the TACC environment, frontend/backend data flow, Agent loop, actual prompts and all six tools. A [standalone HTML reading version](docs/项目技术架构报告.html) includes embedded diagrams.
+
+## Implementation update on the proposal-completion branch
+
+This branch adds deterministic evidence tables, historical price/SMA and rolling-volatility charts, validated numerical presentation, reusable ranking preferences, multiple browser conversations, private restart snapshots, worker progress events, a local browser server, independent offline references and a genuine **no-tool** baseline runner. It keeps the original fixed CSVs and the single-agent architecture.
+
+Start an explicitly scripted preview without any model or key:
+
+```bash
+python3 agent/demo_web.py
+```
+
+Connect a real model from the repository root:
+
+```bash
+# Fill agent/server-url.txt with the actual /v1 URL, or pass it explicitly:
+python3 agent/local_web.py --provider qwen --base-url http://ACTUAL_SERVICE_HOST:8000/v1
+# Local DeepSeek browser alternative, after exporting DEEPSEEK_API_KEY:
+python3 agent/local_web.py --provider deepseek
+```
+
+Only use the local Qwen option where its internal service address is reachable. The existing TACC `submit-web.sh` / `web_bridge.py` deployment remains supported. Configure credentials in environment variables; `.env.example` is an example and is not loaded automatically.
+
+Run offline verification from the repository root:
+
+```bash
+python3 -m unittest discover -s agent -v
+python3 scripts/export_snapshot.py --check
+python3 evaluation/run.py --mode offline --output evaluation/runs/offline-001
+```
+
+See the [Chinese implementation and connection guide](docs/实施说明与接入指南.md), [evaluation protocol](evaluation/README.md) and [validation record](docs/VALIDATION.md). Full Qwen/DeepSeek comparative evaluation remains pending. For the current server deployment and real-model smoke-test status, see the [server validation record](docs/服务器部署实测记录.md). Do not interpret the offline scripted preview or calculation checks as live LLM performance.
+
+The current scope is financial-condition screening within a fixed thirty-company technology universe. Verified sub-sector metadata is unavailable. The UI and prompt explicitly disclose this limitation; a sub-sector filter still requires sourced metadata. Historical analysis does not require a future-price forecasting model.
+
+
 ## Local chat with DeepSeek (start here)
 
 The Python agent and CSV tools run locally. The LLM runs at DeepSeek's API; your messages and selected tool results are sent there. No TACC job is needed. API usage is billed to your DeepSeek account.
@@ -31,11 +97,11 @@ Reference: https://api-docs.deepseek.com/quick_start
 ### Browser chat on your own machine (DeepSeek)
 
 ```bash
-cd agent
-python3 web_local.py
+export DEEPSEEK_API_KEY='YOUR_LOCAL_KEY'
+python3 agent/local_web.py --provider deepseek
 ```
 
-Set `DEEPSEEK_API_KEY` first, then open the printed `http://127.0.0.1:8765/` URL. It serves the same page as the TACC chat, but the agent and its tools run locally and the model is DeepSeek. Charts requested in the conversation are shown under the answer. Logs and chart files are written to `agent/logs/web/`.
+Open the printed `http://127.0.0.1:8765/` URL. It serves the same page as the TACC chat, but the agent and its tools run locally and the model is DeepSeek. Tables and charts are drawn by the page from tool results; the model's explanation is rendered as Markdown after escaping. Conversations and audit logs are written to `agent/logs/web/`.
 
 ### Browser chat on TACC
 
@@ -43,20 +109,20 @@ Set `DEEPSEEK_API_KEY` first, then open the printed `http://127.0.0.1:8765/` URL
 bash submit-web.sh
 ```
 
-The script stages the agent, CSVs and web page and runs one `tcloud submit` for a one-hour, CPU-only chat job. Use the returned **chat job ID** in both commands below. Wait for `Chat ready` in the log before launching the bridge.
+The script now defaults to one GPU allocation containing both Qwen and the Agent. It stages only the runtime files and invokes the same `scripts/tacc.py` workflow described above. Use `bash submit-web.sh --external-model` only for a separately deployed model whose non-loopback address is reachable from the CPU job. Use the returned **chat job ID** in both commands below. Wait for `Chat ready` in the log before launching the bridge.
 
 ```bash
 tcloud cat slurm_log/stock-chat-JOB_ID.log
 python3 web_bridge.py JOB_ID
 ```
 
-Open the printed loopback URL (default `http://127.0.0.1:8765/`). Ask “Show all four metrics for 0700.HK”, then “Now use 60 trading days for volatility”. Keep the same page open for follow-ups. Refreshing or opening a new tab starts a fresh conversation. Use `--port 8766` if the default local port is occupied.
+Open the printed loopback URL (default `http://127.0.0.1:8765/`). Ask “Show all four metrics for 0700.HK”, then “Now use 60 trading days for volatility”. Keep the same page open for follow-ups. The browser saves conversation IDs and display history; New conversation creates a separate session. The worker restores private snapshots from the same job directory after a restart. Use `--port 8766` if the default local port is occupied.
 
 The job supplies the page and runs the agent and its tools. The laptop serves the page on loopback and uses the authenticated SDK to upload a question and poll for its reply. Transfers add a few seconds to each turn. Job-specific messages and audit logs are under `$TACC_USERDIR/stock-chat/JOB_ID/`. This setup uses the documented file-transfer interface. [TACC SDK](https://github.com/turingaicloud/tcloud-sdk) · [TACC SSH FAQ](https://github.com/turingaicloud/quickstart/blob/master/FAQ.md)
 
-Both allocations must be running. Check them with `tcloud ps -j JOB_ID` if a reply stalls. When finished, press Ctrl+C in the bridge terminal and cancel each active allocation with `tcloud cancel -j JOB_ID`.
+Keep the single allocation running. Check it with `tcloud ps -j JOB_ID` if a reply stalls. The legacy external-model mode requires both its CPU job and separate model service. When finished, press Ctrl+C in the bridge terminal and cancel each active allocation with `tcloud cancel -j JOB_ID`.
 
-### Single-question batch job
+### Legacy single-question batch job with an external model
 
 The included `tuxiv.conf`, `job.sh`, and copied `setup-sdk-account.sh` target the course's existing tcloud/proxy environment, following the local `qwen27b-student-release` package. These are not generic Texas TACC Slurm instructions. The batch launcher now runs the LLM chat agent; start the course model service first. The standalone `agent.py` still works without a model.
 
@@ -121,7 +187,7 @@ printf '%s\n' 'http://ACTUAL_SERVICE_HOST:8000/v1' > server-url.txt
 
 `question.txt → chat_agent.py → TACC Qwen → JSON tool request → Python CSV calculation → Qwen → final answer`
 
-The chat client selects `deepseek_client.py` for local DeepSeek use or the course's unmodified `qwen_client.py` for TACC. The model requests tools via a prompted JSON protocol. `tool_registry.py` supplies the descriptions, argument types, required fields and examples included in the system prompt, and validates each request before dispatch. The dispatcher executes only the allowlisted Python tools and sends their results back to the model. This is application-managed tool calling, not native API `tools` mode. Malformed requests are returned to the LLM for correction, with at most twelve steps per turn. The audit log records model messages, token usage, requests, and tool results. Numerical calculations are deterministic; the LLM's summary still requires review against the logged results.
+The chat client selects `deepseek_client.py` for local DeepSeek use or the course's unmodified `qwen_client.py` for TACC. The model requests tools via a prompted JSON protocol. `tool_registry.py` supplies the descriptions, argument types, required fields and examples included in the system prompt, and validates each request before dispatch. The dispatcher executes only the allowlisted Python tools and sends their results back to the model. This is application-managed tool calling, not native API `tools` mode. Malformed requests are returned to the LLM for correction, with at most twelve steps per turn. Final prose contains qualitative explanation and evidence IDs; numbers, dates, sources and score breakdowns are rendered by the application, with bounded repair or a clearly marked tool-only fallback. The audit log records model input messages, outputs, token usage, requests, tool results, errors and duration, with session/turn identifiers. Numerical calculations are deterministic; the LLM's summary still requires review against the logged results.
 
 ### Available tool groups
 
@@ -131,7 +197,6 @@ The chat client selects `deepseek_client.py` for local DeepSeek use or the cours
 | `ticker_metrics` | `ticker`, optional `window=252` | Original four metrics |
 | `financial_trends` | `ticker` | Annual profit-margin change, debt/equity growth, ROE |
 | `price_analysis` | `ticker`, optional `window=252`, `rolling_window=20` | Calendar 1/3/6/12-month returns, SMA20/50/200, RSI14, MACD12/26/9, maximum drawdown, rolling volatility, volume ratio, latest 50/200 crossover |
-| `price_chart` | `ticker`, optional `window=252` | Saves an SVG line chart of adjusted close with SMA20/50/200; returns the file path, date range, start/end price, change, high and low |
 | `stock_correlation` | `ticker`, `other_ticker`, optional `window=252` | Correlation of log returns over identical date intervals |
 | `rank_stocks` | Optional `top_k=5`, `weights`, `filters`, `window=252` | Filtered, weighted percentile ranking using the original four metrics |
 
@@ -158,7 +223,7 @@ Volatility uses the latest 253 observations by default, yielding 252 returns. A 
 
 The data is a fixed 18 November 2026 snapshot, with completed prices through 17 November. It is not a live feed. Financial statement dates differ by company; vendor reporting labels and debt definitions retain the limitations in [the dataset notes](agent/data/README.md).
 
-The chat log (`logs/chat.jsonl`, or `--log PATH`) timestamps every event. Model calls and tool executions record their duration in seconds, model service failures are logged as `model_error`, and each turn ends with a `turn` event holding its status, total time, and model/tool call counts. Charts are saved as SVG files in a `charts/` folder next to the chat log and the path is printed after the answer; the web chat shows them under the answer.
+The chat log (`logs/chat.jsonl`, or `--log PATH`) stamps every event with a UTC time, the session ID and the turn ID. Model calls and tool executions record `duration_ms`; a turn ends with `turn_complete` (duration, evidence IDs, whether the tool-only fallback was used) or `turn_error` (error type and message), and a failed turn is rolled back. Rejected responses are logged as `model_format_error` (including replies cut off at the output limit) or `answer_validation_error`.
 
 Each successful request appends parameters, calculation time, formulas, inputs, dates, source URLs, underlying financial observations, values, and statuses to `logs/requests.jsonl` (or `--log PATH`). `--json` also prints the full result.
 
@@ -174,7 +239,7 @@ Tests cover all tickers, normalization, unknown symbols, independent numeric exa
 
 # Project Tasks
 
-Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysis**. Tasks are listed in suggested implementation order; completion status is not yet assessed.
+Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysis**. Tasks are listed in suggested implementation order; statuses below distinguish implemented code from pending real-model acceptance. Historical task ownership is retained; this branch does not assign new team responsibilities.
 
 | # | Task | Description | Done? | Responsible |
 |---|------|-----------|-------|-------------|
@@ -182,18 +247,18 @@ Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysi
 | 2 | Build the fixed dataset | Collect and clean financial statements and historical prices; save sources, snapshot date, and missing-data flags. | ✅ | DUAN Zihang Raymond |
 | 3 | Implement financial tools | Calculate and verify revenue growth, net profit margin, debt-to-equity, and historical volatility. | ✅ | DUAN Zihang Raymond |
 | 4 | Implement screening and ranking | Apply mandatory filters, normalize metrics, calculate weighted scores, and return configurable Top-K with score breakdowns. | ✅ | DUAN Zihang Raymond |
-| 5 | Implement historical trend tools | Calculate indicators and generate price charts; explain historical bullish/bearish signals without predicting prices. | X | |
+| 5 | Implement historical trend tools | Calculate indicators and generate price charts; explain historical bullish/bearish signals without predicting prices. | Implemented indicators and charts; live explanation review pending | |
 | 6 | Connect the TACC model | Confirm backend access, configure model calls, and validate structured tool requests and parameters. | ✅ | DUAN Zihang Raymond |
-| 7 | Build the three agent workflows | Route requests to individual stock analysis, recommendations, or trend analysis; execute the appropriate tools. | X | |
-| 8 | Add grounded explanations | Explain performance, risks, rankings, and trends using tool results; display the data date and check numerical consistency. | X | |
-| 9 | Add conversation memory | Preserve results and preferences; support comparisons, indicator questions, and revised screening criteria. | Partial Complete | DUAN Zihang Raymond |
-| 10 | Build backend reliability and logging | Handle invalid inputs, missing data, and service/tool errors; log model calls, tool executions, errors, and timings. | ? | |
-| 11 | Build the web interface | Support natural-language requests, execution progress, metrics, rankings, charts, and follow-up questions. | Partial Complete | DUAN Zihang Raymond |
+| 7 | Build the three agent workflows | Route requests to individual stock analysis, recommendations, or trend analysis; execute the appropriate tools. | Implemented shared tool loop; live routing acceptance pending | |
+| 8 | Add grounded explanations | Explain performance, risks, rankings, and trends using tool results; display the data date and check numerical consistency. | Deterministic numbers and citation guard implemented; qualitative review pending | |
+| 9 | Add conversation memory | Preserve results and preferences; support comparisons, indicator questions, and revised screening criteria. | Implemented state, conversations and restart snapshots; live follow-up acceptance pending | DUAN Zihang Raymond |
+| 10 | Build backend reliability and logging | Handle invalid inputs, missing data, and service/tool errors; log model calls, tool executions, errors, and timings. | Implemented validation, failure rollback, progress and timing logs | |
+| 11 | Build the web interface | Support natural-language requests, execution progress, metrics, rankings, charts, and follow-up questions. | Implemented charts, tables and conversation UI; local browser tested | DUAN Zihang Raymond |
 | 12 | Create the evaluation set | Cover all three workflows, follow-ups, and invalid/incomplete inputs; verify reference calculations, filters, rankings, and tool outputs. | ✅ | horoling |
 | 13 | Implement the baseline | Use another provider's general-purpose LLM without custom tools; keep prompts and applicable company context identical; record model/API settings. | ✅ | horoling |
 | 14 | Run and compare evaluations | Report numerical accuracy, recommendation quality, trend grounding, explanation grounding, follow-up success, and response time. | ✅ | horoling |
 | 15 | Analyze failures and limitations | Document at least one observed failure, its cause, and mitigation; acknowledge that different models prevent isolating tool-use effects. | ✅ | horoling |
-| 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | X | |
+| 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | Runnable app, tests and instructions provided; live demo/final results pending | |
 
 ## Task 1
 
@@ -267,7 +332,7 @@ Financial trends require matching annual periods and currencies and may use olde
 
 Annual trends exclude issuer quarterly supplements. Correlation matches both endpoints of each return interval. Invalid prices are rejected, and a constant return series yields undefined correlation.
 
-**Trend prediction status:** Indicator calculations are implemented, but there is no combined up/down/neutral forecast formula or model yet. Trend prediction is separate from ranking and still needs a defined forecast horizon, prediction rule/model, and backtesting. Historical indicators alone are not a validated prediction system.
+**Trend prediction status:** Indicator calculations are implemented, but there is no combined up/down/neutral forecast formula or model yet. Future-price prediction is outside the proposal scope; no forecast model or backtest is required for historical signal analysis. Historical indicators alone are not a validated prediction system.
 
 ## Task 2
 
@@ -307,14 +372,11 @@ User can send and receive message to/from TACC with correct tool calls.
 
 ## Task 9
 
-Current web chat interface can keep earlier messages and tool results so follow-up questions can refer to previous stocks, metrics, and screening criteria.
-But now only have one conversation, and "new conversation" feature is not added yet. So need to work on it later.
-
+The agent retains bounded recent messages plus explicit ranking history, filters, weights, windows and focused symbols. `reuse_previous=true` preserves unmodified ranking parameters. Browser conversations have independent IDs, local display histories and private server JSON snapshots. Failed turns roll back state. Long-term semantic memory and cross-job migration are outside this implementation.
 
 ## Task 11
 
-Current web chat is single conversation webpage, support natural language requests, it can display the execution progress (by outputing the tools used), metrics, rankings, and followup request.
-Need to further test markdown display, and implement multi-conversation feature, and chart display in the webchat.
+The browser renders financial tables, rankings, source/period details, historical adjusted-price/SMA and rolling-volatility charts, live worker phase updates and follow-ups. It supports new conversations, switching, reload recovery and JSON export. Model/user prose is rendered as text; numerical tables are built from evidence. Local browser smoke tests cover desktop and mobile behavior. Real TACC browser acceptance remains pending.
 
 
 ## Tasks 12 - 14
@@ -342,5 +404,15 @@ The agent column is the third Qwen run, made after the ranking fix. Scoring is a
 - Results vary between runs. `follow-01` failed in the second run (the model answered without calling the tool) and passed in the first and third.
 - "Qwen, no tools + raw data" has 4 cases that the service rejected with HTTP 400 (prompt too long for the 32K context), so that column is incomplete.
 - Earlier agent runs are kept for comparison: `results/old-agent-8-steps/` (6 tools, 8-step limit, 38/43) and `results/old-agent-before-ranking-fix/` (12-step limit, 38/43).
+
+**After merging the `complete_raw` branch (22 November 2026).** The table above was measured on the earlier agent, in which the model wrote every figure into its answer. The merged agent renders figures in evidence tables and the model writes a shorter cited explanation, so those Qwen numbers describe the previous version and the Qwen run has to be repeated on TACC. The merged agent was run on the same 43 cases with DeepSeek (`deepseek-flash`) as the model; results are in [evaluation/results/merged-agent-deepseek/](evaluation/results/merged-agent-deepseek/summary.md):
+
+| Agent version, DeepSeek as the model | Cases passed | Numerical accuracy | Exact ranking order | Mean time per turn | Tokens per turn |
+|---|---|---|---|---|---|
+| `main` before the merge | 93.0% (40/43) | 100% (55/55) | 100% (13/13) | 5.5 s | 13,261 |
+| `complete_raw` as pushed | 86.0% (37/43) | 100% (55/55) | 92.3% (12/13) | 2.8 s | 5,673 |
+| Merged | 95.3% (41/43) | 100% (55/55) | 100% (13/13) | 3.1 s | 5,703 |
+
+One run each, so differences of one or two cases are within run-to-run variation. Four of the six `complete_raw` failures were scoring errors (the scorer read ticker order from the rendered evidence text and missed three refusal wordings); the scorer now judges wording and ranking order on the model's explanation only. The remaining merged failures are `invalid-02` (asked "Show the metrics." with no company, the model shows Tencent instead of asking) and `ind-07` (scorer false negative).
 
 Task 15: observed failures, their causes and mitigations, scorer errors and limitations are written up in [evaluation/FAILURE_ANALYSIS.md](evaluation/FAILURE_ANALYSIS.md).

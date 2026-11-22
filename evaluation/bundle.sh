@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 mkdir -p agent_src/data
-for f in agent.py analysis_tools.py chat_agent.py tool_registry.py qwen_client.py deepseek_client.py; do
+for f in agent.py analysis_tools.py chat_agent.py tool_registry.py evidence.py session_store.py qwen_client.py deepseek_client.py; do
     cp -f "../agent/$f" agent_src/
 done
 cp -f ../agent/data/*.csv agent_src/data/

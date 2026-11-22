@@ -1,0 +1,81 @@
+{
+  "numeric_checks": [
+    {
+      "metric": "Revenue growth",
+      "actual": 10.992173611412227,
+      "reference": 10.992173611412218,
+      "passed": true
+    },
+    {
+      "metric": "Net profit margin",
+      "actual": 27.356495837097444,
+      "reference": 27.356495837097444,
+      "passed": true
+    },
+    {
+      "metric": "Debt-to-equity",
+      "actual": 0.4153953020329215,
+      "reference": 0.4153953020329215,
+      "passed": true
+    },
+    {
+      "metric": "Historical volatility",
+      "actual": 32.551206438735974,
+      "reference": 32.551206438735996,
+      "passed": true
+    },
+    {
+      "metric": "sma_20",
+      "actual": 396.0699996948242,
+      "reference": 396.0699996948242,
+      "passed": true
+    },
+    {
+      "metric": "sma_50",
+      "actual": 415.61999877929685,
+      "reference": 415.61999877929685,
+      "passed": true
+    },
+    {
+      "metric": "sma_200",
+      "actual": 464.87047622680666,
+      "reference": 464.87047622680666,
+      "passed": true
+    },
+    {
+      "metric": "maximum_drawdown",
+      "actual": -17.72428884026258,
+      "reference": -17.72428884026258,
+      "passed": true
+    }
+  ],
+  "ranking_checks": [
+    {
+      "top_k": 3,
+      "symbols": [
+        "0700.HK",
+        "1698.HK",
+        "9999.HK"
+      ],
+      "passed": true
+    },
+    {
+      "top_k": 5,
+      "symbols": [
+        "0700.HK",
+        "1698.HK",
+        "9999.HK",
+        "0300.HK",
+        "0981.HK"
+      ],
+      "passed": true
+    }
+  ],
+  "chart_checks": [
+    {
+      "points": 61,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

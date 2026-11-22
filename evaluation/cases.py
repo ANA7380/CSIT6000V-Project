@@ -14,13 +14,13 @@ FOUR = [GROWTH, MARGIN, DEBT, VOL]
 
 UNSUPPORTED = ['not supported', 'unsupported', 'unknown ticker', 'not in the', 'not available', 'unavailable',
                'not part of', 'not covered', 'not included', 'cannot find', 'could not find', "couldn't find",
-               'no data', 'not found', 'outside', '不支持', '未知', '不在', '无法', '没有', '未包含', '不包含']
+               'no data', 'not found', 'outside', 'not in this', 'no verified', 'cannot rank', "can't rank", '不支持', '未知', '不在', '无法', '没有', '未包含', '不包含']
 ASK_TICKER = ['which ticker', 'which stock', 'which company', 'specify', 'provide a ticker', 'provide the ticker',
               'please provide', 'let me know which', 'what ticker', '哪只', '哪个', '请提供', '请指定']
 NOT_AVAILABLE = ['not available', 'unavailable', 'not supported', 'cannot provide', 'no p/e', 'not provide',
                  'does not include', "doesn't include", 'not included', 'n/a', '不可用', '无法提供', '不提供', '没有', '不支持']
 NO_PREDICTION = ['cannot predict', "can't predict", 'can not predict', 'not predict', 'no prediction', 'unable to predict',
-                 'not a forecast', 'not forecast', 'no forecast', 'cannot forecast', 'not able to predict',
+                 'not a forecast', 'not forecast', 'no forecast', 'cannot forecast', "can't forecast", 'can not forecast', 'unable to forecast', 'not able to predict',
                  'no price target', 'not provide a price target', 'cannot provide a price target',
                  '无法预测', '不能预测', '不预测', '不作预测']
 INVALID_ARG = ['at least 2', 'between 2', 'invalid', 'must be', 'not valid', 'cannot be', 'nonnegative', 'non-negative',

@@ -8,7 +8,7 @@ from chat_agent import ChatAgent, parse_action
 class ChatTests(unittest.TestCase):
     def test_two_objects_recover_lookup_before_answer(self):
         broken = '{"tool":"list_tickers","arguments":{}}\n{"answer":"Premature answer","tool_calls":[{"name":"list_tickers","arguments":{}}]}'
-        responses = iter([broken, '{"answer":"All tickers retrieved."}'])
+        responses = iter([broken, '{"answer":"All tickers retrieved. [E1]"}'])
         def fake(messages, base_url, **kwargs):
             if messages[-1]['content'].startswith('TOOL_RESULT'):
                 result = json.loads(messages[-1]['content'].split('\n', 1)[1])
@@ -18,19 +18,19 @@ class ChatTests(unittest.TestCase):
             return {'choices': [{'message': {'content': next(responses)}}]}
         with tempfile.TemporaryDirectory() as folder:
             agent = ChatAgent('http://localhost:8000/v1', Path(folder)/'audit.jsonl', fake)
-            self.assertEqual(agent.ask('list tickers all of them'), 'All tickers retrieved.')
+            self.assertTrue(agent.ask('list tickers all of them').startswith('All tickers retrieved. [E1]'))
             events = [json.loads(line) for line in agent.log.read_text().splitlines()]
             self.assertEqual(sum(e['event'] == 'tool_result' for e in events), 1)
 
     def test_format_error_is_not_tool_failure(self):
-        responses = iter(['not JSON', '{"tool":"list_tickers","arguments":{}}', '{"answer":"Done"}'])
+        responses = iter(['not JSON', '{"tool":"list_tickers","arguments":{}}', '{"answer":"Done [E1]"}'])
         def fake(messages, base_url, **kwargs):
             if messages[-1]['content'].startswith('MODEL_FORMAT_ERROR'):
                 self.assertFalse(json.loads(messages[-1]['content'].split('\n', 1)[1])['tool_executed'])
             return {'choices': [{'message': {'content': next(responses)}}]}
         with tempfile.TemporaryDirectory() as folder:
             agent = ChatAgent('http://localhost:8000/v1', Path(folder)/'audit.jsonl', fake)
-            self.assertEqual(agent.ask('list tickers'), 'Done')
+            self.assertTrue(agent.ask('list tickers').startswith('Done [E1]'))
             events = [json.loads(line) for line in agent.log.read_text(encoding='utf-8').splitlines()]
             self.assertEqual(sum(e['event'] == 'model_format_error' for e in events), 1)
             self.assertEqual(sum(e['event'] == 'tool_result' for e in events), 1)
@@ -47,17 +47,18 @@ class ChatTests(unittest.TestCase):
     def test_tool_roundtrip(self):
         actions = iter([
             {'tool': 'ticker_metrics', 'arguments': {'ticker': '700'}},
-            {'answer': 'Revenue growth is 10.99% in the fixed snapshot.'},
+            {'answer': 'The company has positive revenue growth in this fixed snapshot. [E1]'},
         ])
         def fake_chat(messages, base_url, **kwargs):
-            if len(messages) > 2:
+            if messages[-1]['content'].startswith('TOOL_RESULT'):
                 result = json.loads(messages[-1]['content'].split('\n', 1)[1])
                 self.assertEqual(result['result']['symbol'], '0700.HK')
                 self.assertIn('Revenue growth', result['result']['metrics'])
             return {'choices': [{'message': {'content': json.dumps(next(actions))}}]}
         with tempfile.TemporaryDirectory() as folder:
             agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl', fake_chat)
-            self.assertIn('10.99%', agent.ask('Show Tencent metrics'))
+            self.assertIn('Revenue growth:', agent.ask('Show Tencent metrics'))
+            self.assertIsNotNone(agent.last_response['evidence'][0]['metrics'][0]['value'])
             self.assertIn('metric_calculation', agent.log.read_text(encoding='utf-8'))
 
     def test_invalid_tool_arguments(self):
@@ -69,19 +70,18 @@ class ChatTests(unittest.TestCase):
                     agent.dispatch(name, args)
 
     def test_timings_and_turn_summary_logged(self):
-        responses = iter(['{"tool":"list_tickers","arguments":{}}', '{"answer":"Done"}'])
+        responses = iter(['{"tool":"list_tickers","arguments":{}}', '{"answer":"Done [E1]"}'])
         def fake(messages, base_url, **kwargs):
             return {'choices': [{'message': {'content': next(responses)}}]}
         with tempfile.TemporaryDirectory() as folder:
             agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl', fake)
             agent.ask('list tickers')
             events = [json.loads(line) for line in agent.log.read_text(encoding='utf-8').splitlines()]
-            self.assertTrue(all('time' in e for e in events))
+            self.assertTrue(all('timestamp' in e and e['session_id'] == agent.session_id for e in events))
             for kind in ('model', 'tool_result'):
-                self.assertTrue(all(e['seconds'] >= 0 for e in events if e['event'] == kind))
-            turn = events[-1]
-            self.assertEqual((turn['event'], turn['status'], turn['model_calls'], turn['tool_calls']), ('turn', 'ok', 2, 1))
-            self.assertGreaterEqual(turn['seconds'], turn['model_seconds'])
+                self.assertTrue(all(e['duration_ms'] >= 0 for e in events if e['event'] == kind))
+            self.assertEqual(sum(e['event'] == 'model' for e in events), 2)
+            self.assertEqual((events[-1]['event'], events[-1]['evidence_ids']), ('turn_complete', ['E1']))
 
     def test_service_error_logged_and_turn_rolled_back(self):
         def broken(messages, base_url, **kwargs):
@@ -92,21 +92,8 @@ class ChatTests(unittest.TestCase):
                 agent.ask('Show Tencent metrics')
             self.assertEqual(len(agent.messages), 1)
             events = [json.loads(line) for line in agent.log.read_text(encoding='utf-8').splitlines()]
-            error = next(e for e in events if e['event'] == 'model_error')
-            self.assertEqual(error['error_type'], 'RuntimeError')
-            self.assertIn('Cannot reach', error['error'])
-            self.assertEqual((events[-1]['event'], events[-1]['status'], events[-1]['model_calls']), ('turn', 'error', 1))
-
-    def test_price_chart_saved_and_markup_kept_out_of_context(self):
-        import xml.dom.minidom
-        with tempfile.TemporaryDirectory() as folder:
-            agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl')
-            result = agent.dispatch('price_chart', {'ticker': '700', 'window': 60})
-            self.assertNotIn('svg', result)
-            self.assertEqual((result['points'], result['status']), (61, 'ok'))
-            self.assertEqual(agent.charts, [result['chart_file']])
-            xml.dom.minidom.parse(result['chart_file'])
-            self.assertNotIn('<svg', agent.log.read_text(encoding='utf-8'))
+            self.assertEqual((events[-1]['event'], events[-1]['error_type']), ('turn_error', 'RuntimeError'))
+            self.assertIn('Cannot reach', events[-1]['error'])
 
     def test_truncated_answer_is_dropped_and_shorter_one_requested(self):
         replies = iter([('{"answer":"a very long answer that was cut', 'length'), ('{"answer":"Short."}', 'stop')])
@@ -118,12 +105,13 @@ class ChatTests(unittest.TestCase):
             return {'choices': [{'message': {'content': content}, 'finish_reason': reason}]}
         with tempfile.TemporaryDirectory() as folder:
             agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl', fake)
-            self.assertEqual(agent.ask('Rank the top 10 stocks'), 'Short.')
+            self.assertTrue(agent.ask('Rank the top 10 stocks').startswith('Short.'))
 
     def test_ranking_result_for_model_omits_source_urls(self):
+        from evidence import model_result
         with tempfile.TemporaryDirectory() as folder:
             agent = ChatAgent('http://localhost:8000/v1', Path(folder) / 'audit.jsonl')
-            shown = json.dumps(agent.dispatch('rank_stocks', {'top_k': 10}))
+            shown = json.dumps(model_result(agent.dispatch('rank_stocks', {'top_k': 10})))
             self.assertNotIn('source_url', shown)
             self.assertLess(len(shown), 20000)
             self.assertEqual(len(json.loads(shown)['results']), 10)

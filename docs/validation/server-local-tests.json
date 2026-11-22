@@ -1,0 +1,10 @@
+{
+  "tests": 41,
+  "failures": 0,
+  "errors": 0,
+  "runtime": "Python 3.10",
+  "result": "passed",
+  "added_case": "Single leading system message; grounded crossover label; Unicode numerical guard; bounded explanation repair",
+  "source_log": "Final local regression, including real loopback HTTP tests",
+  "duration_seconds": 9.314
+}

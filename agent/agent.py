@@ -39,7 +39,7 @@ class TickerAgent:
         return ticker
 
     def run(self, ticker, window=252):
-        if window < 2:
+        if type(window) is not int or not 2 <= window <= 5000:
             raise ValueError("Volatility window must be at least 2 returns.")
         symbol = self.normalize(ticker)
         row = self.snapshot[symbol]

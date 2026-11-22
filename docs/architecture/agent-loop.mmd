@@ -1,0 +1,15 @@
+flowchart TD
+  A[输入校验 备份状态] --> B[构建唯一 system 状态和历史]
+  B --> C[LLM 决策]
+  C --> D{JSON 协议校验}
+  D -->|tool| E[白名单工具执行]
+  E --> F[保存证据 更新状态 追加 TOOL_RESULT]
+  F --> B
+  D -->|answer| G{解释和引用校验}
+  D -->|格式错误| M[MODEL_FORMAT_ERROR]
+  M --> B
+  G -->|第一次失败| R[ANSWER_VALIDATION_ERROR]
+  R --> B
+  G -->|通过| H[结构化输出与持久化]
+  G -->|累计两次失败| K[有本轮证据则降级 否则报错]
+  C -.最多12次模型调用.-> K

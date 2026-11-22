@@ -71,7 +71,9 @@ class AgentSystem:
 
     def ask(self, prompt):
         self.agent.events.clear()
-        answer = self.agent.ask(prompt)
+        self.explanation = None
+        answer = self.agent.ask(prompt)       # explanation followed by the rendered tool evidence
+        self.explanation = (self.agent.last_response or {}).get('answer')
         return answer
 
     def trace(self):
@@ -82,7 +84,10 @@ class AgentSystem:
         for e in events:                      # only what the model was actually shown
             if e['event'] == 'tool_result' and 'result' in e:
                 flatten_numbers(e['result'], evidence)
-        return {'tool_calls': tools, 'format_errors': sum(e['event'] == 'model_format_error' for e in events),
+        return {'explanation': self.explanation, 'tool_calls': tools,
+                'format_errors': sum(e['event'] == 'model_format_error' for e in events),
+                'validation_errors': sum(e['event'] == 'answer_validation_error' for e in events),
+                'fallback': bool((self.agent.last_response or {}).get('fallback')),
                 'evidence': sorted(set(round(x, 8) for x in evidence))}
 
 
