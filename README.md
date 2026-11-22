@@ -32,6 +32,10 @@ See the [server deployment guide](docs/服务器部署指南.md) for configurati
 
 The [Chinese technical architecture report](docs/项目技术架构报告.md) explains the TACC environment, frontend/backend data flow, Agent loop, actual prompts and all six tools. A [standalone HTML reading version](docs/项目技术架构报告.html) includes embedded diagrams.
 
+## Merged version (22 November 2026)
+
+This version combines two lines of work. **zeron90** wrote the evidence-based agent loop, the browser interface with multiple conversations, conversation snapshots, the co-located TACC deployment and the architecture documents (branch `complete_raw`). **horoling** wrote the 43-case evaluation, the baselines, the results and failure analysis, and the fixes for malformed and cut-off model replies. The base agent, dataset and first web chat are by **DUAN Zihang Raymond**. How the two were combined and compared is described under Tasks 12 - 14.
+
 ## Implementation update on the proposal-completion branch
 
 This branch adds deterministic evidence tables, historical price/SMA and rolling-volatility charts, validated numerical presentation, reusable ranking preferences, multiple browser conversations, private restart snapshots, worker progress events, a local browser server, independent offline references and a genuine **no-tool** baseline runner. It keeps the original fixed CSVs and the single-agent architecture.
@@ -247,18 +251,18 @@ Based on the proposal: **An Explainable AI Agent for Stock Screening and Analysi
 | 2 | Build the fixed dataset | Collect and clean financial statements and historical prices; save sources, snapshot date, and missing-data flags. | ✅ | DUAN Zihang Raymond |
 | 3 | Implement financial tools | Calculate and verify revenue growth, net profit margin, debt-to-equity, and historical volatility. | ✅ | DUAN Zihang Raymond |
 | 4 | Implement screening and ranking | Apply mandatory filters, normalize metrics, calculate weighted scores, and return configurable Top-K with score breakdowns. | ✅ | DUAN Zihang Raymond |
-| 5 | Implement historical trend tools | Calculate indicators and generate price charts; explain historical bullish/bearish signals without predicting prices. | Implemented indicators and charts; live explanation review pending | |
+| 5 | Implement historical trend tools | Calculate indicators and generate price charts; explain historical bullish/bearish signals without predicting prices. | Implemented indicators and charts; live explanation review pending | zeron90 |
 | 6 | Connect the TACC model | Confirm backend access, configure model calls, and validate structured tool requests and parameters. | ✅ | DUAN Zihang Raymond |
-| 7 | Build the three agent workflows | Route requests to individual stock analysis, recommendations, or trend analysis; execute the appropriate tools. | Implemented shared tool loop; live routing acceptance pending | |
-| 8 | Add grounded explanations | Explain performance, risks, rankings, and trends using tool results; display the data date and check numerical consistency. | Deterministic numbers and citation guard implemented; qualitative review pending | |
-| 9 | Add conversation memory | Preserve results and preferences; support comparisons, indicator questions, and revised screening criteria. | Implemented state, conversations and restart snapshots; live follow-up acceptance pending | DUAN Zihang Raymond |
-| 10 | Build backend reliability and logging | Handle invalid inputs, missing data, and service/tool errors; log model calls, tool executions, errors, and timings. | Implemented validation, failure rollback, progress and timing logs | |
-| 11 | Build the web interface | Support natural-language requests, execution progress, metrics, rankings, charts, and follow-up questions. | Implemented charts, tables and conversation UI; local browser tested | DUAN Zihang Raymond |
-| 12 | Create the evaluation set | Cover all three workflows, follow-ups, and invalid/incomplete inputs; verify reference calculations, filters, rankings, and tool outputs. | ✅ | horoling |
+| 7 | Build the three agent workflows | Route requests to individual stock analysis, recommendations, or trend analysis; execute the appropriate tools. | Implemented shared tool loop; live routing acceptance pending | zeron90 |
+| 8 | Add grounded explanations | Explain performance, risks, rankings, and trends using tool results; display the data date and check numerical consistency. | Deterministic numbers and citation guard implemented; qualitative review pending | zeron90 |
+| 9 | Add conversation memory | Preserve results and preferences; support comparisons, indicator questions, and revised screening criteria. | Implemented state, conversations and restart snapshots; live follow-up acceptance pending | DUAN Zihang Raymond, zeron90 |
+| 10 | Build backend reliability and logging | Handle invalid inputs, missing data, and service/tool errors; log model calls, tool executions, errors, and timings. | Implemented validation, failure rollback, progress and timing logs | zeron90, horoling |
+| 11 | Build the web interface | Support natural-language requests, execution progress, metrics, rankings, charts, and follow-up questions. | Implemented charts, tables and conversation UI; local browser tested | DUAN Zihang Raymond, zeron90, horoling |
+| 12 | Create the evaluation set | Cover all three workflows, follow-ups, and invalid/incomplete inputs; verify reference calculations, filters, rankings, and tool outputs. | ✅ | horoling, zeron90 |
 | 13 | Implement the baseline | Use another provider's general-purpose LLM without custom tools; keep prompts and applicable company context identical; record model/API settings. | ✅ | horoling |
 | 14 | Run and compare evaluations | Report numerical accuracy, recommendation quality, trend grounding, explanation grounding, follow-up success, and response time. | ✅ | horoling |
 | 15 | Analyze failures and limitations | Document at least one observed failure, its cause, and mitigation; acknowledge that different models prevent isolating tool-use effects. | ✅ | horoling |
-| 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | Runnable app, tests and instructions provided; live demo/final results pending | |
+| 16 | Package and demonstrate | Deliver the working app, source repository, evaluation results, tested demo, and reproducible setup instructions. | Runnable app, tests and instructions provided; live demo/final results pending | zeron90, horoling |
 
 ## Task 1
 
